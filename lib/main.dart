@@ -79,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                     icon: const Icon(Icons.create_outlined),
                     label: TranslateText(
-                      'Create new coupler',
+                      'Create/edit coupler',
                       language: settings.language,
                     ),
                   ),
@@ -111,8 +111,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                         : selectedName,
                                     items: localStored
                                         .map((e) => DropdownMenuItem<String>(
-                                              child: Text(e),
                                               value: e,
+                                              child: Text(e),
                                             ))
                                         .toList(),
                                     onChanged: (String? variant) {
@@ -208,9 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   label: TranslateText('Hide',
                                       language: settings.language)),
                               TextButton.icon(
-                                  onPressed: () {
-                                    settings.saveSettings();
-                                  },
+                                  onPressed: () => settings.saveSettings(),
                                   icon: const Icon(Icons.save_outlined),
                                   label: TranslateText('Save to device',
                                       language: settings.language)),

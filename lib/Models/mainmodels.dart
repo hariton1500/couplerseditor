@@ -10,11 +10,13 @@ class CableEnd {
   int sideIndex;
   String direction;
   int fibersNumber;
+  String colorScheme;
   Map<int, double> fiberPosY = {};
   CableEnd(
       {required this.fibersNumber,
       required this.direction,
-      required this.sideIndex});
+      required this.sideIndex,
+      required this.colorScheme});
 
   Widget widget(List<Color> colors) {
     return Column(
@@ -48,6 +50,7 @@ class CableEnd {
         direction: json["direction"],
         sideIndex: json["sideIndex"],
         fibersNumber: json["fibersNumber"],
+        colorScheme: json['colorScheme'],
       );
 }
 
@@ -77,37 +80,11 @@ class Connection {
 }
 
 class Mufta {
-  List<Color> colors = [
-    Colors.blue,
-    Colors.orange,
-    Colors.green,
-    Colors.brown,
-    Colors.grey,
-    Colors.white,
-    Colors.red,
-    Colors.black,
-    Colors.yellow,
-    Colors.purple,
-    Colors.pink,
-    Colors.indigo,
-    Colors.blue,
-    Colors.orange,
-    Colors.green,
-    Colors.brown,
-    Colors.grey,
-    Colors.white,
-    Colors.red,
-    Colors.black,
-    Colors.yellow,
-    Colors.purple,
-    Colors.pink,
-    Colors.indigo
-  ];
-
   Mufta({
     required this.name,
     required this.cables,
-    required this.connections, this.location,
+    required this.connections,
+    this.location,
   });
 
   String name = '';
@@ -123,13 +100,12 @@ class Mufta {
         'location': location?.toJson()
       };
   factory Mufta.fromJson(Map<String, dynamic> json) => Mufta(
-        name: json["name"],
-        cables: List<CableEnd>.from(
-            json["cables"].map((x) => CableEnd.fromJson(x))),
-        connections: List<Connection>.from(
-            json["connections"].map((x) => Connection.fromJson(x))),
-        location: json["location"]
-      );
+      name: json["name"],
+      cables:
+          List<CableEnd>.from(json["cables"].map((x) => CableEnd.fromJson(x))),
+      connections: List<Connection>.from(
+          json["connections"].map((x) => Connection.fromJson(x))),
+      location: json["location"]);
 }
 
 class Settings {
@@ -144,9 +120,8 @@ class Settings {
 
   void saveSettings() async {
     SharedPreferences shared = await SharedPreferences.getInstance();
-    shared.setString(
-        'settings',
-        jsonEncode(
-            {'couplersListUrl': couplersListUrl, 'couplerUrl': couplerUrl, 'language': language}));
+    shared.setString('couplersListUrl', couplersListUrl);
+    shared.setString('couplerUrl', couplerUrl);
+    shared.setString('language', language);
   }
 }

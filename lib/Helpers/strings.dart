@@ -133,9 +133,9 @@ Map<String, Map<String, String>> strings = {
     'en': 'Load from URL',
     'ru': 'Загрузить по URL',
   },
-  'Create new coupler': {
-    'en': 'Create new coupler',
-    'ru': 'Создать новую муфту',
+  'Create/edit coupler': {
+    'en': 'Create/edit coupler',
+    'ru': 'Создать/редактировать муфту',
   },
   'Location:': {
     'en': 'Location:',
@@ -145,6 +145,7 @@ Map<String, Map<String, String>> strings = {
     'en': 'Location Picker',
     'ru': 'Выбор расположения',
   },
+  'Marking:': {'en': 'Marking', 'ru': 'Маркировка:'}
 };
 
 class TranslateText extends Text {
