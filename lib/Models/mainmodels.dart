@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:coupolerseditor/Helpers/fibercolors.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,13 +45,14 @@ class CableEnd {
         'direction': direction,
         'sideIndex': sideIndex,
         'fibersNumber': fibersNumber,
+        'colorScheme': colorScheme
         //'fiberPosY': fiberPosY
       };
   factory CableEnd.fromJson(Map<String, dynamic> json) => CableEnd(
         direction: json["direction"],
         sideIndex: json["sideIndex"],
         fibersNumber: json["fibersNumber"],
-        colorScheme: json['colorScheme'],
+        colorScheme: json['colorScheme'] ?? fiberColors.keys.first,
       );
 }
 
@@ -97,7 +99,7 @@ class Mufta {
         'name': name,
         'cables': cables, //?.map((e) => e.toJson()).toList(),
         'connections': connections, //?.map((e) => e.toJson()).toList()
-        'location': location?.toJson()
+        'location': location
       };
   factory Mufta.fromJson(Map<String, dynamic> json) => Mufta(
       name: json["name"],

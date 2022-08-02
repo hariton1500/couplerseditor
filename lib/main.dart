@@ -57,15 +57,17 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       //appBar: AppBar(),
       body: isShowMuftu
-          ? MuftaScreen(
-              lang: settings.language,
-              mufta: mufta,
-              callback: () {
-                //print('recieved callback');
-                setState(() {
-                  isShowMuftu = false;
-                });
-              },
+          ? SafeArea(
+              child: MuftaScreen(
+                lang: settings.language,
+                mufta: mufta,
+                callback: () {
+                  //print('recieved callback');
+                  setState(() {
+                    isShowMuftu = false;
+                  });
+                },
+              ),
             )
           : SafeArea(
               child: Column(

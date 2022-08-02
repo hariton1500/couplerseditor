@@ -41,9 +41,10 @@ class MuftaScreenState extends State<MuftaScreen> {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               TranslateText('Coupler name:', language: widget.lang),
               TextButton(
@@ -75,36 +76,35 @@ class MuftaScreenState extends State<MuftaScreen> {
                   },
                   child: TranslateText(
                       widget.mufta.name == '' ? 'NoName' : widget.mufta.name)),
-              TextButton(
-                  onPressed: () => showDialog<ll.LatLng>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: TranslateText(
-                            'Location Picker',
-                            language: widget.lang,
-                          ),
-                          content: const LocationPicker(),
-                        );
-                      }).then((value) => setState(() {
-                        widget.mufta.location = value;
-                      })),
-                  child: Row(
-                    children: [
-                      TranslateText(
-                        'Location:',
-                        language: widget.lang,
-                      ),
-                      Text((widget.mufta.location != null
-                          ? widget.mufta.location!
-                              .toJson()['coordinates']
-                              .toString()
-                          : ''))
-                    ],
-                  ))
             ],
           ),
-          //const SizedBox(height: 30,),
+          TextButton(
+              onPressed: () => showDialog<ll.LatLng>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: TranslateText(
+                        'Location Picker',
+                        language: widget.lang,
+                      ),
+                      content: const LocationPicker(),
+                    );
+                  }).then((value) => setState(() {
+                    widget.mufta.location = value;
+                  })),
+              child: Row(
+                children: [
+                  TranslateText(
+                    'Location:',
+                    language: widget.lang,
+                  ),
+                  Text((widget.mufta.location != null
+                      ? widget.mufta.location!
+                          .toJson()['coordinates']
+                          .toString()
+                      : ''))
+                ],
+              )),
           GestureDetector(
             onTapDown: (details) {
               //print(details.localPosition);
