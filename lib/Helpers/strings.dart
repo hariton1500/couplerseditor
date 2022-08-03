@@ -145,7 +145,15 @@ Map<String, Map<String, String>> strings = {
     'en': 'Location Picker',
     'ru': 'Выбор расположения',
   },
-  'Marking:': {'en': 'Marking', 'ru': 'Маркировка:'}
+  'Marking:': {'en': 'Marking', 'ru': 'Маркировка:'},
+  'Edit / View fiber comments:': {
+    'en': 'Edit / View fiber comments:',
+    'ru': 'Редактирование/Просмотр:'
+  },
+  'Edit/View fibers': {
+    'en': 'Edit/View fibers',
+    'ru': 'Редактирование/Просмотр волокон'
+  }
 };
 
 class TranslateText extends Text {

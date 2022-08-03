@@ -12,12 +12,16 @@ class CableEnd {
   String direction;
   int fibersNumber;
   String colorScheme;
+  List<String> fiberComments = [];
   Map<int, double> fiberPosY = {};
   CableEnd(
       {required this.fibersNumber,
       required this.direction,
       required this.sideIndex,
-      required this.colorScheme});
+      required this.colorScheme,
+      required this.fiberComments}) {
+    fiberComments = List.filled(fibersNumber, '');
+  }
 
   Widget widget(List<Color> colors) {
     return Column(
@@ -45,15 +49,15 @@ class CableEnd {
         'direction': direction,
         'sideIndex': sideIndex,
         'fibersNumber': fibersNumber,
-        'colorScheme': colorScheme
-        //'fiberPosY': fiberPosY
+        'colorScheme': colorScheme,
+        'fiberComments': fiberComments
       };
   factory CableEnd.fromJson(Map<String, dynamic> json) => CableEnd(
-        direction: json["direction"],
-        sideIndex: json["sideIndex"],
-        fibersNumber: json["fibersNumber"],
-        colorScheme: json['colorScheme'] ?? fiberColors.keys.first,
-      );
+      direction: json["direction"],
+      sideIndex: json["sideIndex"],
+      fibersNumber: json["fibersNumber"],
+      colorScheme: json['colorScheme'] ?? fiberColors.keys.first,
+      fiberComments: json['fiberComments']);
 }
 
 class Connection {
