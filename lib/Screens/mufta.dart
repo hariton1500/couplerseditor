@@ -50,10 +50,13 @@ class MuftaScreenState extends State<MuftaScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+          Wrap(
+            //mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              TranslateText('Coupler name:', language: widget.lang),
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: TranslateText('Coupler name:', language: widget.lang),
+              ),
               TextButton(
                   onPressed: () {
                     showDialog<String>(
@@ -81,8 +84,11 @@ class MuftaScreenState extends State<MuftaScreen> {
                       });
                     });
                   },
-                  child: Text(widget.mufta.name == '' ? 'NoName' : widget.mufta.name, softWrap: true, maxLines: 2,)
-                ),
+                  child: Text(
+                    widget.mufta.name == '' ? 'NoName' : widget.mufta.name,
+                    softWrap: true,
+                    maxLines: 2,
+                  )),
             ],
           ),
           TextButton(
@@ -649,21 +655,22 @@ class MuftaScreenState extends State<MuftaScreen> {
                                           }),
                                       exportVariant == variants[0].value
                                           ? Column(
-                                            children: [
-                                              const Text(
-                                                  'exporting device:'),
-                                              TranslateText(widget.mufta.name, language: widget.lang)
-                                            ],
-                                          )
+                                              children: [
+                                                const Text('exporting device:'),
+                                                TranslateText(widget.mufta.name,
+                                                    language: widget.lang)
+                                              ],
+                                            )
                                           : Container(),
                                       exportVariant == variants[1].value
                                           ? Column(
-                                            children: [
-                                              const Text(
-                                                  'exporting to:'),
-                                              TranslateText(settings.couplerUrl, language: widget.lang)
-                                            ],
-                                          )
+                                              children: [
+                                                const Text('exporting to:'),
+                                                TranslateText(
+                                                    settings.couplerUrl,
+                                                    language: widget.lang)
+                                              ],
+                                            )
                                           : Container()
                                     ],
                                   ),
@@ -717,7 +724,9 @@ class MuftaScreenState extends State<MuftaScreen> {
                                   icon: const Icon(Icons.delete_outline),
                                   label: TranslateText('Delete')),
                               Text(
-                                  '${widget.mufta.cables[c.cableIndex1].direction}[${c.fiberNumber1 + 1}] <--> ${widget.mufta.cables[c.cableIndex2].direction}[${c.fiberNumber2 + 1}]', maxLines: 2,),
+                                '${widget.mufta.cables[c.cableIndex1].direction}[${c.fiberNumber1 + 1}] <--> ${widget.mufta.cables[c.cableIndex2].direction}[${c.fiberNumber2 + 1}]',
+                                maxLines: 2,
+                              ),
                             ],
                           ))
                       .toList(),

@@ -153,7 +153,28 @@ Map<String, Map<String, String>> strings = {
   'Edit/View fibers': {
     'en': 'Edit/View fibers',
     'ru': 'Редактирование/Просмотр волокон'
-  }
+  },
+  'List of couplers from billing': {
+    'en': 'List of couplers from billing',
+    'ru': 'Список муфт из биллинга'
+  },
+  'List of couplers from device': {
+    'en': 'List of couplers from device',
+    'ru': 'Список муфт из устройства'
+  },
+  'List of couplers is Loading or Empty': {
+    'en': 'List of couplers is Loading or Empty',
+    'ru': 'Список муфт загружается или пуст'
+  },
+  'Delete coupler': {'en': 'Delete coupler', 'ru': 'Удалить муфту'},
+  'Are you sure you want to delete coupler?': {
+    'en': 'Are you sure you want to delete coupler?',
+    'ru': 'Вы уверены, что хотите удалить муфту?'
+  },
+  'Load from billing software (json)': {
+    'en': 'Load from billing software (json)',
+    'ru': 'Загрузить из биллинга (json)'
+  },
 };
 
 class TranslateText extends Text {

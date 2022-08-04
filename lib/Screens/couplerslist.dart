@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:coupolerseditor/Helpers/epsg3395.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
@@ -30,6 +31,8 @@ class _CouplersListState extends State<CouplersList> {
 
   final MapController _mapController = MapController();
 
+  int? selectedCouplerIndex;
+
   @override
   void initState() {
     print('isFromBilling: ${widget.isFromBilling}');
@@ -57,12 +60,21 @@ class _CouplersListState extends State<CouplersList> {
                   showAsMap = !showAsMap;
                 });
               },
-            )
+            ),
+            selectedCouplerIndex != null
+                ? IconButton(
+                    icon: const Icon(Icons.check_rounded),
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pop(couplers[selectedCouplerIndex!]);
+                    },
+                  )
+                : Container(),
           ],
         ),
         body: Center(
           child: couplers.isEmpty
-              ? TranslateText('List of couplers is Loading...',
+              ? TranslateText('List of couplers is Loading or Empty',
                   language: widget.lang)
               : !showAsMap
                   ? ListView.builder(
@@ -73,7 +85,45 @@ class _CouplersListState extends State<CouplersList> {
                         return ListTile(
                           leading: IconButton(
                             icon: const Icon(Icons.delete_rounded),
-                            onPressed: () {},
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: TranslateText(
+                                    'Delete coupler',
+                                    language: widget.lang,
+                                  ),
+                                  content: TranslateText(
+                                    'Are you sure you want to delete coupler?',
+                                    language: widget.lang,
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      child: TranslateText(
+                                        'Cancel',
+                                        language: widget.lang,
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: TranslateText(
+                                        'Delete',
+                                        language: widget.lang,
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        removeCoupler(coupler['name']);
+                                        setState(() {
+                                          couplers.removeAt(index);
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                           title: Text(coupler.toString()),
                         );
@@ -81,20 +131,32 @@ class _CouplersListState extends State<CouplersList> {
                     )
                   : FlutterMap(
                       options: MapOptions(
+                          crs: const Epsg3395(),
                           controller: _mapController,
                           center: LatLng(45.200834, 33.351089),
                           zoom: 16.0,
-                          maxZoom: 18.0),
+                          maxZoom: 18.0,
+                          onTap: (tapPos, latlng) {
+                            print(tapPos.relative.toString());
+                            setState(() {
+                              selectedCouplerIndex = null;
+                            });
+                          }),
                       layers: [
+                        /*
                         TileLayerOptions(
                             urlTemplate:
                                 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=ru-RU&scale=1&xss=1&yss=1&s=G5zdHJ1c3Q%3D&client=gme-google&style=api%3A1.0.0&key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'),
+                        */
                         /*
                         TileLayerOptions(
                           urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                           subdomains: ['a', 'b', 'c'],
                         ),
                         */
+                        TileLayerOptions(
+                            urlTemplate:
+                                'https://core-sat.maps.yandex.net/tiles?l=sat&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU'),
                         MarkerLayerOptions(
                           markers: couplers.map((e) {
                             Map<String, dynamic> coupler = jsonDecode(e);
@@ -104,19 +166,21 @@ class _CouplersListState extends State<CouplersList> {
                               point: LatLng(
                                   coupler['location']['coordinates'][1],
                                   coupler['location']['coordinates'][0]),
-                              builder: (ctx) => IconButton(
-                                autofocus: true,
-                                icon: const Icon(Icons.location_on),
-                                onPressed: () {
-                                  _mapController.move(
-                                      LatLng(
-                                          coupler['location']['coordinates'][1],
-                                          coupler['location']['coordinates']
-                                              [0]),
-                                      16);
-                                  print('clicked on marker ${coupler['name']}');
-                                },
-                              ),
+                              builder: (ctx) =>
+                                  selectedCouplerIndex != couplers.indexOf(e)
+                                      ? IconButton(
+                                          autofocus: true,
+                                          icon: const Icon(Icons.location_on),
+                                          onPressed: () {
+                                            print(
+                                                'clicked on marker ${coupler['name']}');
+                                            setState(() {
+                                              selectedCouplerIndex =
+                                                  couplers.indexOf(e);
+                                            });
+                                          },
+                                        )
+                                      : Text(coupler['name']),
                             );
                           }).toList(),
                         ),
@@ -141,5 +205,10 @@ class _CouplersListState extends State<CouplersList> {
               sharedPreferences.getString(codedCouplerKey) ?? '')
           .toList();
     });
+  }
+
+  void removeCoupler(String couplerName) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.remove('coupler: $couplerName');
   }
 }

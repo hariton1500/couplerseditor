@@ -57,7 +57,7 @@ class CableEnd {
       sideIndex: json["sideIndex"],
       fibersNumber: json["fibersNumber"],
       colorScheme: json['colorScheme'] ?? fiberColors.keys.first,
-      fiberComments: json['fiberComments']);
+      fiberComments: List.castFrom<dynamic, String>(json['fiberComments']));
 }
 
 class Connection {
@@ -113,7 +113,7 @@ class Mufta {
           List<CableEnd>.from(json['cables'].map((x) => CableEnd.fromJson(x))),
       connections: List<Connection>.from(
           json['connections'].map((x) => Connection.fromJson(x))),
-      location: json['location']);
+      location: LatLng.fromJson(json['location']));
 
   /*
   fromJson(String json) {
@@ -131,7 +131,7 @@ class Mufta {
       'name': name,
       'cables': cables,
       'connections': connections,
-      'location': location
+      'location': location!.toJson()
     });
   }
 
