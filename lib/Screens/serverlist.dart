@@ -80,7 +80,7 @@ class _ServerListState extends State<ServerList> {
                         icon: const Icon(Icons.location_on),
                         onPressed: () {
                           _mapController.move(
-                              LatLng(coupler['latitude'], coupler['longitude']), 16);
+                              LatLng(coupler['location']['latitude'], coupler['location']['longitude']), 16);
                         },
                       ),
                     );
