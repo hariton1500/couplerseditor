@@ -114,8 +114,6 @@ class MuftaScreenState extends State<MuftaScreen> {
               )),
           GestureDetector(
             onTapDown: (details) {
-              //print(details.localPosition);
-              //print(widget.mufta.cables!.length);
               int index = widget.mufta.cables.indexWhere((cable) {
                 double x = cable.sideIndex == 0
                     ? 50

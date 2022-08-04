@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Mufta muftaFromJson(String str) => Mufta.fromJson(json.decode(str));
-String muftaToJson(Mufta data) => json.encode(data.toJson());
+//Mufta muftaFromJson(String str) => Mufta.fromJson(json.decode(str));
+//String muftaToJson(Mufta data) => json.encode(data.toJson());
 
 class CableEnd {
   int sideIndex;
@@ -134,11 +134,12 @@ class Mufta {
       'location': location
     });
   }
-  
+
   void saveToLocal() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String jsonString = toJson();
-    sharedPreferences.setString(name, jsonString);
+    print('saving to local: $jsonString');
+    sharedPreferences.setString('coupler: $name', jsonString);
   }
 }
 

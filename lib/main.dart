@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'Helpers/strings.dart';
 import 'Models/mainmodels.dart';
 import 'Screens/mufta.dart';
-import 'Screens/serverlist.dart';
+import 'Screens/couplerslist.dart';
 
 void main() {
   runApp(const MyApp());
@@ -88,34 +88,54 @@ class _MyHomePageState extends State<MyHomePage> {
                       language: settings.language,
                     ),
                   ),
-                  Row(
+                  Wrap(
                     children: [
-                      TextButton.icon(onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute<String>(
-                          builder: (context) => ServerList(
-                            lang: settings.language,
-                            serverListURL: settings.couplersListUrl,
-                          ),
-                        )).then((value) {
-                          setState(() {
-                            if (value != null) {
-                              mufta = Mufta.fromJson(jsonDecode(value));
-                            }
-                          });
-                        });
-                      }, icon: const Icon(Icons.wifi_tethering), label: TranslateText('Import from billing software (json)', language: settings.language)),
                       TextButton.icon(
                           onPressed: () {
-                            setState(() {
-                              loadNames().then((value) => localStored = value);
-                              isShowImport = !isShowImport;
+                            Navigator.of(context)
+                                .push(MaterialPageRoute<String>(
+                              builder: (context) => CouplersList(
+                                isFromBilling: true,
+                                lang: settings.language,
+                                couplersListURL: settings.couplersListUrl,
+                              ),
+                            ))
+                                .then((value) {
+                              setState(() {
+                                if (value != null) {
+                                  mufta = Mufta.fromJson(jsonDecode(value));
+                                }
+                              });
                             });
                           },
-                          icon: const Icon(Icons.import_export_outlined),
-                          label:
-                              TranslateText('Import from device', language: settings.language)),
+                          icon: const Icon(Icons.download_rounded),
+                          label: TranslateText(
+                              'Load from billing software (json)',
+                              language: settings.language)),
+                      TextButton.icon(
+                          onPressed: () {
+                            Navigator.of(context)
+                                .push(MaterialPageRoute<String>(
+                              builder: (context) => CouplersList(
+                                isFromBilling: false,
+                                lang: settings.language,
+                                couplersListURL: settings.couplersListUrl,
+                              ),
+                            ))
+                                .then((value) {
+                              setState(() {
+                                if (value != null) {
+                                  mufta = Mufta.fromJson(jsonDecode(value));
+                                }
+                              });
+                            });
+                          },
+                          icon: const Icon(Icons.download_for_offline_rounded),
+                          label: TranslateText('Load from device',
+                              language: settings.language)),
                     ],
                   ),
+                  /*
                   if (isShowImport) ...[
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -169,6 +189,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                   ],
+                  */
                   TextButton.icon(
                       onPressed: () {
                         setState(() {
