@@ -26,6 +26,13 @@ class MuftaScreenState extends State<MuftaScreen> {
   int? isCableSelected;
   int longestSideHeight = 10;
   bool isShowAddConnections = false;
+  Settings settings = Settings();
+
+  @override
+  void initState() {
+    super.initState();
+    settings.loadSettings();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +81,8 @@ class MuftaScreenState extends State<MuftaScreen> {
                       });
                     });
                   },
-                  child: TranslateText(
-                      widget.mufta.name == '' ? 'NoName' : widget.mufta.name)),
+                  child: Text(widget.mufta.name == '' ? 'NoName' : widget.mufta.name, softWrap: true, maxLines: 2,)
+                ),
             ],
           ),
           TextButton(
@@ -617,8 +624,8 @@ class MuftaScreenState extends State<MuftaScreen> {
                   ? TextButton.icon(
                       onPressed: () {
                         var variants = const [
-                          'to Local Device',
-                          'to REST of billing software'
+                          'to Device',
+                          'to billing software (json)',
                         ]
                             .map((e) => DropdownMenuItem<String>(
                                 value: e, child: TranslateText(e)))
@@ -643,12 +650,22 @@ class MuftaScreenState extends State<MuftaScreen> {
                                             });
                                           }),
                                       exportVariant == variants[0].value
-                                          ? Text(
-                                              'exporting to local device coupler ${widget.mufta.name}')
+                                          ? Column(
+                                            children: [
+                                              const Text(
+                                                  'exporting device:'),
+                                              TranslateText(widget.mufta.name, language: widget.lang)
+                                            ],
+                                          )
                                           : Container(),
                                       exportVariant == variants[1].value
-                                          ? const Text(
-                                              'exporting to REST URL: ')
+                                          ? Column(
+                                            children: [
+                                              const Text(
+                                                  'exporting to:'),
+                                              TranslateText(settings.couplerUrl, language: widget.lang)
+                                            ],
+                                          )
                                           : Container()
                                     ],
                                   ),
@@ -657,7 +674,7 @@ class MuftaScreenState extends State<MuftaScreen> {
                                         onPressed: () {
                                           if (exportVariant ==
                                               variants[0].value) {
-                                            saveToLocal(widget.mufta);
+                                            widget.mufta.saveToLocal();
                                           }
                                           Navigator.of(context)
                                               .pop(exportVariant);
@@ -693,8 +710,6 @@ class MuftaScreenState extends State<MuftaScreen> {
                               const SizedBox(
                                 width: 40,
                               ),
-                              TranslateText(
-                                  '${widget.mufta.cables[c.cableIndex1].direction}[${c.fiberNumber1 + 1}] <---> ${widget.mufta.cables[c.cableIndex2].direction}[${c.fiberNumber2 + 1}]'),
                               TextButton.icon(
                                   onPressed: () {
                                     setState(() {
@@ -702,7 +717,9 @@ class MuftaScreenState extends State<MuftaScreen> {
                                     });
                                   },
                                   icon: const Icon(Icons.delete_outline),
-                                  label: TranslateText('Delete'))
+                                  label: TranslateText('Delete')),
+                              Text(
+                                  '${widget.mufta.cables[c.cableIndex1].direction}[${c.fiberNumber1 + 1}] <--> ${widget.mufta.cables[c.cableIndex2].direction}[${c.fiberNumber2 + 1}]', maxLines: 2,),
                             ],
                           ))
                       .toList(),
@@ -821,13 +838,6 @@ class MuftaPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}
-
-void saveToLocal(Mufta mufta) async {
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  String jsonString = muftaToJson(mufta);
-  print(jsonString);
-  sharedPreferences.setString(mufta.name, jsonString);
 }
 
 Future<List<String>> loadNames() async {

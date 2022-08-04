@@ -98,6 +98,7 @@ class Mufta {
   List<Connection> connections = [];
   LatLng? location;
 
+  /*
   Map<String, dynamic> toJson() => {
         //'colors' : colors,
         'name': name,
@@ -105,13 +106,40 @@ class Mufta {
         'connections': connections, //?.map((e) => e.toJson()).toList()
         'location': location
       };
+  */
   factory Mufta.fromJson(Map<String, dynamic> json) => Mufta(
       name: json["name"],
       cables:
-          List<CableEnd>.from(json["cables"].map((x) => CableEnd.fromJson(x))),
+          List<CableEnd>.from(json['cables'].map((x) => CableEnd.fromJson(x))),
       connections: List<Connection>.from(
-          json["connections"].map((x) => Connection.fromJson(x))),
-      location: json["location"]);
+          json['connections'].map((x) => Connection.fromJson(x))),
+      location: json['location']);
+
+  /*
+  fromJson(String json) {
+    Map<String, dynamic> map = jsonDecode(json);
+    name = map['name'];
+    cables = List<CableEnd>.from(map['cables'].map((x) => CableEnd.fromJson(x)));
+    connections =
+        List<Connection>.from(map['connections'].map((x) => Connection.fromJson(x)));
+    location = map['location'];
+  }
+  */
+
+  String toJson() {
+    return jsonEncode({
+      'name': name,
+      'cables': cables,
+      'connections': connections,
+      'location': location
+    });
+  }
+  
+  void saveToLocal() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String jsonString = toJson();
+    sharedPreferences.setString(name, jsonString);
+  }
 }
 
 class Settings {
