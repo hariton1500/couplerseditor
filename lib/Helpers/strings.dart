@@ -183,7 +183,7 @@ class TranslateText extends Text {
           strings[text]?[language] ?? text,
           key: key,
           style: const TextStyle(
-            fontSize: 12,
+            //fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
         );

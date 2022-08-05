@@ -8,11 +8,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 //String muftaToJson(Mufta data) => json.encode(data.toJson());
 
 class CableEnd {
-  int sideIndex;
-  String direction;
-  int fibersNumber;
-  String colorScheme;
+  int sideIndex = 0;
+  String direction = '';
+  int fibersNumber = 0;
+  String? colorScheme;
   List<String> fiberComments = [];
+  //List<int> withSpliter = [];
   Map<int, double> fiberPosY = {};
   List<int> spliters = [];
 
@@ -20,9 +21,9 @@ class CableEnd {
       {required this.fibersNumber,
       required this.direction,
       required this.sideIndex,
-      required this.colorScheme,
-      required this.fiberComments}) {
+      required this.colorScheme}) {
     fiberComments = List.filled(fibersNumber, '');
+    spliters = List.filled(fibersNumber, 0);
   }
 
   Widget widget(List<Color> colors) {
@@ -52,14 +53,17 @@ class CableEnd {
         'sideIndex': sideIndex,
         'fibersNumber': fibersNumber,
         'colorScheme': colorScheme,
-        'fiberComments': fiberComments
+        'fiberComments': fiberComments,
+        'spliter': spliters,
       };
-  factory CableEnd.fromJson(Map<String, dynamic> json) => CableEnd(
-      direction: json["direction"],
-      sideIndex: json["sideIndex"],
-      fibersNumber: json["fibersNumber"],
-      colorScheme: json['colorScheme'] ?? fiberColors.keys.first,
-      fiberComments: List.castFrom<dynamic, String>(json['fiberComments']));
+  CableEnd.fromJson(Map<String, dynamic> json) {
+    direction = json["direction"];
+    sideIndex = json["sideIndex"];
+    fibersNumber = json["fibersNumber"];
+    colorScheme = json['colorScheme'] ?? fiberColors.keys.first;
+    fiberComments = List.castFrom<dynamic, String>(json['fiberComments']);
+    spliters = json['spliters'] ?? List.filled(fibersNumber, 0);
+  }
 }
 
 class Connection {

@@ -1,3 +1,4 @@
+import 'package:coupolerseditor/Screens/fiberseditor.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:latlong2/latlong.dart' as ll;
@@ -236,11 +237,11 @@ class MuftaScreenState extends State<MuftaScreen> {
                                 OutlinedButton(
                                     onPressed: () {
                                       Navigator.of(context).pop(CableEnd(
-                                          direction: cableName,
-                                          fibersNumber: fibersNumber,
-                                          sideIndex: 0,
-                                          colorScheme: colorScheme,
-                                          fiberComments: []));
+                                        direction: cableName,
+                                        fibersNumber: fibersNumber,
+                                        sideIndex: 0,
+                                        colorScheme: colorScheme,
+                                      ));
                                     },
                                     child: TranslateText('Add',
                                         language: widget.lang))
@@ -254,7 +255,7 @@ class MuftaScreenState extends State<MuftaScreen> {
                   icon: const Icon(Icons.add_outlined),
                   label: TranslateText('Add cable', language: widget.lang)),
               isCableSelected != null && isCableSelected! >= 0
-                  ? Row(
+                  ? Wrap(
                       children: [
                         TextButton.icon(
                             onPressed: () {
@@ -279,17 +280,20 @@ class MuftaScreenState extends State<MuftaScreen> {
                                 builder: (BuildContext context) {
                                   CableEnd cableEnd =
                                       widget.mufta.cables[isCableSelected!];
-                                  return AlertDialog(
-                                    title: TranslateText(
-                                        'Edit / View fiber comments:',
-                                        language: widget.lang),
-                                    actions: [
-                                      OutlinedButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(),
-                                          child: const Text('Ok'))
-                                    ],
-                                    content: SingleChildScrollView(
+                                  return FibersEditor(
+                                      lang: widget.lang,
+                                      cableEnd:
+                                          cableEnd); /*AlertDialog(
+                                      title: TranslateText(
+                                          'Edit / View fibers:',
+                                          language: widget.lang),
+                                      actions: [
+                                        OutlinedButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                            child: const Text('Ok'))
+                                      ],
+                                      content: SingleChildScrollView(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -334,8 +338,7 @@ class MuftaScreenState extends State<MuftaScreen> {
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  );
+                                    ),*/
                                 }),
                             icon: const Icon(Icons.edit_rounded),
                             label: TranslateText('Edit/View fibers',
@@ -565,8 +568,15 @@ class MuftaScreenState extends State<MuftaScreen> {
                                         onAccept: (data) => setState(() {
                                           //print('target: $cableIndex : $fiber, source: $data');
                                           setState(() {
-                                            if (widget.mufta.connections.where((c) => c.cableIndex1 == data.keys.first).toList().isNotEmpty) {
-                                              widget.mufta.cables[cableIndex].spliters.add(data.values.first);
+                                            if (widget.mufta.connections
+                                                .where((c) =>
+                                                    c.cableIndex1 ==
+                                                    data.keys.first)
+                                                .toList()
+                                                .isNotEmpty) {
+                                              widget.mufta.cables[cableIndex]
+                                                  .spliters
+                                                  .add(data.values.first);
                                             }
                                             widget.mufta.connections.add(
                                                 Connection(
@@ -629,70 +639,77 @@ class MuftaScreenState extends State<MuftaScreen> {
             children: [
               widget.mufta.cables.isNotEmpty
                   ? TextButton.icon(
-                      onPressed: () {
-                        var variants = const [
-                          'to Device',
-                          'to billing software (json)',
-                        ]
-                            .map((e) => DropdownMenuItem<String>(
-                                value: e, child: TranslateText(e)))
-                            .toList();
-                        String exportVariant = variants.first.value!;
-                        showDialog<String>(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return StatefulBuilder(builder:
-                                  (BuildContext context, StateSetter setState) {
-                                return AlertDialog(
-                                  title: TranslateText('Export',
-                                      language: widget.lang),
-                                  content: Column(
-                                    children: [
-                                      DropdownButton<String>(
-                                          value: exportVariant,
-                                          items: variants,
-                                          onChanged: (variant) {
-                                            setState(() {
-                                              exportVariant = variant!;
-                                            });
-                                          }),
-                                      exportVariant == variants[0].value
-                                          ? Column(
-                                              children: [
-                                                const Text('exporting device:'),
-                                                TranslateText(widget.mufta.name,
-                                                    language: widget.lang)
-                                              ],
-                                            )
-                                          : Container(),
-                                      exportVariant == variants[1].value
-                                          ? Column(
-                                              children: [
-                                                const Text('exporting to:'),
-                                                TranslateText(
-                                                    settings.couplerUrl,
-                                                    language: widget.lang)
-                                              ],
-                                            )
-                                          : Container()
-                                    ],
-                                  ),
-                                  actions: [
-                                    OutlinedButton(
-                                        onPressed: () {
-                                          if (exportVariant ==
-                                              variants[0].value) {
-                                            widget.mufta.saveToLocal();
-                                          }
-                                          Navigator.of(context)
-                                              .pop(exportVariant);
-                                        },
-                                        child: TranslateText('Export'))
-                                  ],
-                                );
-                              });
-                            }).then((value) => print(value));
-                      },
+                      onPressed: (widget.mufta.location == null ||
+                              widget.mufta.cables.isEmpty)
+                          ? null
+                          : () {
+                              var variants = const [
+                                'to Device',
+                                'to billing software (json)',
+                              ]
+                                  .map((e) => DropdownMenuItem<String>(
+                                      value: e, child: TranslateText(e)))
+                                  .toList();
+                              String exportVariant = variants.first.value!;
+                              showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(builder:
+                                        (BuildContext context,
+                                            StateSetter setState) {
+                                      return AlertDialog(
+                                        title: TranslateText('Export',
+                                            language: widget.lang),
+                                        content: Column(
+                                          children: [
+                                            DropdownButton<String>(
+                                                value: exportVariant,
+                                                items: variants,
+                                                onChanged: (variant) {
+                                                  setState(() {
+                                                    exportVariant = variant!;
+                                                  });
+                                                }),
+                                            exportVariant == variants[0].value
+                                                ? Column(
+                                                    children: [
+                                                      const Text(
+                                                          'exporting device:'),
+                                                      TranslateText(
+                                                          widget.mufta.name,
+                                                          language: widget.lang)
+                                                    ],
+                                                  )
+                                                : Container(),
+                                            exportVariant == variants[1].value
+                                                ? Column(
+                                                    children: [
+                                                      const Text(
+                                                          'exporting to:'),
+                                                      TranslateText(
+                                                          settings.couplerUrl,
+                                                          language: widget.lang)
+                                                    ],
+                                                  )
+                                                : Container()
+                                          ],
+                                        ),
+                                        actions: [
+                                          OutlinedButton(
+                                              onPressed: () {
+                                                if (exportVariant ==
+                                                    variants[0].value) {
+                                                  widget.mufta.saveToLocal();
+                                                }
+                                                Navigator.of(context)
+                                                    .pop(exportVariant);
+                                              },
+                                              child: TranslateText('Export'))
+                                        ],
+                                      );
+                                    });
+                                  }).then((value) => print(value));
+                            },
                       icon: const Icon(Icons.save_outlined),
                       label: TranslateText('Export', language: widget.lang))
                   : Container(),
