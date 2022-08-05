@@ -565,6 +565,9 @@ class MuftaScreenState extends State<MuftaScreen> {
                                         onAccept: (data) => setState(() {
                                           //print('target: $cableIndex : $fiber, source: $data');
                                           setState(() {
+                                            if (widget.mufta.connections.where((c) => c.cableIndex1 == data.keys.first).toList().isNotEmpty) {
+                                              widget.mufta.cables[cableIndex].spliters.add(data.values.first);
+                                            }
                                             widget.mufta.connections.add(
                                                 Connection(
                                                     cableIndex1:

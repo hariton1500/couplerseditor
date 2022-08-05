@@ -14,6 +14,8 @@ class CableEnd {
   String colorScheme;
   List<String> fiberComments = [];
   Map<int, double> fiberPosY = {};
+  List<int> spliters = [];
+
   CableEnd(
       {required this.fibersNumber,
       required this.direction,
@@ -98,15 +100,6 @@ class Mufta {
   List<Connection> connections = [];
   LatLng? location;
 
-  /*
-  Map<String, dynamic> toJson() => {
-        //'colors' : colors,
-        'name': name,
-        'cables': cables, //?.map((e) => e.toJson()).toList(),
-        'connections': connections, //?.map((e) => e.toJson()).toList()
-        'location': location
-      };
-  */
   factory Mufta.fromJson(Map<String, dynamic> json) => Mufta(
       name: json["name"],
       cables:
@@ -114,17 +107,6 @@ class Mufta {
       connections: List<Connection>.from(
           json['connections'].map((x) => Connection.fromJson(x))),
       location: LatLng.fromJson(json['location']));
-
-  /*
-  fromJson(String json) {
-    Map<String, dynamic> map = jsonDecode(json);
-    name = map['name'];
-    cables = List<CableEnd>.from(map['cables'].map((x) => CableEnd.fromJson(x)));
-    connections =
-        List<Connection>.from(map['connections'].map((x) => Connection.fromJson(x)));
-    location = map['location'];
-  }
-  */
 
   String toJson() {
     return jsonEncode({
