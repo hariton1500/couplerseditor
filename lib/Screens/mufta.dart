@@ -157,6 +157,16 @@ class MuftaScreenState extends State<MuftaScreen> {
             crossAxisAlignment: WrapCrossAlignment.start,
             //mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+                  isCableSelected == null ? Container() : Column(
+                    children: widget.mufta.cables[isCableSelected!].fiberComments.where((comment) => comment != '').toList().map((comment) => Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text('${widget.mufta.cables[isCableSelected!].fiberComments.indexOf(comment)}: '),
+                        ),
+                        Text(comment),
+                      ],
+                    )).toList(),),
               TextButton.icon(
                   onPressed: () {
                     showDialog<CableEnd>(
@@ -568,16 +578,6 @@ class MuftaScreenState extends State<MuftaScreen> {
                                         onAccept: (data) => setState(() {
                                           //print('target: $cableIndex : $fiber, source: $data');
                                           setState(() {
-                                            if (widget.mufta.connections
-                                                .where((c) =>
-                                                    c.cableIndex1 ==
-                                                    data.keys.first)
-                                                .toList()
-                                                .isNotEmpty) {
-                                              widget.mufta.cables[cableIndex]
-                                                  .spliters
-                                                  .add(data.values.first);
-                                            }
                                             widget.mufta.connections.add(
                                                 Connection(
                                                     cableIndex1:
@@ -674,7 +674,7 @@ class MuftaScreenState extends State<MuftaScreen> {
                                                 ? Column(
                                                     children: [
                                                       const Text(
-                                                          'exporting device:'),
+                                                          'Coupler name:'),
                                                       TranslateText(
                                                           widget.mufta.name,
                                                           language: widget.lang)
@@ -685,7 +685,7 @@ class MuftaScreenState extends State<MuftaScreen> {
                                                 ? Column(
                                                     children: [
                                                       const Text(
-                                                          'exporting to:'),
+                                                          'Coupler name:'),
                                                       TranslateText(
                                                           settings.couplerUrl,
                                                           language: widget.lang)
@@ -715,8 +715,6 @@ class MuftaScreenState extends State<MuftaScreen> {
                   : Container(),
               TextButton.icon(
                   onPressed: () {
-                    //super.widget.callback;
-                    //print('call back');
                     widget.callback();
                   },
                   icon: const Icon(Icons.arrow_back_outlined),
@@ -729,25 +727,23 @@ class MuftaScreenState extends State<MuftaScreen> {
                       .where((element) =>
                           element.cableIndex1 == isCableSelected ||
                           element.cableIndex2 == isCableSelected)
-                      .map((c) => Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              const SizedBox(
-                                width: 40,
-                              ),
-                              TextButton.icon(
+                      .map((c) => ListTile(
+                        dense: true,
+                            //mainAxisAlignment: MainAxisAlignment.start,
+                            //children: [
+                              leading: IconButton(
                                   onPressed: () {
                                     setState(() {
                                       widget.mufta.connections.remove(c);
                                     });
                                   },
                                   icon: const Icon(Icons.delete_outline),
-                                  label: TranslateText('Delete')),
-                              Text(
+                                  ),
+                              title: Text(
                                 '${widget.mufta.cables[c.cableIndex1].direction}[${c.fiberNumber1 + 1}] <--> ${widget.mufta.cables[c.cableIndex2].direction}[${c.fiberNumber2 + 1}]',
                                 maxLines: 2,
                               ),
-                            ],
+                            //],
                           ))
                       .toList(),
                 )

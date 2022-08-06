@@ -18,7 +18,6 @@ class LocationPicker extends StatefulWidget {
 class _LocationPickerState extends State<LocationPicker> {
   final MapController _mapController = MapController();
   final List<Marker> _markers = [];
-  final List<CircleMarker> _circles = [];
 
   //Location location = Location();
 
