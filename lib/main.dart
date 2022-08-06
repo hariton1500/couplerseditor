@@ -126,6 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               setState(() {
                                 if (value != null) {
                                   mufta = Mufta.fromJson(jsonDecode(value));
+                                  isShowMuftu = true;
                                 }
                               });
                             });
