@@ -157,12 +157,17 @@ class MuftaScreenState extends State<MuftaScreen> {
             crossAxisAlignment: WrapCrossAlignment.start,
             //mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+                  widget.mufta.cables[isCableSelected!].fiberComments.where((comment) => comment != '').toList().isNotEmpty ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TranslateText('Fibers with comments:',
+                        language: widget.lang),
+                  ) : Container(),
                   isCableSelected == null ? Container() : Column(
                     children: widget.mufta.cables[isCableSelected!].fiberComments.where((comment) => comment != '').toList().map((comment) => Row(
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0),
-                          child: Text('${widget.mufta.cables[isCableSelected!].fiberComments.indexOf(comment)}: '),
+                          child: Text('[${widget.mufta.cables[isCableSelected!].fiberComments.indexOf(comment) + 1}]: '),
                         ),
                         Text(comment),
                       ],
@@ -293,63 +298,8 @@ class MuftaScreenState extends State<MuftaScreen> {
                                   return FibersEditor(
                                       lang: widget.lang,
                                       cableEnd:
-                                          cableEnd); /*AlertDialog(
-                                      title: TranslateText(
-                                          'Edit / View fibers:',
-                                          language: widget.lang),
-                                      actions: [
-                                        OutlinedButton(
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
-                                            child: const Text('Ok'))
-                                      ],
-                                      content: SingleChildScrollView(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: List.generate(
-                                                cableEnd.fibersNumber,
-                                                (index) => Text(
-                                                    '[${index + 1}]: ${cableEnd.fiberComments[index]}')),
-                                          ),
-                                          Column(
-                                            children: List.generate(
-                                                cableEnd.fibersNumber,
-                                                (index) => Row(
-                                                      children: [
-                                                        Text('[${index + 1}]'),
-                                                        SizedBox(
-                                                          width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width /
-                                                              4 *
-                                                              2,
-                                                          child: TextField(
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .text,
-                                                            onChanged:
-                                                                ((value) =>
-                                                                    setState(
-                                                                        () {
-                                                                      cableEnd.fiberComments[
-                                                                              index] =
-                                                                          value;
-                                                                    })),
-                                                          ),
-                                                        )
-                                                      ],
-                                                    )),
-                                          ),
-                                        ],
-                                      ),
-                                    ),*/
-                                }),
+                                          cableEnd);
+                                }).then((value) => setState((){})),
                             icon: const Icon(Icons.edit_rounded),
                             label: TranslateText('Edit/View fibers',
                                 language: widget.lang))

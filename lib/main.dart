@@ -136,61 +136,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               language: settings.language)),
                     ],
                   ),
-                  /*
-                  if (isShowImport) ...[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              TranslateText('From Local:',
-                                  language: settings.language),
-                              if (localStored.isNotEmpty) ...[
-                                DropdownButton<String>(
-                                    value: selectedName == ''
-                                        ? null
-                                        : selectedName,
-                                    items: localStored
-                                        .map((e) => DropdownMenuItem<String>(
-                                              value: e,
-                                              child: Text(e),
-                                            ))
-                                        .toList(),
-                                    onChanged: (String? variant) {
-                                      //print('selection - $variant');
-                                      setState(() {
-                                        selectedName = variant!;
-                                      });
-                                    }),
-                                OutlinedButton(
-                                    onPressed: () {
-                                      //print('selected:');
-                                      //print(selectedName);
-                                      loadMuftaJson(selectedName).then((value) {
-                                        mufta = muftaFromJson(value);
-                                        setState(() {
-                                          isShowImport = false;
-                                          isShowMuftu = true;
-                                        });
-                                      });
-                                    },
-                                    child: TranslateText('Import',
-                                        language: settings.language))
-                              ] else
-                                TranslateText('nothing stored',
-                                    language: settings.language),
-                            ],
-                          ),
-                          TranslateText('From REST:',
-                              language: settings.language)
-                        ],
-                      ),
-                    ),
-                  ],
-                  */
                   TextButton.icon(
                       onPressed: () {
                         setState(() {

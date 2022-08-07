@@ -125,7 +125,19 @@ class _CouplersListState extends State<CouplersList> {
                               );
                             },
                           ),
-                          title: Text(coupler.toString()),
+                          title: TextButton(
+                            child: Text(
+                              coupler['name'],
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                selectedCouplerIndex = index;
+                              });
+                            },
+                          ),
                         );
                       },
                     )
