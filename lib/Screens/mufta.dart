@@ -157,21 +157,36 @@ class MuftaScreenState extends State<MuftaScreen> {
             crossAxisAlignment: WrapCrossAlignment.start,
             //mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-                  widget.mufta.cables[isCableSelected!].fiberComments.where((comment) => comment != '').toList().isNotEmpty ? Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TranslateText('Fibers with comments:',
-                        language: widget.lang),
-                  ) : Container(),
-                  isCableSelected == null ? Container() : Column(
-                    children: widget.mufta.cables[isCableSelected!].fiberComments.where((comment) => comment != '').toList().map((comment) => Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text('[${widget.mufta.cables[isCableSelected!].fiberComments.indexOf(comment) + 1}]: '),
-                        ),
-                        Text(comment),
-                      ],
-                    )).toList(),),
+              isCableSelected != null &&
+                      widget.mufta.cables[isCableSelected!].fiberComments
+                          .where((comment) => comment != '')
+                          .toList()
+                          .isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TranslateText('Fibers with comments:',
+                          language: widget.lang),
+                    )
+                  : Container(),
+              isCableSelected == null
+                  ? Container()
+                  : Column(
+                      children: widget
+                          .mufta.cables[isCableSelected!].fiberComments
+                          .where((comment) => comment != '')
+                          .toList()
+                          .map((comment) => Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Text(
+                                        '[${widget.mufta.cables[isCableSelected!].fiberComments.indexOf(comment) + 1}]: '),
+                                  ),
+                                  Text(comment),
+                                ],
+                              ))
+                          .toList(),
+                    ),
               TextButton.icon(
                   onPressed: () {
                     showDialog<CableEnd>(
@@ -296,10 +311,8 @@ class MuftaScreenState extends State<MuftaScreen> {
                                   CableEnd cableEnd =
                                       widget.mufta.cables[isCableSelected!];
                                   return FibersEditor(
-                                      lang: widget.lang,
-                                      cableEnd:
-                                          cableEnd);
-                                }).then((value) => setState((){})),
+                                      lang: widget.lang, cableEnd: cableEnd);
+                                }).then((value) => setState(() {})),
                             icon: const Icon(Icons.edit_rounded),
                             label: TranslateText('Edit/View fibers',
                                 language: widget.lang))
@@ -678,21 +691,21 @@ class MuftaScreenState extends State<MuftaScreen> {
                           element.cableIndex1 == isCableSelected ||
                           element.cableIndex2 == isCableSelected)
                       .map((c) => ListTile(
-                        dense: true,
+                            dense: true,
                             //mainAxisAlignment: MainAxisAlignment.start,
                             //children: [
-                              leading: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      widget.mufta.connections.remove(c);
-                                    });
-                                  },
-                                  icon: const Icon(Icons.delete_outline),
-                                  ),
-                              title: Text(
-                                '${widget.mufta.cables[c.cableIndex1].direction}[${c.fiberNumber1 + 1}] <--> ${widget.mufta.cables[c.cableIndex2].direction}[${c.fiberNumber2 + 1}]',
-                                maxLines: 2,
-                              ),
+                            leading: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  widget.mufta.connections.remove(c);
+                                });
+                              },
+                              icon: const Icon(Icons.delete_outline),
+                            ),
+                            title: Text(
+                              '${widget.mufta.cables[c.cableIndex1].direction}[${c.fiberNumber1 + 1}] <--> ${widget.mufta.cables[c.cableIndex2].direction}[${c.fiberNumber2 + 1}]',
+                              maxLines: 2,
+                            ),
                             //],
                           ))
                       .toList(),
