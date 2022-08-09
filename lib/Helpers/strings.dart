@@ -175,6 +175,14 @@ Map<String, Map<String, String>> strings = {
     'en': 'Load from billing software (json)',
     'ru': 'Загрузить из биллинга (json)'
   },
+  'Fibers with comments and spliters:': {
+    'en': 'Fibers with comments and spliters:',
+    'ru': 'Волокона с комментариями и делителями:'
+  },
+  'Spliter on': {
+    'en': 'Spliter of ',
+    'ru': 'Делитель на '
+  },
 };
 
 class TranslateText extends Text {

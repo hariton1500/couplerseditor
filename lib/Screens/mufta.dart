@@ -164,29 +164,55 @@ class MuftaScreenState extends State<MuftaScreen> {
                           .isNotEmpty
                   ? Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: TranslateText('Fibers with comments:',
+                      child: TranslateText('Fibers with comments and spliters:',
                           language: widget.lang),
                     )
                   : Container(),
               isCableSelected == null
                   ? Container()
                   : Column(
-                      children: widget
-                          .mufta.cables[isCableSelected!].fiberComments
-                          .where((comment) => comment != '')
-                          .toList()
-                          .map((comment) => Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 8.0),
-                                    child: Text(
-                                        '[${widget.mufta.cables[isCableSelected!].fiberComments.indexOf(comment) + 1}]: '),
-                                  ),
-                                  Text(comment),
-                                ],
-                              ))
-                          .toList(),
-                    ),
+                    children: [
+                      Column(
+                          children: widget
+                              .mufta.cables[isCableSelected!].fiberComments
+                              .where((comment) => comment != '')
+                              .toList()
+                              .map((comment) => Row(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 8.0),
+                                        child: Text(
+                                            '[${widget.mufta.cables[isCableSelected!].fiberComments.indexOf(comment) + 1}]: '),
+                                      ),
+                                      Text(comment),
+                                    ],
+                                  ))
+                              .toList(),
+                        ),
+                      Column(
+                        children: widget.mufta.cables[isCableSelected!].spliters
+                            .where((spliter) => spliter != 0)
+                            .map((spliter) => Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Text(
+                                          '[${widget.mufta.cables[isCableSelected!].spliters.indexOf(spliter) + 1}]: '),
+                                    ),
+                                    Row(
+                                      children: [
+                                        TranslateText('Spliter of ',
+                                            language: widget.lang),
+                                        Text(
+                                            '$spliter'),
+                                      ],
+                                    ),
+                                  ],
+                                ))
+                            .toList(),
+                      )
+                    ],
+                  ),
               TextButton.icon(
                   onPressed: () {
                     showDialog<CableEnd>(

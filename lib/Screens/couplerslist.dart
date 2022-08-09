@@ -143,7 +143,7 @@ class _CouplersListState extends State<CouplersList> {
                     )
                   : FlutterMap(
                       options: MapOptions(
-                          crs: const Epsg3395(),
+                          //crs: const Epsg3395(),
                           controller: _mapController,
                           center: LatLng(45.200834, 33.351089),
                           zoom: 16.0,
@@ -155,20 +155,18 @@ class _CouplersListState extends State<CouplersList> {
                             });
                           }),
                       layers: [
-                        /*
+                        
                         TileLayerOptions(
                             urlTemplate:
                                 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=ru-RU&scale=1&xss=1&yss=1&s=G5zdHJ1c3Q%3D&client=gme-google&style=api%3A1.0.0&key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'),
-                        */
+                        
                         /*
                         TileLayerOptions(
                           urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                           subdomains: ['a', 'b', 'c'],
                         ),
                         */
-                        TileLayerOptions(
-                            urlTemplate:
-                                'https://core-sat.maps.yandex.net/tiles?l=sat&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU'),
+                        //TileLayerOptions(urlTemplate: 'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU'),
                         MarkerLayerOptions(
                           markers: couplers.map((e) {
                             Map<String, dynamic> coupler = jsonDecode(e);
@@ -182,7 +180,7 @@ class _CouplersListState extends State<CouplersList> {
                                   selectedCouplerIndex != couplers.indexOf(e)
                                       ? IconButton(
                                           autofocus: true,
-                                          icon: const Icon(Icons.location_on),
+                                          icon: const Icon(Icons.location_on, color: Colors.red,),
                                           onPressed: () {
                                             print(
                                                 'clicked on marker ${coupler['name']}');

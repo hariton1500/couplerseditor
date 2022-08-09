@@ -66,7 +66,7 @@ class _LocationPickerState extends State<LocationPicker> {
         width: MediaQuery.of(context).size.width,
         child: FlutterMap(
           options: MapOptions(
-              crs: const Epsg3395(),
+              //crs: const Epsg3395(),
               controller: _mapController,
               center: LatLng(45.200834, 33.351089),
               zoom: 16.0,
@@ -90,14 +90,18 @@ class _LocationPickerState extends State<LocationPicker> {
               }),
           layers: [
             //TileLayerOptions(urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", userAgentPackageName: 'com.example.app',),
-            //TileLayerOptions(urlTemplate: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=ru-RU&scale=1&xss=1&yss=1&s=G5zdHJ1c3Q%3D&client=gme-google&style=api%3A1.0.0&key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'),
-            TileLayerOptions(
-                urlTemplate:
-                    'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=tr_TR'),
+            //TileLayerOptions(urlTemplate: 'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU'),
+            TileLayerOptions(urlTemplate: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=ru-RU&scale=1&xss=1&yss=1&s=G5zdHJ1c3Q%3D&client=gme-google&style=api%3A1.0.0&key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'),
+            //TileLayerOptions(urlTemplate: 'https://tiles.api-maps.yandex.ru/v1/tiles/?l=map&scale=1.0&x={x}&y={y}&z={z}&lang=ru_RU&apikey='),
             /*
             TileLayerOptions(
                 urlTemplate:
                     'http://vec{s}.maps.yandex.net/tiles?l=map&v=20.26.0&z={z}&x={x}&y={y}&scale=1&lang=ru_RU',
+                subdomains: ['01', '02', '03', '04'],
+                backgroundColor: Colors.transparent),
+            TileLayerOptions(
+                urlTemplate:
+                    'http://vec{s}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=1.0&lang=ru_RU',
                 subdomains: ['01', '02', '03', '04'],
                 backgroundColor: Colors.transparent),*/
             //CircleLayerOptions(circles: _circles),
