@@ -93,7 +93,7 @@ class _LocationPickerState extends State<LocationPicker> {
             //TileLayerOptions(urlTemplate: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=ru-RU&scale=1&xss=1&yss=1&s=G5zdHJ1c3Q%3D&client=gme-google&style=api%3A1.0.0&key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'),
             TileLayerOptions(
                 urlTemplate:
-                    'https://core-sat.maps.yandex.net/tiles?l=sat&v=3.569.0&x={x}&y={y}&z={z}&lang=tr_TR'),
+                    'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=tr_TR'),
             /*
             TileLayerOptions(
                 urlTemplate:
