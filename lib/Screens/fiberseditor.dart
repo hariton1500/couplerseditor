@@ -1,8 +1,8 @@
-import 'package:coupolerseditor/Models/mainmodels.dart';
 import 'package:flutter/material.dart';
 
 import '../Helpers/spliters.dart';
 import '../Helpers/strings.dart';
+import '../Models/cableend.dart';
 
 class FibersEditor extends StatefulWidget {
   final String lang;

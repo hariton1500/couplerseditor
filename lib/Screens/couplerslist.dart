@@ -1,6 +1,5 @@
 import 'dart:convert';
-
-import 'package:coupolerseditor/Helpers/epsg3395.dart';
+//import 'package:coupolerseditor/Helpers/epsg3395.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';

@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'Helpers/strings.dart';
-import 'Models/mainmodels.dart';
+import 'Models/coupler.dart';
+import 'Models/settings.dart';
 import 'Screens/mufta.dart';
 import 'Screens/couplerslist.dart';
 
@@ -37,7 +38,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool isShowMuftu = false, isShowSetup = false, isShowImport = false;
-  Mufta mufta = Mufta(cables: [], connections: [], name: '');
+  Mufta mufta = Mufta(cableEnds: [], connections: [], name: '');
   Settings settings = Settings();
   List<String> localStored = [];
   String selectedName = '';

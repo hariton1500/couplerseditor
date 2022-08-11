@@ -3,8 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
-
-import '../Helpers/epsg3395.dart';
+//import '../Helpers/epsg3395.dart';
 
 //import 'package:latlong/latlong.dart';
 
@@ -105,7 +104,7 @@ class _LocationPickerState extends State<LocationPicker> {
                 subdomains: ['01', '02', '03', '04'],
                 backgroundColor: Colors.transparent),*/
             //CircleLayerOptions(circles: _circles),
-            MarkerLayerOptions(markers: _markers)
+            MarkerLayerOptions(markers: _markers),
           ],
           mapController: _mapController,
         ),
