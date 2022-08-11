@@ -53,47 +53,42 @@ class MuftaScreenState extends State<MuftaScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Wrap(
-            //mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: TranslateText('Coupler name:', language: widget.lang),
-              ),
-              TextButton(
-                  onPressed: () {
-                    showDialog<String>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          String name = '';
-                          return AlertDialog(
-                            title: TranslateText('Name editing',
-                                language: widget.lang),
-                            content: TextField(
-                              onChanged: (text) => name = text,
-                            ),
-                            actions: [
-                              OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context, name);
-                                  },
-                                  child: TranslateText('Ok',
-                                      language: widget.lang))
-                            ],
-                          );
-                        }).then((value) {
-                      setState(() {
-                        widget.mufta.name = value ?? '';
-                      });
-                    });
-                  },
-                  child: Text(
-                    widget.mufta.name == '' ? 'NoName' : widget.mufta.name,
-                    softWrap: true,
-                    maxLines: 2,
-                  )),
-            ],
+          const Padding(
+            padding: EdgeInsets.only(left: 8),
           ),
+          //TranslateText('Coupler name:', language: widget.lang),
+          TextButton(
+              onPressed: () {
+                showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      String name = '';
+                      return AlertDialog(
+                        title: TranslateText('Name editing',
+                            language: widget.lang),
+                        content: TextField(
+                          onChanged: (text) => name = text,
+                        ),
+                        actions: [
+                          OutlinedButton(
+                              onPressed: () {
+                                Navigator.pop(context, name);
+                              },
+                              child: TranslateText('Ok',
+                                  language: widget.lang))
+                        ],
+                      );
+                    }).then((value) {
+                  setState(() {
+                    widget.mufta.name = value ?? '';
+                  });
+                });
+              },
+              child: Text(
+                widget.mufta.name == '' ? 'NoName' : widget.mufta.name,
+                //softWrap: true,
+                //maxLines: 2,
+              )),
           TextButton(
               onPressed: () => showDialog<ll.LatLng>(
                   context: context,
@@ -118,7 +113,7 @@ class MuftaScreenState extends State<MuftaScreen> {
                       ? widget.mufta.location!
                           .toJson()['coordinates']
                           .toString()
-                      : ''))
+                      : ''), style: const TextStyle(fontSize: 10)),
                 ],
               )),
           GestureDetector(
@@ -707,6 +702,7 @@ class MuftaScreenState extends State<MuftaScreen> {
               TextButton.icon(
                   onPressed: () {
                     widget.callback();
+                    Navigator.of(context).pop();
                   },
                   icon: const Icon(Icons.arrow_back_outlined),
                   label: TranslateText('Back', language: widget.lang))

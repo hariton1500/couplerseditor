@@ -6,6 +6,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helpers/strings.dart';
+import '../Models/coupler.dart';
+import 'mufta.dart';
 
 class CouplersList extends StatefulWidget {
   final String lang;
@@ -64,8 +66,8 @@ class _CouplersListState extends State<CouplersList> {
                 ? IconButton(
                     icon: const Icon(Icons.check_rounded),
                     onPressed: () {
-                      Navigator.of(context)
-                          .pop(couplers[selectedCouplerIndex!]);
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => MuftaScreen(mufta: Mufta.fromJson(jsonDecode(couplers[selectedCouplerIndex!])), callback: () => setState(() {}), lang: widget.lang)));
+                      //Navigator.of(context).pop(couplers[selectedCouplerIndex!]);
                     },
                   )
                 : Container(),

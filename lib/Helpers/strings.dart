@@ -186,12 +186,12 @@ Map<String, Map<String, String>> strings = {
 };
 
 class TranslateText extends Text {
-  TranslateText(String text, {Key? key, String language = 'en'})
+  TranslateText(String text, {Key? key, String language = 'en', double size = 10.0})
       : super(
           strings[text]?[language] ?? text,
           key: key,
-          style: const TextStyle(
-            //fontSize: 12,
+          style: TextStyle(
+            fontSize: size,
             fontWeight: FontWeight.bold,
           ),
         );

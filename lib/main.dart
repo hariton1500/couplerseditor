@@ -60,28 +60,17 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       //appBar: AppBar(),
-      body: isShowMuftu
-          ? SafeArea(
-              child: MuftaScreen(
-                lang: settings.language,
-                mufta: mufta,
-                callback: () {
-                  //print('recieved callback');
-                  setState(() {
-                    isShowMuftu = false;
-                  });
-                },
-              ),
-            )
-          : SafeArea(
+      body: SafeArea(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextButton.icon(
                     onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => MuftaScreen(mufta: mufta, callback: () => setState(() {}), lang: settings.language)));
+                      /*
                       setState(() {
                         isShowMuftu = true;
-                      });
+                      });*/
                     },
                     icon: const Icon(Icons.create_outlined),
                     label: TranslateText(
@@ -92,21 +81,21 @@ class _MyHomePageState extends State<MyHomePage> {
                   Wrap(
                     children: [
                       TextButton.icon(
-                          onPressed: () {
-                            Navigator.of(context)
-                                .push(MaterialPageRoute<String>(
-                              builder: (context) => CouplersList(
+                          onPressed: () async{
+                            await Navigator.of(context).push(MaterialPageRoute<String>(builder: (context) =>
+                              CouplersList(
                                 isFromBilling: true,
                                 lang: settings.language,
                                 couplersListURL: settings.couplersListUrl,
                               ),
                             ))
                                 .then((value) {
-                              setState(() {
-                                if (value != null) {
-                                  mufta = Mufta.fromJson(jsonDecode(value));
-                                }
-                              });
+                                  setState(() {
+                                    if (value != null) {
+                                      mufta = Mufta.fromJson(jsonDecode(value));
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => MuftaScreen(mufta: mufta, callback: () => setState(() {}), lang: settings.language)));
+                                    }
+                                  });
                             });
                           },
                           icon: const Icon(Icons.download_rounded),
