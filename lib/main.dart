@@ -1,6 +1,7 @@
 //import 'package:couplers/Screens/mufta2.dart';
 import 'dart:convert';
 
+import 'package:coupolerseditor/Models/node.dart';
 import 'package:flutter/material.dart';
 
 import 'Helpers/strings.dart';
@@ -62,160 +63,170 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       //appBar: AppBar(),
       body: SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Divider(),
-                  Center(child: TranslateText('Couplers:', language: settings.language)),
-                  TextButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => MuftaScreen(mufta: mufta, callback: () => setState(() {}), lang: settings.language)));
-                      /*
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Divider(),
+            Center(
+                child: TranslateText('Couplers:', language: settings.language)),
+            TextButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => MuftaScreen(
+                        mufta: mufta,
+                        callback: () => setState(() {}),
+                        lang: settings.language)));
+                /*
                       setState(() {
                         isShowMuftu = true;
                       });*/
-                    },
-                    icon: const Icon(Icons.create_outlined),
-                    label: TranslateText(
-                      'Create/edit coupler',
-                      language: settings.language,
-                    ),
-                  ),
-                  Wrap(
-                    children: [
-                      TextButton.icon(
-                          onPressed: () async{
-                            await Navigator.of(context).push(MaterialPageRoute<String>(builder: (context) =>
-                              CouplersList(
-                                isFromBilling: true,
-                                lang: settings.language,
-                                couplersListURL: settings.couplersListUrl,
-                              ),
-                            ))
-                                .then((value) {
-                                  setState(() {
-                                    if (value != null) {
-                                      mufta = Mufta.fromJson(jsonDecode(value));
-                                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => MuftaScreen(mufta: mufta, callback: () => setState(() {}), lang: settings.language)));
-                                    }
-                                  });
-                            });
-                          },
-                          icon: const Icon(Icons.download_rounded),
-                          label: TranslateText(
-                              'Load from billing software (json)',
-                              language: settings.language)),
-                      TextButton.icon(
-                          onPressed: () {
-                            Navigator.of(context)
-                                .push(MaterialPageRoute<String>(
-                              builder: (context) => CouplersList(
-                                isFromBilling: false,
-                                lang: settings.language,
-                                couplersListURL: settings.couplersListUrl,
-                              ),
-                            ))
-                                .then((value) {
-                              setState(() {
-                                if (value != null) {
-                                  mufta = Mufta.fromJson(jsonDecode(value));
-                                  isShowMuftu = true;
-                                }
-                              });
-                            });
-                          },
-                          icon: const Icon(Icons.download_for_offline_rounded),
-                          label: TranslateText('Load from device',
-                              language: settings.language)),
-                    ],
-                  ),
-                  TextButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          isShowSetup = !isShowSetup;
-                        });
-                      },
-                      icon: const Icon(Icons.settings_outlined),
-                      label: TranslateText('Settings',
-                          language: settings.language)),
-                  if (isShowSetup) ...[
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        children: [
-                          //Settings
-                          TranslateText('Language:',
-                              language: settings.language),
-                          Row(
-                            children: [
-                              Radio<String>(
-                                  value: 'en',
-                                  groupValue: settings.language,
-                                  onChanged: (lang) => setState(
-                                      () => settings.language = lang!)),
-                              const Text('English'),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Radio<String>(
-                                  value: 'ru',
-                                  groupValue: settings.language,
-                                  onChanged: (lang) => setState(
-                                      () => settings.language = lang!)),
-                              const Text('Русский'),
-                            ],
-                          ),
-                          TranslateText('Load list of couplers URL:',
-                              language: settings.language),
-                          TextFormField(
-                            initialValue: settings.couplersListUrl,
-                            onChanged: (value) =>
-                                settings.couplersListUrl = value,
-                          ),
-                          TranslateText('Load coupler URL:',
-                              language: settings.language),
-                          TextFormField(
-                            initialValue: settings.couplerUrl,
-                            onChanged: (value) => settings.couplerUrl = value,
-                          ),
-                          Row(
-                            children: [
-                              TextButton.icon(
-                                  onPressed: () {
-                                    setState(() {
-                                      isShowSetup = false;
-                                    });
-                                  },
-                                  icon: const Icon(Icons.arrow_upward_outlined),
-                                  label: TranslateText('Hide',
-                                      language: settings.language)),
-                              TextButton.icon(
-                                  onPressed: () => settings.saveSettings(),
-                                  icon: const Icon(Icons.save_outlined),
-                                  label: TranslateText('Save to device',
-                                      language: settings.language)),
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                  const Divider(),
-                  Center(child: TranslateText('Nodes:', language: settings.language)),
-                  TextButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => NodesScreen(mufta: mufta, callback: () => setState(() {}), lang: settings.language)));
-                    },
-                    icon: const Icon(Icons.create_outlined),
-                    label: TranslateText(
-                      'Create/edit node',
-                      language: settings.language,
-                    ),
-                  ),
-                ],
+              },
+              icon: const Icon(Icons.create_outlined),
+              label: TranslateText(
+                'Create/edit coupler',
+                language: settings.language,
               ),
             ),
+            Wrap(
+              children: [
+                TextButton.icon(
+                    onPressed: () async {
+                      await Navigator.of(context)
+                          .push(MaterialPageRoute<String>(
+                        builder: (context) => CouplersList(
+                          isFromBilling: true,
+                          lang: settings.language,
+                          couplersListURL: settings.couplersListUrl,
+                        ),
+                      ))
+                          .then((value) {
+                        setState(() {
+                          if (value != null) {
+                            mufta = Mufta.fromJson(jsonDecode(value));
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => MuftaScreen(
+                                    mufta: mufta,
+                                    callback: () => setState(() {}),
+                                    lang: settings.language)));
+                          }
+                        });
+                      });
+                    },
+                    icon: const Icon(Icons.download_rounded),
+                    label: TranslateText('Load from billing software (json)',
+                        language: settings.language)),
+                TextButton.icon(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute<String>(
+                        builder: (context) => CouplersList(
+                          isFromBilling: false,
+                          lang: settings.language,
+                          couplersListURL: settings.couplersListUrl,
+                        ),
+                      ))
+                          .then((value) {
+                        setState(() {
+                          if (value != null) {
+                            mufta = Mufta.fromJson(jsonDecode(value));
+                            isShowMuftu = true;
+                          }
+                        });
+                      });
+                    },
+                    icon: const Icon(Icons.download_for_offline_rounded),
+                    label: TranslateText('Load from device',
+                        language: settings.language)),
+              ],
+            ),
+            TextButton.icon(
+                onPressed: () {
+                  setState(() {
+                    isShowSetup = !isShowSetup;
+                  });
+                },
+                icon: const Icon(Icons.settings_outlined),
+                label: TranslateText('Settings', language: settings.language)),
+            if (isShowSetup) ...[
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    //Settings
+                    TranslateText('Language:', language: settings.language),
+                    Row(
+                      children: [
+                        Radio<String>(
+                            value: 'en',
+                            groupValue: settings.language,
+                            onChanged: (lang) =>
+                                setState(() => settings.language = lang!)),
+                        const Text('English'),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Radio<String>(
+                            value: 'ru',
+                            groupValue: settings.language,
+                            onChanged: (lang) =>
+                                setState(() => settings.language = lang!)),
+                        const Text('Русский'),
+                      ],
+                    ),
+                    TranslateText('Load list of couplers URL:',
+                        language: settings.language),
+                    TextFormField(
+                      initialValue: settings.couplersListUrl,
+                      onChanged: (value) => settings.couplersListUrl = value,
+                    ),
+                    TranslateText('Load coupler URL:',
+                        language: settings.language),
+                    TextFormField(
+                      initialValue: settings.couplerUrl,
+                      onChanged: (value) => settings.couplerUrl = value,
+                    ),
+                    Row(
+                      children: [
+                        TextButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                isShowSetup = false;
+                              });
+                            },
+                            icon: const Icon(Icons.arrow_upward_outlined),
+                            label: TranslateText('Hide',
+                                language: settings.language)),
+                        TextButton.icon(
+                            onPressed: () => settings.saveSettings(),
+                            icon: const Icon(Icons.save_outlined),
+                            label: TranslateText('Save to device',
+                                language: settings.language)),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ],
+            const Divider(),
+            Center(child: TranslateText('Nodes:', language: settings.language)),
+            TextButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => NodesScreen(
+                        node: Node(address: 'no Address'),
+                        callback: () => setState(() {}),
+                        lang: settings.language)));
+              },
+              icon: const Icon(Icons.create_outlined),
+              label: TranslateText(
+                'Create/edit node',
+                language: settings.language,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
