@@ -109,4 +109,6 @@ class _NodesScreenState extends State<NodesScreen> {
       ])),
     );
   }
+
+  cableEndsList() {}
 }
