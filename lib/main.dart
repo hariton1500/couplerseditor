@@ -214,7 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => NodesScreen(
-                        node: Node(address: 'no Address'),
+                        //node: Node(address: 'no Address'),
                         callback: () => setState(() {}),
                         lang: settings.language)));
               },

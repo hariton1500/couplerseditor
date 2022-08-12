@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+List<int> fibers = [1, 2, 4, 8, 12, 16, 20, 24];
+
 Map<String, List<Color>> fiberColors = {
   'DIN/VDE 08888': [
     Colors.red,
@@ -25,7 +27,8 @@ Map<String, List<Color>> fiberColors = {
     Colors.cyanAccent,
     Colors.black,
     Colors.orange,
-    Colors.pink[200]!],
+    Colors.pink[200]!
+  ],
   'SNR': [
     Colors.blue,
     Colors.orange,

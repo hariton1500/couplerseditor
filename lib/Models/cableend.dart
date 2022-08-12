@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../Helpers/fibercolors.dart';
+import 'package:http/http.dart' as http;
+import '../Helpers/fibers.dart';
 
 class CableEnd {
   int id = -1;
@@ -13,7 +13,7 @@ class CableEnd {
   Map<int, double> fiberPosY = {};
   List<int> spliters = [];
 
-  CableEnd( 
+  CableEnd(
       {required this.id,
       required this.fibersNumber,
       required this.direction,
@@ -23,7 +23,7 @@ class CableEnd {
     spliters = List.filled(fibersNumber, 0);
   }
 
-  Widget widget(List<Color> colors) {
+  Widget widget({required List<Color> colors}) {
     return Column(
       children: List.generate(
           fibersNumber,
@@ -54,6 +54,7 @@ class CableEnd {
         'fiberComments': fiberComments,
         'spliter': spliters,
       };
+
   CableEnd.fromJson(Map<String, dynamic> json) {
     id = json['id'] ?? -1;
     direction = json["direction"];

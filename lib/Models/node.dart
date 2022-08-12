@@ -3,7 +3,7 @@ import 'package:latlong2/latlong.dart';
 
 class Node {
   LatLng? location;
-  List? equipments = [];
+  List equipments = [];
   List<CableEnd> cableEnds = [];
   String address = '';
 
