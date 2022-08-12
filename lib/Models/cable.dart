@@ -1,6 +1,8 @@
+import 'package:coupolerseditor/Models/cableend.dart';
+
 class Cable {
 
-  List ends = [];
+  List<CableEnd> ends = [];
 
   Cable({required this.ends});
 

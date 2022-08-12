@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../Helpers/fibercolors.dart';
 
 class CableEnd {
+  int id = -1;
   int sideIndex = 0;
   String direction = '';
   int fibersNumber = 0;
@@ -12,8 +13,9 @@ class CableEnd {
   Map<int, double> fiberPosY = {};
   List<int> spliters = [];
 
-  CableEnd(
-      {required this.fibersNumber,
+  CableEnd( 
+      {required this.id,
+      required this.fibersNumber,
       required this.direction,
       required this.sideIndex,
       required this.colorScheme}) {
@@ -44,6 +46,7 @@ class CableEnd {
   }
 
   Map<String, dynamic> toJson() => {
+        'id': id,
         'direction': direction,
         'sideIndex': sideIndex,
         'fibersNumber': fibersNumber,
@@ -52,6 +55,7 @@ class CableEnd {
         'spliter': spliters,
       };
   CableEnd.fromJson(Map<String, dynamic> json) {
+    id = json['id'] ?? -1;
     direction = json["direction"];
     sideIndex = json["sideIndex"];
     fibersNumber = json["fibersNumber"];
