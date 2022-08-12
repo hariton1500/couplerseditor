@@ -183,6 +183,14 @@ Map<String, Map<String, String>> strings = {
     'en': 'Spliter of ',
     'ru': 'Делитель на '
   },
+  'Create/edit node': {
+    'en': 'Create/edit node',
+    'ru': 'Создать/редактировать узел'
+  },
+  'Nodes:': {
+    'en': 'Nodes:',
+    'ru': 'Узлы:'
+  },
 };
 
 class TranslateText extends Text {

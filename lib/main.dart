@@ -8,6 +8,7 @@ import 'Models/coupler.dart';
 import 'Models/settings.dart';
 import 'Screens/mufta.dart';
 import 'Screens/couplerslist.dart';
+import 'Screens/node.dart';
 
 void main() {
   runApp(const MyApp());
@@ -64,6 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Divider(),
+                  Center(child: TranslateText('Couplers:', language: settings.language)),
                   TextButton.icon(
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(builder: (context) => MuftaScreen(mufta: mufta, callback: () => setState(() {}), lang: settings.language)));
@@ -197,7 +200,19 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                       ),
                     ),
-                  ]
+                  ],
+                  const Divider(),
+                  Center(child: TranslateText('Nodes:', language: settings.language)),
+                  TextButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => NodesScreen(mufta: mufta, callback: () => setState(() {}), lang: settings.language)));
+                    },
+                    icon: const Icon(Icons.create_outlined),
+                    label: TranslateText(
+                      'Create/edit node',
+                      language: settings.language,
+                    ),
+                  ),
                 ],
               ),
             ),
