@@ -24,7 +24,7 @@ class CableEnd {
   }
 
   Widget widget({required List<Color> colors}) {
-    return Column(
+    return Wrap(
       children: List.generate(
           fibersNumber,
           (index) => Container(
@@ -33,14 +33,12 @@ class CableEnd {
                   color: colors[index]),
               //color: colors[index],
               width: 30,
-              height: 16,
+              height: 20,
               child: Center(
                   child: Text(
                 (index + 1).toString(),
-                style: TextStyle(
-                    color: (index == 7 || index == 19)
-                        ? Colors.white
-                        : Colors.black),
+                style: const TextStyle(
+                    color: Colors.black),
               )))),
     );
   }

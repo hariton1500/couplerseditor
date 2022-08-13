@@ -73,7 +73,15 @@ class _NodesScreenState extends State<NodesScreen> {
         for (final cableEnd in node.cableEnds)
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: cableEnd.widget(colors: fiberColors[cableEnd.colorScheme!]!),
+            child: Column(
+              children: [
+                Text(
+                  '[${node.cableEnds.indexOf(cableEnd) + 1}]${cableEnd.direction}: ${cableEnd.fibersNumber}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                cableEnd.widget(colors: fiberColors[cableEnd.colorScheme!]!),
+              ],
+            ),
           ),
         Wrap(
           children: [
@@ -106,7 +114,7 @@ class _NodesScreenState extends State<NodesScreen> {
                             )
                           ]);
                     }).then((value) => setState(
-                      () => value != null ? node.equipments!.add(value) : print,
+                      () => value != null ? node.equipments.add(value) : print,
                     )),
                 icon: const Icon(Icons.add),
                 label: TranslateText('Add equipment', language: widget.lang)),
