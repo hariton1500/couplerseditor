@@ -12,6 +12,7 @@ class CableEnd {
   //List<int> withSpliter = [];
   Map<int, double> fiberPosY = {};
   List<int> spliters = [];
+  //Function callback = (Object asd) {};
 
   CableEnd(
       {required this.id,
@@ -23,24 +24,39 @@ class CableEnd {
     spliters = List.filled(fibersNumber, 0);
   }
 
-  Widget widget({required List<Color> colors}) {
+  Widget widget(
+      {required List<Color> colors,
+      required void Function(MapEntry<Object, int>, int) callback}) {
     return Wrap(
       children: List.generate(
           fibersNumber,
-          (index) => Container(
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                  color: colors[index]),
-              //color: colors[index],
-              width: 30,
-              height: 20,
-              child: Center(
-                  child: Text(
-                (index + 1).toString(),
-                style: const TextStyle(
-                    color: Colors.black),
-              )))),
+          (index) => Draggable<MapEntry<CableEnd, int>>(
+              data: MapEntry(this, index),
+              feedback: element(index, colors),
+              child: DragTarget<MapEntry<Object, int>>(builder:
+                  (BuildContext context,
+                      List<MapEntry<Object, int>?> candidateData,
+                      List<dynamic> rejectedData) {
+                return element(index, colors);
+              }, onAccept: (data) {
+                print('onAcceptOnCableEnd: $data');
+                callback(data, index);
+              }))),
     );
+  }
+
+  Widget element(int index, List<Color> colors) {
+    return Container(
+        decoration: BoxDecoration(
+            border: Border.all(color: Colors.black), color: colors[index]),
+        //color: colors[index],
+        width: 30,
+        height: 20,
+        child: Center(
+            child: Text(
+          (index + 1).toString(),
+          style: const TextStyle(color: Colors.black),
+        )));
   }
 
   Map<String, dynamic> toJson() => {

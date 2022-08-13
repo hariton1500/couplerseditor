@@ -1,9 +1,6 @@
 //import 'package:couplers/Screens/mufta2.dart';
 import 'dart:convert';
-
-import 'package:coupolerseditor/Models/node.dart';
 import 'package:flutter/material.dart';
-
 import 'Helpers/strings.dart';
 import 'Models/coupler.dart';
 import 'Models/settings.dart';

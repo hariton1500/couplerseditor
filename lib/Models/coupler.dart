@@ -64,4 +64,14 @@ class Mufta {
     print('saving to local: $jsonString');
     sharedPreferences.setString('coupler: $name', jsonString);
   }
+
+  Function addConnection() {
+    return (int cableIndex, int fiberNumber) {
+      connections.add(Connection(
+          cableIndex1: cableIndex,
+          fiberNumber1: fiberNumber,
+          cableIndex2: 0,
+          fiberNumber2: 0));
+    };
+  }
 }

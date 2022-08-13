@@ -1,3 +1,4 @@
+import 'package:coupolerseditor/Models/activedevice.dart';
 import 'package:coupolerseditor/Models/cableend.dart';
 import 'package:flutter/material.dart';
 
@@ -24,15 +25,6 @@ class _NodesScreenState extends State<NodesScreen> {
   Node node = Node(address: '');
   //List equipments = [];
   //List<CableEnd> cableEnds = [];
-  String direction = '';
-  int fibersNumber = 1;
-  List<DropdownMenuItem<int>> fibersList = fibers
-      .map((e) => DropdownMenuItem<int>(
-            value: e,
-            child: Text(e.toString()),
-          ))
-      .toList();
-  String colorScheme = fiberColors.keys.toList().first;
 
   @override
   Widget build(BuildContext context) {
@@ -60,16 +52,16 @@ class _NodesScreenState extends State<NodesScreen> {
             },
           ),
         ),
-        for (final Map equipment in node.equipments)
+        for (final equipment in node.equipments)
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: equipment.containsKey('widget')
-                ? equipment['widget']
-                : Text(
-                    '[${node.equipments.indexOf(equipment) + 1}]${equipment['name']}: ${equipment['value'].toString()}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-          ),
+              padding: const EdgeInsets.all(8.0),
+              child: equipment.widget(callback: (o, i) {
+                print('$o; $i');
+                setState(() {
+                  node.connections.add(Connection(
+                      connectionData: MapEntry(o, MapEntry(equipment, i))));
+                });
+              })),
         for (final cableEnd in node.cableEnds)
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -79,40 +71,147 @@ class _NodesScreenState extends State<NodesScreen> {
                   '[${node.cableEnds.indexOf(cableEnd) + 1}]${cableEnd.direction}: ${cableEnd.fibersNumber}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                cableEnd.widget(colors: fiberColors[cableEnd.colorScheme!]!),
+                cableEnd.widget(
+                    colors: fiberColors[cableEnd.colorScheme!]!,
+                    callback: (o, i) {
+                      print('$o; $i');
+                      setState(() {
+                        node.connections.add(Connection(
+                            connectionData:
+                                MapEntry(o, MapEntry(cableEnd, i))));
+                      });
+                    }),
+              ],
+            ),
+          ),
+        for (final connection in node.connections)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          setState(() {
+                            node.connections.remove(connection);
+                          });
+                        },
+                        icon: const Icon(Icons.delete_outline)),
+                    Text(
+                      '${connection.connectionData!.key.key is CableEnd ? (connection.connectionData!.key.key as CableEnd).direction : (connection.connectionData!.key.key as ActiveDevice).ip}[${connection.connectionData!.key.value + 1}]',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const Icon(Icons.plumbing_outlined),
+                    Text(
+                        '${connection.connectionData!.value.key is CableEnd ? (connection.connectionData!.value.key as CableEnd).direction : (connection.connectionData!.value.key as ActiveDevice).ip}[${connection.connectionData!.value.value + 1}]',
+                        style: const TextStyle(fontWeight: FontWeight.bold))
+                  ],
+                ),
               ],
             ),
           ),
         Wrap(
           children: [
             TextButton.icon(
-                onPressed: () => showDialog<Map<String, dynamic>>(
+                onPressed: () => showDialog<ActiveDevice>(
                     context: context,
                     builder: (context) {
-                      return AlertDialog(
-                          title: TranslateText('Add new equipment:',
-                              language: widget.lang),
-                          content: Column(
-                            children: [
-                              for (final equipment in equipmentsList)
-                                OutlinedButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(equipment),
-                                    child: Text(equipment['name']))
-                            ],
-                          ),
-                          actions: [
-                            OutlinedButton.icon(
-                              icon: const Icon(Icons.cancel_outlined),
-                              label: TranslateText(
-                                'cancel',
-                                language: widget.lang,
+                      return StatefulBuilder(builder:
+                          (BuildContext context, StateSetter setState) {
+                        String id = '-1', ports = '8', ip = '';
+                        return AlertDialog(
+                            title: TranslateText('Add new equipment:',
+                                language: widget.lang),
+                            content: Column(
+                              children: [
+                                TextField(
+                                  keyboardType: TextInputType.number,
+                                  controller: TextEditingController(text: ip),
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'IP address',
+                                  ),
+                                  onChanged: (value) {
+                                    ip = value;
+                                  },
+                                ),
+                                const Divider(),
+                                TextField(
+                                  keyboardType: TextInputType.number,
+                                  controller: TextEditingController(text: id),
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'ID',
+                                  ),
+                                  onChanged: (value) {
+                                    id = value;
+                                  },
+                                ),
+                                const Divider(),
+                                TextField(
+                                  keyboardType: TextInputType.number,
+                                  controller:
+                                      TextEditingController(text: ports),
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Ports',
+                                  ),
+                                  onChanged: (value) {
+                                    ports = value;
+                                  },
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              OutlinedButton.icon(
+                                icon: const Icon(Icons.cancel_outlined),
+                                label: TranslateText(
+                                  'cancel',
+                                  language: widget.lang,
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
                               ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            )
-                          ]);
+                              OutlinedButton.icon(
+                                icon: const Icon(Icons.add_outlined),
+                                label: TranslateText(
+                                  'Add device',
+                                  language: widget.lang,
+                                ),
+                                onPressed: () {
+                                  RegExp ipExp = RegExp(
+                                      r"^(?!0)(?!.*\.$)((1?\d?\d|25[0-5]|2[0-4]\d)(\.|$)){4}$",
+                                      caseSensitive: false,
+                                      multiLine: false);
+                                  if (int.tryParse(id) != null) {
+                                    if (int.tryParse(ports) != null) {
+                                      if (ipExp.hasMatch(ip)) {
+                                        Navigator.of(context).pop(ActiveDevice(
+                                            id: int.parse(id),
+                                            ip: ip,
+                                            ports: int.parse(ports)));
+                                      } else {
+                                        setState(() {
+                                          ip = '';
+                                        });
+                                      }
+                                    } else {
+                                      setState(() {
+                                        ports = '8';
+                                      });
+                                    }
+                                  } else {
+                                    setState(() {
+                                      id = '-1';
+                                    });
+                                  }
+                                },
+                              )
+                            ]);
+                      });
                     }).then((value) => setState(
                       () => value != null ? node.equipments.add(value) : print,
                     )),
@@ -124,6 +223,15 @@ class _NodesScreenState extends State<NodesScreen> {
             onPressed: () => showDialog<CableEnd>(
                 context: context,
                 builder: (context) {
+                  String direction = '';
+                  int fibersNumber = 1;
+                  List<DropdownMenuItem<int>> fibersList = fibers
+                      .map((e) => DropdownMenuItem<int>(
+                            value: e,
+                            child: Text(e.toString()),
+                          ))
+                      .toList();
+                  String colorScheme = fiberColors.keys.toList().first;
                   return StatefulBuilder(
                       builder: (BuildContext context, StateSetter setState) {
                     return AlertDialog(

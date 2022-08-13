@@ -763,6 +763,12 @@ class MuftaScreenState extends State<MuftaScreen> {
       ),
     );
   }
+
+  Function addConnection() {
+    return () {
+      print('add connection');
+    };
+  }
 }
 
 class MuftaPainter extends CustomPainter {
