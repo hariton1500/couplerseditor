@@ -30,7 +30,9 @@ class Node {
 }
 
 class Connection {
+
   MapEntry<MapEntry<Object, int>, MapEntry<Object, int>>? connectionData;
+
   Connection({required this.connectionData});
   Connection.fromJson(Map<String, dynamic> json) {
     connectionData =

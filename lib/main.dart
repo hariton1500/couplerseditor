@@ -212,7 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => NodesScreen(
                         //node: Node(address: 'no Address'),
-                        callback: () => setState(() {}),
+                        //callback: () => setState(() {}),
                         lang: settings.language)));
               },
               icon: const Icon(Icons.create_outlined),
