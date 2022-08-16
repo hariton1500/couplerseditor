@@ -1,8 +1,6 @@
 import 'package:coupolerseditor/Models/activedevice.dart';
 import 'package:coupolerseditor/Models/cableend.dart';
 import 'package:flutter/material.dart';
-
-import '../Helpers/equipments.dart';
 import '../Helpers/fibers.dart';
 import '../Helpers/strings.dart';
 import '../Models/node.dart';
@@ -13,7 +11,6 @@ class NodesScreen extends StatefulWidget {
 
   const NodesScreen({
     Key? key,
-    required void Function() callback,
     required this.lang,
   }) : super(key: key);
 
@@ -23,8 +20,7 @@ class NodesScreen extends StatefulWidget {
 
 class _NodesScreenState extends State<NodesScreen> {
   Node node = Node(address: '');
-  //List equipments = [];
-  //List<CableEnd> cableEnds = [];
+  int selectedAquipmentIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -55,13 +51,19 @@ class _NodesScreenState extends State<NodesScreen> {
         for (final equipment in node.equipments)
           Padding(
               padding: const EdgeInsets.all(8.0),
-              child: equipment.widget(callback: (o, i) {
-                print('$o; $i');
-                setState(() {
-                  node.connections.add(Connection(
-                      connectionData: MapEntry(o, MapEntry(equipment, i))));
-                });
-              })),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() => selectedAquipmentIndex = node.equipments.indexOf(equipment));
+                },
+                child: equipment.widget(callback: (o, i) {
+                  print('$o; $i');
+                  Connection connection = Connection(
+                      connectionData: MapEntry(o, MapEntry(equipment, i)));
+                  node.connections.add(connection);
+                  setState(() {
+                  });
+                }, isSelected: selectedAquipmentIndex == node.equipments.indexOf(equipment)),
+              )),
         for (final cableEnd in node.cableEnds)
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -115,108 +117,18 @@ class _NodesScreenState extends State<NodesScreen> {
         Wrap(
           children: [
             TextButton.icon(
-                onPressed: () => showDialog<ActiveDevice>(
-                    context: context,
-                    builder: (context) {
-                      return StatefulBuilder(builder:
-                          (BuildContext context, StateSetter setState) {
-                        String id = '-1', ports = '8', ip = '';
-                        return AlertDialog(
-                            title: TranslateText('Add new equipment:',
-                                language: widget.lang),
-                            content: Column(
-                              children: [
-                                TextField(
-                                  keyboardType: TextInputType.number,
-                                  controller: TextEditingController(text: ip),
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    labelText: 'IP address',
-                                  ),
-                                  onChanged: (value) {
-                                    ip = value;
-                                  },
-                                ),
-                                const Divider(),
-                                TextField(
-                                  keyboardType: TextInputType.number,
-                                  controller: TextEditingController(text: id),
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    labelText: 'ID',
-                                  ),
-                                  onChanged: (value) {
-                                    id = value;
-                                  },
-                                ),
-                                const Divider(),
-                                TextField(
-                                  keyboardType: TextInputType.number,
-                                  controller:
-                                      TextEditingController(text: ports),
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    labelText: 'Ports',
-                                  ),
-                                  onChanged: (value) {
-                                    ports = value;
-                                  },
-                                ),
-                              ],
-                            ),
-                            actions: [
-                              OutlinedButton.icon(
-                                icon: const Icon(Icons.cancel_outlined),
-                                label: TranslateText(
-                                  'cancel',
-                                  language: widget.lang,
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              OutlinedButton.icon(
-                                icon: const Icon(Icons.add_outlined),
-                                label: TranslateText(
-                                  'Add device',
-                                  language: widget.lang,
-                                ),
-                                onPressed: () {
-                                  RegExp ipExp = RegExp(
-                                      r"^(?!0)(?!.*\.$)((1?\d?\d|25[0-5]|2[0-4]\d)(\.|$)){4}$",
-                                      caseSensitive: false,
-                                      multiLine: false);
-                                  if (int.tryParse(id) != null) {
-                                    if (int.tryParse(ports) != null) {
-                                      if (ipExp.hasMatch(ip)) {
-                                        Navigator.of(context).pop(ActiveDevice(
-                                            id: int.parse(id),
-                                            ip: ip,
-                                            ports: int.parse(ports)));
-                                      } else {
-                                        setState(() {
-                                          ip = '';
-                                        });
-                                      }
-                                    } else {
-                                      setState(() {
-                                        ports = '8';
-                                      });
-                                    }
-                                  } else {
-                                    setState(() {
-                                      id = '-1';
-                                    });
-                                  }
-                                },
-                              )
-                            ]);
-                      });
-                    }).then((value) => setState(
-                      () => value != null ? node.equipments.add(value) : print,
-                    )),
+                onPressed: () async {
+                  var res = await ActiveDevice(id: -1, ip: '', model: '', ports: 8).fromDialog(context, widget.lang);
+                  print(res?.toJson());
+                  if (res?.ports != 0 || res?.ip != '' || res?.model != '') {
+                    res != null ? node.equipments.add(res) : null;
+                  }
+                  setState(() {});
+                },
+                  //node.equipments.add(},//ActiveDevice().askForNewDevice(context, widget.lang).then((value) => setState(() => value != null ? node.equipments.add(value) : print,)),
                 icon: const Icon(Icons.add),
                 label: TranslateText('Add equipment', language: widget.lang)),
+            
           ],
         ),
         TextButton.icon(
