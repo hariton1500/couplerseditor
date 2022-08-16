@@ -312,11 +312,20 @@ class _NodesScreenState extends State<NodesScreen> {
                 )),
             icon: const Icon(Icons.add),
             label: TranslateText('Add cable ending', language: widget.lang)),
-        if ((node.cableEnds.length + node.equipments.length) >= 2) ...[
-          TextButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.add_outlined),
-            label: TranslateText('Add connection', language: widget.lang),
+        if (node.cableEnds.isNotEmpty || node.equipments.isNotEmpty) ...[
+          Wrap(
+            children: [
+              TextButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.save_outlined),
+                label: TranslateText('Save to Server', language: widget.lang),
+              ),
+              TextButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.arrow_back_outlined),
+                label: TranslateText('back', language: widget.lang),
+              ),
+            ],
           ),
         ]
       ])),
