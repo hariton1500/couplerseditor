@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../Helpers/strings.dart';
 
@@ -103,7 +102,7 @@ class ActiveDevice {
       width: isLarge ? 30 * 1.1 : 30,
       height: isLarge ? 30 * 1.1 : 30,
       decoration: BoxDecoration(
-        color: Colors.green,
+        color: Colors.grey,
         border: Border.all(color: Colors.black),
       ),
       child: Text(
@@ -170,7 +169,8 @@ class ActiveDevice {
                       const Divider(),
                       TextField(
                         keyboardType: TextInputType.number,
-                        controller: TextEditingController(text: ports.toString()),
+                        controller:
+                            TextEditingController(text: ports.toString()),
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Ports',
@@ -222,7 +222,7 @@ class ActiveDevice {
                             ports = '8';
                           });
                         }
-                      }/* else {
+                      } /* else {
                         setState(() {
                           id = '-1';
                         });

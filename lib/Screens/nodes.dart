@@ -11,25 +11,24 @@ import 'location_picker.dart';
 
 class NodesScreen extends StatefulWidget {
   final String lang;
+  final Node node;
 
-  const NodesScreen({
-    Key? key,
-    required this.lang,
-  }) : super(key: key);
+  const NodesScreen({Key? key, required this.lang, required this.node})
+      : super(key: key);
 
   @override
   State<NodesScreen> createState() => _NodesScreenState();
 }
 
 class _NodesScreenState extends State<NodesScreen> {
-  Node node = Node(address: 'No address');
+  //Node node = widget.node;
   int selectedAquipmentIndex = -1;
   bool isEdititingAddress = false;
 
   @override
   Widget build(BuildContext context) {
     print(
-        'cableends: ${node.cableEnds.length}; equipments: ${node.equipments.length}');
+        'cableends: ${widget.node.cableEnds.length}; equipments: ${widget.node.equipments.length}');
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -38,18 +37,18 @@ class _NodesScreenState extends State<NodesScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TranslateText(
-              'Node address:',
+              'node address:',
               language: widget.lang,
             ),
           ),
           isEdititingAddress
               ? TextField(
-                  controller: TextEditingController(text: node.address),
+                  controller: TextEditingController(text: widget.node.address),
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (value) {
-                    node.address = value;
+                    widget.node.address = value;
                     //isEdititingAddress = false;
                   },
                   onEditingComplete: () => setState(() {
@@ -62,7 +61,7 @@ class _NodesScreenState extends State<NodesScreen> {
                       isEdititingAddress = true;
                     });
                   },
-                  child: Text(node.address)),
+                  child: Text(widget.node.address)),
           TextButton(
               onPressed: () => showDialog<ll.LatLng>(
                   context: context,
@@ -75,7 +74,7 @@ class _NodesScreenState extends State<NodesScreen> {
                       content: const LocationPicker(),
                     );
                   }).then((value) => setState(() {
-                    node.location = value;
+                    widget.node.location = value;
                   })),
               child: Wrap(
                 children: [
@@ -84,8 +83,8 @@ class _NodesScreenState extends State<NodesScreen> {
                     language: widget.lang,
                   ),
                   Text(
-                      (node.location != null
-                          ? node.location!
+                      (widget.node.location != null
+                          ? widget.node.location!
                               .toJson()['coordinates']
                               .toString()
                           : ''),
@@ -94,13 +93,13 @@ class _NodesScreenState extends State<NodesScreen> {
               )),
           const Divider(),
           //location picker
-          for (final equipment in node.equipments)
+          for (final equipment in widget.node.equipments)
             Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: GestureDetector(
                   onTap: () {
                     setState(() => selectedAquipmentIndex =
-                        node.equipments.indexOf(equipment));
+                        widget.node.equipments.indexOf(equipment));
                   },
                   child: equipment.widget(
                       language: widget.lang,
@@ -109,19 +108,19 @@ class _NodesScreenState extends State<NodesScreen> {
                         Connection connection = Connection(
                             connectionData:
                                 MapEntry(o, MapEntry(equipment, i)));
-                        node.connections.add(connection);
+                        widget.node.connections.add(connection);
                         setState(() {});
                       },
                       isSelected: selectedAquipmentIndex ==
-                          node.equipments.indexOf(equipment)),
+                          widget.node.equipments.indexOf(equipment)),
                 )),
-          for (final cableEnd in node.cableEnds)
+          for (final cableEnd in widget.node.cableEnds)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
                   Text(
-                    '[${node.cableEnds.indexOf(cableEnd) + 1}]${cableEnd.direction}: ${cableEnd.fibersNumber}',
+                    '[${widget.node.cableEnds.indexOf(cableEnd) + 1}]${cableEnd.direction}: ${cableEnd.fibersNumber}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   cableEnd.widget(
@@ -129,7 +128,7 @@ class _NodesScreenState extends State<NodesScreen> {
                       callback: (o, i) {
                         print('$o; $i');
                         setState(() {
-                          node.connections.add(Connection(
+                          widget.node.connections.add(Connection(
                               connectionData:
                                   MapEntry(o, MapEntry(cableEnd, i))));
                         });
@@ -137,7 +136,7 @@ class _NodesScreenState extends State<NodesScreen> {
                 ],
               ),
             ),
-          for (final connection in node.connections)
+          for (final connection in widget.node.connections)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -148,7 +147,7 @@ class _NodesScreenState extends State<NodesScreen> {
                       IconButton(
                           onPressed: () {
                             setState(() {
-                              node.connections.remove(connection);
+                              widget.node.connections.remove(connection);
                             });
                           },
                           icon: const Icon(Icons.delete_outline)),
@@ -174,7 +173,7 @@ class _NodesScreenState extends State<NodesScreen> {
                             .fromDialog(context, widget.lang);
                     print(res?.toJson());
                     if (res?.ports != 0 || res?.ip != '' || res?.model != '') {
-                      res != null ? node.equipments.add(res) : null;
+                      res != null ? widget.node.equipments.add(res) : null;
                     }
                     setState(() {});
                   },
@@ -186,7 +185,7 @@ class _NodesScreenState extends State<NodesScreen> {
                       context: context,
                       builder: (BuildContext context) {
                         ActiveDevice activeDevice =
-                            node.equipments[selectedAquipmentIndex];
+                            widget.node.equipments[selectedAquipmentIndex];
                         return AvtiveDevicePortsEditor(
                             lang: widget.lang, activeDevice: activeDevice);
                       }).then((value) => setState(() {})),
@@ -197,7 +196,7 @@ class _NodesScreenState extends State<NodesScreen> {
                 TextButton.icon(
                   onPressed: () {
                     setState(() {
-                      node.equipments.removeAt(selectedAquipmentIndex);
+                      widget.node.equipments.removeAt(selectedAquipmentIndex);
                       selectedAquipmentIndex = -1;
                     });
                   },
@@ -298,22 +297,28 @@ class _NodesScreenState extends State<NodesScreen> {
                       );
                     });
                   }).then((value) => setState(
-                    () => value != null ? node.cableEnds.add(value) : print,
+                    () => value != null
+                        ? widget.node.cableEnds.add(value)
+                        : print,
                   )),
               icon: const Icon(Icons.add),
               label: TranslateText('Add cable ending', language: widget.lang)),
-          if (node.cableEnds.isNotEmpty || node.equipments.isNotEmpty) ...[
+          if (widget.node.cableEnds.isNotEmpty ||
+              widget.node.equipments.isNotEmpty) ...[
             Wrap(
               children: [
                 TextButton.icon(
                   onPressed: () {
-                    print(node.toJson());
+                    //print(node.toJson());
+                    widget.node.saveToLocal();
                   },
                   icon: const Icon(Icons.save_outlined),
                   label: TranslateText('Save to Server', language: widget.lang),
                 ),
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                   icon: const Icon(Icons.arrow_back_outlined),
                   label: TranslateText('back', language: widget.lang),
                 ),

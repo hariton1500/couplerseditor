@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'Helpers/strings.dart';
 import 'Models/coupler.dart';
+import 'Models/node.dart';
 import 'Models/settings.dart';
 import 'Screens/mufta.dart';
 import 'Screens/couplerslist.dart';
 import 'Screens/nodes.dart';
+import 'Screens/nodeslist.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,6 +43,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Settings settings = Settings();
   List<String> localStored = [];
   String selectedName = '';
+
+  Node node = Node(address: 'no address');
 
   @override
   void initState() {
@@ -211,15 +215,68 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => NodesScreen(
-                        //node: Node(address: 'no Address'),
-                        //callback: () => setState(() {}),
-                        lang: settings.language)));
+                          //node: Node(address: 'no Address'),
+                          //callback: () => setState(() {}),
+                          lang: settings.language, node: node,
+                        )));
               },
               icon: const Icon(Icons.create_outlined),
               label: TranslateText(
                 'Create/edit node',
                 language: settings.language,
               ),
+            ),
+            Wrap(
+              children: [
+                TextButton.icon(
+                    onPressed: () async {
+                      await Navigator.of(context)
+                          .push(MaterialPageRoute<String>(
+                        builder: (context) => NodesList(
+                          isFromBilling: true,
+                          lang: settings.language,
+                          nodesListURL: settings.nodesListUrl,
+                        ),
+                      ))
+                          .then((value) {
+                        setState(() {
+                          if (value != null) {
+                            mufta = Mufta.fromJson(jsonDecode(value));
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => NodesScreen(
+                                    node: node,
+                                    //callback: () => setState(() {}),
+                                    lang: settings.language)));
+                          }
+                        });
+                      });
+                    },
+                    icon: const Icon(Icons.download_rounded),
+                    label: TranslateText('Load from billing software (json)',
+                        language: settings.language)),
+                TextButton.icon(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute<String>(
+                        builder: (context) => NodesList(
+                          isFromBilling: false,
+                          lang: settings.language,
+                          nodesListURL: settings.nodesListUrl,
+                        ),
+                      ))
+                          .then((value) {
+                        setState(() {
+                          if (value != null) {
+                            mufta = Mufta.fromJson(jsonDecode(value));
+                            isShowMuftu = true;
+                          }
+                        });
+                      });
+                    },
+                    icon: const Icon(Icons.download_for_offline_rounded),
+                    label: TranslateText('Load from device',
+                        language: settings.language)),
+              ],
             ),
           ],
         ),
