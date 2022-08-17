@@ -1,7 +1,11 @@
+import 'dart:convert';
+
+import 'package:coupolerseditor/Models/node.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helpers/strings.dart';
+import 'nodes.dart';
 
 class NodesList extends StatefulWidget {
   const NodesList(
@@ -20,6 +24,7 @@ class NodesList extends StatefulWidget {
 
 class _NodesListState extends State<NodesList> {
   List<String> nodesJsonStrings = [];
+  int selectedNodeIndex = -1;
 
   @override
   void initState() {
@@ -31,14 +36,29 @@ class _NodesListState extends State<NodesList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nodes'),
-      ),
+      appBar: AppBar(title: const Text('Nodes'), actions: [
+        selectedNodeIndex >= 0
+            ? IconButton(
+                icon: const Icon(Icons.check_rounded),
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => NodesScreen(
+                            node: Node.fromJson(jsonDecode(
+                                nodesJsonStrings[selectedNodeIndex])),
+                            lang: widget.lang,
+                          )));
+                  //Navigator.of(context).pop(couplers[selectedCouplerIndex!]);
+                },
+              )
+            : Container(),
+      ]),
       body: Center(
         child: nodesJsonStrings.isNotEmpty
             ? ListView.builder(
                 itemCount: nodesJsonStrings.length,
                 itemBuilder: (ctx, index) {
+                  Map<String, dynamic> node =
+                      jsonDecode(nodesJsonStrings[index]);
                   return ListTile(
                     leading: IconButton(
                       icon: const Icon(Icons.delete_rounded),
@@ -47,11 +67,11 @@ class _NodesListState extends State<NodesList> {
                           context: context,
                           builder: (context) => AlertDialog(
                             title: TranslateText(
-                              'Delete coupler',
+                              'Delete node',
                               language: widget.lang,
                             ),
                             content: TranslateText(
-                              'Are you sure you want to delete coupler?',
+                              'Are you sure you want to delete node?',
                               language: widget.lang,
                             ),
                             actions: [
@@ -82,7 +102,19 @@ class _NodesListState extends State<NodesList> {
                         );
                       },
                     ),
-                    title: Text(nodesJsonStrings[index]),
+                    title: TextButton(
+                      child: Text(
+                        node['address'],
+                        style: const TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          selectedNodeIndex = index;
+                        });
+                      },
+                    ),
                   );
                 })
             : TranslateText('Nodes are loading...', language: widget.lang),

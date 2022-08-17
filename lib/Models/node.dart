@@ -16,8 +16,27 @@ class Node {
 
   Node.fromJson(Map<String, dynamic> json) {
     location = LatLng.fromJson(json['location']);
-    equipments = json['equipments'];
+    equipments = List.from(json['equipments'])
+        .map((x) => ActiveDevice.fromJson(x))
+        .toList();
     address = json['address'];
+    cableEnds =
+        List.from(json['cableEnds']).map((x) => CableEnd.fromJson(x)).toList();
+    connections = List.from(json['connections']).map((e) {
+      print(e);
+      var side1 = e['connectionData'][0];
+      var side2 = e['connectionData'][1];
+      Object s1, s2;
+      side1['side1'][0] == 'AD'
+          ? s1 = equipments.firstWhere((x) => x.ip == side1['side1'][1])
+          : s1 = cableEnds.firstWhere((x) => x.direction == side1['side1'][1]);
+      side2['side2'][0] == 'AD'
+          ? s2 = equipments.firstWhere((x) => x.ip == side2['side2'][1])
+          : s2 = cableEnds.firstWhere((x) => x.direction == side2['side2'][1]);
+      return Connection(
+          connectionData: MapEntry(
+              MapEntry(s1, side1['port']), MapEntry(s2, side2['port'])));
+    }).toList();
   }
 
   String toJson() {

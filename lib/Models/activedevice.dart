@@ -18,10 +18,11 @@ class ActiveDevice {
     spliters = List.filled(ports, 0);
   }
   ActiveDevice.fromJson(Map<String, dynamic> json) {
+    print('loading ActiveDevice from json=$json');
     id = json['id'] ?? -1;
     ip = json['ip'] as String;
     ports = json['ports'] as int;
-    model = json['name'] as String;
+    model = json['model'] as String;
     portComments = List.filled(ports, '');
     spliters = List.filled(ports, 0);
   }
