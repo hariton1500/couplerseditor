@@ -105,7 +105,7 @@ class MuftaScreenState extends State<MuftaScreen> {
                       }).then((value) => setState(() {
                         widget.mufta.location = value;
                       })),
-                  child: Row(
+                  child: Wrap(
                     children: [
                       TranslateText(
                         'Location:',

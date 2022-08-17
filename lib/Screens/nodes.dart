@@ -5,10 +5,12 @@ import '../Helpers/fibers.dart';
 import '../Helpers/strings.dart';
 import '../Models/node.dart';
 import 'activedeviceportseditor.dart';
+import 'package:latlong2/latlong.dart' as ll;
+
+import 'location_picker.dart';
 
 class NodesScreen extends StatefulWidget {
   final String lang;
-  //final Node node= Node(address: 'asdasd');
 
   const NodesScreen({
     Key? key,
@@ -20,7 +22,7 @@ class NodesScreen extends StatefulWidget {
 }
 
 class _NodesScreenState extends State<NodesScreen> {
-  Node node = Node(address: '');
+  Node node = Node(address: 'No address');
   int selectedAquipmentIndex = -1;
   bool isEdititingAddress = false;
 
@@ -61,6 +63,37 @@ class _NodesScreenState extends State<NodesScreen> {
                     });
                   },
                   child: Text(node.address)),
+          TextButton(
+              onPressed: () => showDialog<ll.LatLng>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: TranslateText(
+                        'Location Picker',
+                        language: widget.lang,
+                      ),
+                      content: const LocationPicker(),
+                    );
+                  }).then((value) => setState(() {
+                    node.location = value;
+                  })),
+              child: Wrap(
+                children: [
+                  TranslateText(
+                    'Location:',
+                    language: widget.lang,
+                  ),
+                  Text(
+                      (node.location != null
+                          ? node.location!
+                              .toJson()['coordinates']
+                              .toString()
+                          : ''),
+                      style: const TextStyle(fontSize: 10)),
+                ],
+              )),
+          const Divider(),
+          //location picker
           for (final equipment in node.equipments)
             Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -273,7 +306,9 @@ class _NodesScreenState extends State<NodesScreen> {
             Wrap(
               children: [
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    print(node.toJson());
+                  },
                   icon: const Icon(Icons.save_outlined),
                   label: TranslateText('Save to Server', language: widget.lang),
                 ),

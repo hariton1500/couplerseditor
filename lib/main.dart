@@ -6,7 +6,7 @@ import 'Models/coupler.dart';
 import 'Models/settings.dart';
 import 'Screens/mufta.dart';
 import 'Screens/couplerslist.dart';
-import 'Screens/node.dart';
+import 'Screens/nodes.dart';
 
 void main() {
   runApp(const MyApp());

@@ -27,15 +27,15 @@ class ActiveDevice {
     spliters = List.filled(ports, 0);
   }
 
-  String toJson() {
-    return jsonEncode({
+  Map<String, dynamic> toJson() {
+    return {
       'id': id,
       'ip': ip,
       'ports': ports,
       'model': model,
       'portComments': portComments,
       'spliters': spliters
-    });
+    };
   }
 
   Widget widget(
@@ -47,7 +47,7 @@ class ActiveDevice {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
-          child: Text('id: $id; model: $model; ip: $ip; ports: $ports',
+          child: Text('$model; ip: $ip; ports: $ports',
               style: TextStyle(
                   color: isSelected ?? false ? Colors.red : Colors.black,
                   fontWeight: FontWeight.bold)),
@@ -128,56 +128,59 @@ class ActiveDevice {
             //String id = '-1', ports = '8', ip = '', model = '';
             return AlertDialog(
                 title: TranslateText('Add new equipment:', language: language),
-                content: Column(
-                  children: [
-                    TextField(
-                      keyboardType: TextInputType.text,
-                      controller: TextEditingController(text: model),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Model',
+                content: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      TextField(
+                        keyboardType: TextInputType.text,
+                        controller: TextEditingController(text: model),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Model',
+                        ),
+                        onChanged: (value) {
+                          model = value;
+                        },
                       ),
-                      onChanged: (value) {
-                        model = value;
-                      },
-                    ),
-                    const Divider(),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      controller: TextEditingController(text: ip),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'IP address',
+                      const Divider(),
+                      TextField(
+                        keyboardType: TextInputType.number,
+                        controller: TextEditingController(text: ip),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'IP address',
+                        ),
+                        onChanged: (value) {
+                          ip = value;
+                        },
                       ),
-                      onChanged: (value) {
-                        ip = value;
-                      },
-                    ),
-                    const Divider(),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      controller: TextEditingController(text: id.toString()),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'ID',
+                      /*
+                      const Divider(),
+                      TextField(
+                        keyboardType: TextInputType.number,
+                        controller: TextEditingController(text: id.toString()),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'ID',
+                        ),
+                        onChanged: (value) {
+                          id = value;
+                        },
+                      ),*/
+                      const Divider(),
+                      TextField(
+                        keyboardType: TextInputType.number,
+                        controller: TextEditingController(text: ports.toString()),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Ports',
+                        ),
+                        onChanged: (value) {
+                          ports = value;
+                        },
                       ),
-                      onChanged: (value) {
-                        id = value;
-                      },
-                    ),
-                    const Divider(),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      controller: TextEditingController(text: ports.toString()),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Ports',
-                      ),
-                      onChanged: (value) {
-                        ports = value;
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 actions: [
                   OutlinedButton.icon(
@@ -219,11 +222,11 @@ class ActiveDevice {
                             ports = '8';
                           });
                         }
-                      } else {
+                      }/* else {
                         setState(() {
                           id = '-1';
                         });
-                      }
+                      }*/
                     },
                   )
                 ]);
