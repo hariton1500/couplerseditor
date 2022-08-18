@@ -39,8 +39,10 @@ class CableEnd {
                 return element(index, colors);
               }, onAccept: (data) {
                 print('onAcceptOnCableEnd: $data');
-                callback(data, index);
-              }))),
+                if (data.key != this) {
+                  callback(data, index);
+                }
+          }))),
     );
   }
 
