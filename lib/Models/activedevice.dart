@@ -23,8 +23,8 @@ class ActiveDevice {
     ip = json['ip'] as String;
     ports = json['ports'] as int;
     model = json['model'] as String;
-    portComments = List.filled(ports, '');
-    spliters = List.filled(ports, 0);
+    portComments = List.from(json['portComments']);
+    spliters = List.from(json['spliters']);
   }
 
   Map<String, dynamic> toJson() {

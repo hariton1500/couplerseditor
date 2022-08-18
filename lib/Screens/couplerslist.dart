@@ -64,9 +64,11 @@ class _CouplersListState extends State<CouplersList> {
             ),
             selectedCouplerIndex != null
                 ? IconButton(
-                    icon: const Icon(Icons.check_rounded),
+                    icon: const Icon(Icons.select_all_outlined),
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => MuftaScreen(mufta: Mufta.fromJson(jsonDecode(couplers[selectedCouplerIndex!])), callback: () => setState(() {}), lang: widget.lang)));
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => MuftaScreen(mufta: Mufta.fromJson(jsonDecode(couplers[selectedCouplerIndex!])), callback: () => setState(() {}), lang: widget.lang))).then((value) => setState(() {
+                        widget.isFromBilling ? loadListFromBilling() : loadListFromDevice();
+                      },));
                       //Navigator.of(context).pop(couplers[selectedCouplerIndex!]);
                     },
                   )

@@ -39,15 +39,14 @@ class _NodesListState extends State<NodesList> {
       appBar: AppBar(title: const Text('Nodes'), actions: [
         selectedNodeIndex >= 0
             ? IconButton(
-                icon: const Icon(Icons.check_rounded),
+                icon: const Icon(Icons.select_all_outlined),
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => NodesScreen(
                             node: Node.fromJson(jsonDecode(
                                 nodesJsonStrings[selectedNodeIndex])),
                             lang: widget.lang,
-                          )));
-                  //Navigator.of(context).pop(couplers[selectedCouplerIndex!]);
+                          ))).then((value) => setState(() {widget.isFromBilling ? loadListFromBilling() : loadListFromDevice();}));
                 },
               )
             : Container(),
