@@ -2,9 +2,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'Helpers/strings.dart';
+import 'Models/cable.dart';
 import 'Models/coupler.dart';
 import 'Models/node.dart';
 import 'Models/settings.dart';
+import 'Screens/cables.dart';
 import 'Screens/mufta.dart';
 import 'Screens/couplerslist.dart';
 import 'Screens/nodes.dart';
@@ -45,6 +47,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String selectedName = '';
 
   Node node = Node(address: 'no address');
+
+  Cable cable = Cable(ends: []);
 
   @override
   void initState() {
@@ -278,6 +282,16 @@ class _MyHomePageState extends State<MyHomePage> {
                         language: settings.language)),
               ],
             ),
+            const Divider(),
+            Center(child: TranslateText('Cables:', language: settings.language)),
+            TextButton.icon(onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CableScreen(
+                        //cable: Cable(address: 'no Address'),
+                        //callback: () => setState(() {}),
+                        lang: settings.language, cable: cable,
+                      )));
+            }, icon: const Icon(Icons.create_outlined), label: TranslateText('Create/edit cable', language: settings.language)),
           ],
         ),
       ),

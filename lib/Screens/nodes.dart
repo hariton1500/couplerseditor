@@ -353,6 +353,7 @@ class _NodesScreenState extends State<NodesScreen> {
                 ),
               ],
             ),
+          ],
           TextButton.icon(
             onPressed: () {
               Navigator.of(context).pop();
@@ -360,7 +361,6 @@ class _NodesScreenState extends State<NodesScreen> {
             icon: const Icon(Icons.arrow_back_outlined),
             label: TranslateText('back', language: widget.lang),
           ),
-          ]
         ])),
       ),
     );

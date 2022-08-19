@@ -41,13 +41,16 @@ class Mufta {
   List<Connection> connections = [];
   LatLng? location;
 
-  factory Mufta.fromJson(Map<String, dynamic> json) => Mufta(
-      name: json["name"],
-      cableEnds:
-          List<CableEnd>.from(json['cables'].map((x) => CableEnd.fromJson(x))),
-      connections: List<Connection>.from(
-          json['connections'].map((x) => Connection.fromJson(x))),
-      location: LatLng.fromJson(json['location']));
+  Mufta.fromJson(Map<String, dynamic> json) {
+      print('loading Mufta from json:');
+      print(json);
+      name = json['name'];
+      cableEnds =
+          List<CableEnd>.from(json['cables'].map((x) => CableEnd.fromJson(x)));
+      connections = List<Connection>.from(
+          json['connections'].map((x) => Connection.fromJson(x)));
+      location = LatLng.fromJson(json['location']);
+  }
 
   String toJson() {
     return jsonEncode({
