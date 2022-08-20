@@ -39,6 +39,11 @@ class Node {
     }).toList();
   }
 
+  @override
+  String toString() {
+    return 'Node: $address; equipments: $equipments; cableEnds: $cableEnds; connections: $connections';
+  }
+
   String toJson() {
     return jsonEncode({
       'address': address,

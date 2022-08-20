@@ -23,6 +23,11 @@ class CableEnd {
     spliters = List.filled(fibersNumber, 0);
   }
 
+  @override
+  String toString() {
+    return 'CableEnd{direction: $direction, fibersNumber: $fibersNumber, colorScheme: $colorScheme}';
+  }
+  
   Widget widget(
       {required List<Color> colors,
       required void Function(MapEntry<Object, int>, int) callback}) {

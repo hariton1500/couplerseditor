@@ -53,18 +53,20 @@ class _CableScreenState extends State<CableScreen> {
           children: [
             ends.isNotEmpty ? Column(
               children: [
+                TranslateText('Cable:', language: widget.lang,),
                 ListView.builder(
                   shrinkWrap: true,
                   itemCount: ends.length,
                   itemBuilder: (ctx, index) {
                     return ListTile(
                       title: Text(ends[index].direction),
-                      subtitle: Text(ends[index].direction),
+                      leading: Text('side ${index + 1}:'),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete_outline),
                         onPressed: () {
                           setState(() {
                             ends.removeAt(index);
+                            _loadCouplersAndNodes(enableFilter: ends.length == 1);
                           });
                         },
                       ),
@@ -88,18 +90,19 @@ class _CableScreenState extends State<CableScreen> {
           shrinkWrap: true,
           itemCount: couplers.length,
           itemBuilder: (context, index) {
-            return ListTile(
+            return couplers[index].cableEnds.isNotEmpty ? ListTile(
               title: Text(couplers[index].name),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   for (var end in couplers[index].cableEnds)
-                    TextButton.icon(label: Text(end.direction), icon: const Icon(Icons.local_hospital_outlined), onPressed: () {setState(() {
-                      ends.add(end);
+                    TextButton.icon(label: Text('${end.direction} (${end.colorScheme}: ${end.fibersNumber})'), icon: const Icon(Icons.local_hospital_outlined), onPressed: () {setState(() {
+                      if (ends.length < 2) ends.add(end);
+                      _loadCouplersAndNodes(enableFilter: ends.length == 1);
                     });})
                 ]
               ),
-            );
+            ) : Container();
           },
         ),
         const Divider(),
@@ -108,18 +111,19 @@ class _CableScreenState extends State<CableScreen> {
           shrinkWrap: true,
           itemCount: nodes.length,
           itemBuilder: (context, index) {
-            return ListTile(
+            return nodes[index].cableEnds.isNotEmpty ? ListTile(
               title: Text(nodes[index].address),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   for (var end in nodes[index].cableEnds)
-                    TextButton.icon(label: Text(end.direction), icon: const Icon(Icons.local_hospital_outlined), onPressed: () {setState(() {
-                      ends.add(end);
+                    TextButton.icon(label: Text('${end.direction} (${end.colorScheme}: ${end.fibersNumber})'), icon: const Icon(Icons.local_hospital_outlined), onPressed: () {setState(() {
+                      if (ends.length < 2) ends.add(end);
+                      _loadCouplersAndNodes(enableFilter: ends.length == 1);
                     });})
                 ]
               ),
-            );
+            ) : Container();
           },
         ),
       ],
@@ -130,7 +134,12 @@ class _CableScreenState extends State<CableScreen> {
     return Container();
   }
   
-  Future<void> _loadCouplersAndNodes({bool isSourceLocal = true}) async {
+  Future<void> _loadCouplersAndNodes({bool isSourceLocal = true, bool enableFilter = false}) async {
+    if (ends.length == 2) {
+      couplers = [];
+      nodes = [];
+      return;
+    }
     if (isSourceLocal) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Set<String> couplersJsonStrings = prefs.getKeys().where((element) => element.startsWith('coupler:')).toSet();
@@ -146,6 +155,38 @@ class _CableScreenState extends State<CableScreen> {
     } else {
       nodes = [];
     }
+    if (enableFilter) {
+      int fNum = ends.first.fibersNumber;
+      String color = ends.first.colorScheme!;
+      for (var coupler in couplers) {
+        List<CableEnd> toRemove = [];
+        for (var end in coupler.cableEnds) {
+          if (end.fibersNumber != fNum || end.colorScheme != color || end != ends.first) {
+            toRemove.add(end);
+            //coupler.cableEnds.remove(end);
+          }
+        }
+        for (var end in toRemove) {
+          coupler.cableEnds.remove(end);
+        }
+      }
+      for (var node in nodes) {
+        List<CableEnd> toRemove = [];
+        for (var end in node.cableEnds) {
+          if (end.fibersNumber != fNum || end.colorScheme != color || end != ends.first) {
+            //node.cableEnds.remove(end);
+            toRemove.add(end);
+          }
+        }
+        for (var end in toRemove) {
+          node.cableEnds.remove(end);
+        }
+      }
+    }
+    for (var coupler in couplers) {
+      print(coupler.toString());
+    }
+    print(nodes);
     setState(() {});
   }
 }

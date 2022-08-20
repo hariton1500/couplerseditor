@@ -41,9 +41,13 @@ class Mufta {
   List<Connection> connections = [];
   LatLng? location;
 
+  String toString() {
+    return 'Mufta: $name; cableEnds: $cableEnds; connections: $connections';
+  }
+  
   Mufta.fromJson(Map<String, dynamic> json) {
       print('loading Mufta from json:');
-      print(json);
+      //print(json);
       name = json['name'];
       cableEnds =
           List<CableEnd>.from(json['cables'].map((x) => CableEnd.fromJson(x)));
