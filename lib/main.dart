@@ -1,4 +1,3 @@
-//import 'package:couplers/Screens/mufta2.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'Helpers/strings.dart';
@@ -287,11 +286,17 @@ class _MyHomePageState extends State<MyHomePage> {
             TextButton.icon(onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => CableScreen(
-                        //cable: Cable(address: 'no Address'),
-                        //callback: () => setState(() {}),
+                        isFromServer: true,
                         lang: settings.language, cable: cable,
                       )));
-            }, icon: const Icon(Icons.create_outlined), label: TranslateText('Create/edit cable', language: settings.language)),
+            }, icon: const Icon(Icons.create_outlined), label: TranslateText('Create/edit cable from Server', language: settings.language)),
+            TextButton.icon(onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CableScreen(
+                        isFromServer: false,
+                        lang: settings.language, cable: cable,
+                      )));
+            }, icon: const Icon(Icons.create_outlined), label: TranslateText('Create/edit cable from Local device', language: settings.language)),
           ],
         ),
       ),
