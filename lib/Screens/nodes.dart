@@ -43,6 +43,7 @@ class _NodesScreenState extends State<NodesScreen> {
           ),
           isEdititingAddress
               ? TextField(
+                  autofocus: true,
                   controller: TextEditingController(text: widget.node.address),
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
@@ -118,10 +119,14 @@ class _NodesScreenState extends State<NodesScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '[${widget.node.cableEnds.indexOf(cableEnd) + 1}]${cableEnd.direction}: ${cableEnd.fibersNumber}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      '[${widget.node.cableEnds.indexOf(cableEnd) + 1}] ${cableEnd.direction}: ${cableEnd.fibersNumber}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                   cableEnd.widget(
                       colors: fiberColors[cableEnd.colorScheme!]!,
@@ -136,10 +141,15 @@ class _NodesScreenState extends State<NodesScreen> {
                 ],
               ),
             ),
+          widget.node.connections.isNotEmpty ? Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: TranslateText('Connections:', language: widget.lang),
+          ) : Container(),
           for (final connection in widget.node.connections)
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
+              padding: const EdgeInsets.all(0.0),
+              /*child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Wrap(
                     crossAxisAlignment: WrapCrossAlignment.center,
@@ -150,20 +160,46 @@ class _NodesScreenState extends State<NodesScreen> {
                               widget.node.connections.remove(connection);
                             });
                           },
-                          icon: const Icon(Icons.delete_outline)),
+                          icon: const Icon(Icons.delete_outline, size: 12)),
                       Text(
-                        '${connection.connectionData!.key.key is CableEnd ? (connection.connectionData!.key.key as CableEnd).direction : (connection.connectionData!.key.key as ActiveDevice).ip}[${connection.connectionData!.key.value + 1}]',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        '${connection.connectionData!.key.key is CableEnd ? (connection.connectionData!.key.key as CableEnd).direction : (connection.connectionData!.key.key as ActiveDevice).ip}[${connection.connectionData!.key.value + 1}] ',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
                       ),
-                      const Icon(Icons.plumbing_outlined),
+                      const Icon(Icons.plumbing_outlined, size: 10),
                       Text(
-                          '${connection.connectionData!.value.key is CableEnd ? (connection.connectionData!.value.key as CableEnd).direction : (connection.connectionData!.value.key as ActiveDevice).ip}[${connection.connectionData!.value.value + 1}]',
-                          style: const TextStyle(fontWeight: FontWeight.bold))
+                          ' ${connection.connectionData!.value.key is CableEnd ? (connection.connectionData!.value.key as CableEnd).direction : (connection.connectionData!.value.key as ActiveDevice).ip}[${connection.connectionData!.value.value + 1}]',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10)),
                     ],
                   ),
                 ],
+              ),*/
+              child: ListTile(
+                dense: true,
+                leading: IconButton(
+                  splashRadius: 12,
+                  iconSize: 12,
+                    onPressed: () {
+                      setState(() {
+                        widget.node.connections.remove(connection);
+                      });
+                    },
+                    icon: const Icon(Icons.delete_outline, size: 12)),
+                title: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        '${connection.connectionData!.key.key is CableEnd ? (connection.connectionData!.key.key as CableEnd).direction : (connection.connectionData!.key.key as ActiveDevice).ip}[${connection.connectionData!.key.value + 1}] ',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+                      ),
+                      const Icon(Icons.plumbing_outlined, size: 10),
+                      Text(
+                          ' ${connection.connectionData!.value.key is CableEnd ? (connection.connectionData!.value.key as CableEnd).direction : (connection.connectionData!.value.key as ActiveDevice).ip}[${connection.connectionData!.value.value + 1}]',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10)),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            
           Wrap(
             children: [
               TextButton.icon(
@@ -315,16 +351,16 @@ class _NodesScreenState extends State<NodesScreen> {
                   icon: const Icon(Icons.save_outlined),
                   label: TranslateText('Save to Server', language: widget.lang),
                 ),
-                TextButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  icon: const Icon(Icons.arrow_back_outlined),
-                  label: TranslateText('back', language: widget.lang),
-                ),
               ],
             ),
-          ]
+          ],
+          TextButton.icon(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_outlined),
+            label: TranslateText('back', language: widget.lang),
+          ),
         ])),
       ),
     );

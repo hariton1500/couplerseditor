@@ -23,6 +23,11 @@ class CableEnd {
     spliters = List.filled(fibersNumber, 0);
   }
 
+  @override
+  String toString() {
+    return 'CableEnd{direction: $direction, fibersNumber: $fibersNumber, colorScheme: $colorScheme}';
+  }
+  
   Widget widget(
       {required List<Color> colors,
       required void Function(MapEntry<Object, int>, int) callback}) {
@@ -39,8 +44,10 @@ class CableEnd {
                 return element(index, colors);
               }, onAccept: (data) {
                 print('onAcceptOnCableEnd: $data');
-                callback(data, index);
-              }))),
+                if (data.key != this) {
+                  callback(data, index);
+                }
+          }))),
     );
   }
 
