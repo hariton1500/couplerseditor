@@ -27,6 +27,10 @@ class ActiveDevice {
     spliters = List.filled(ports, 0);
   }
 
+  String signature() {
+    return '$ip:$ports:$model';
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
