@@ -10,6 +10,7 @@ import 'Screens/mufta.dart';
 import 'Screens/couplerslist.dart';
 import 'Screens/nodes.dart';
 import 'Screens/nodeslist.dart';
+import 'Screens/viewer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -282,21 +283,75 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             const Divider(),
-            Center(child: TranslateText('Cables:', language: settings.language)),
-            TextButton.icon(onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => CableScreen(
-                        isFromServer: true,
-                        lang: settings.language, cable: cable,
-                      )));
-            }, icon: const Icon(Icons.create_outlined), label: TranslateText('Create/edit cable from Server', language: settings.language)),
-            TextButton.icon(onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => CableScreen(
-                        isFromServer: false,
-                        lang: settings.language, cable: cable,
-                      )));
-            }, icon: const Icon(Icons.create_outlined), label: TranslateText('Create/edit cable from Local device', language: settings.language)),
+            Center(
+                child: TranslateText('Cables:', language: settings.language)),
+            TextButton.icon(
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(
+                          builder: (context) => CableScreen(
+                                isFromServer: true,
+                                lang: settings.language,
+                                cable: cable,
+                              )))
+                      .then((value) {
+                    if (value != null) {
+                      setState(() {
+                        cable = value;
+                        cable.saveCableToServer();
+                      });
+                    }
+                  });
+                },
+                icon: const Icon(Icons.create_outlined),
+                label: TranslateText('Create/edit cable from Server',
+                    language: settings.language)),
+            TextButton.icon(
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(
+                          builder: (context) => CableScreen(
+                                isFromServer: false,
+                                lang: settings.language,
+                                cable: cable,
+                              )))
+                      .then((value) {
+                    if (value != null) {
+                      setState(() {
+                        cable = value;
+                        cable.saveCableToLocal();
+                      });
+                    }
+                  });
+                },
+                icon: const Icon(Icons.create_outlined),
+                label: TranslateText('Create/edit cable from Local device',
+                    language: settings.language)),
+            const Divider(),
+            Center(
+                child: TranslateText('Viewer:', language: settings.language)),
+            TextButton.icon(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ViewerScreen(
+                            lang: settings.language,
+                            isFromServer: true,
+                          )));
+                },
+                icon: const Icon(Icons.visibility_outlined),
+                label: TranslateText('Viewer from Server',
+                    language: settings.language)),
+            TextButton.icon(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ViewerScreen(
+                            lang: settings.language,
+                            isFromServer: false,
+                          )));
+                },
+                icon: const Icon(Icons.visibility_outlined),
+                label: TranslateText('Viewer from Local device',
+                    language: settings.language)),
           ],
         ),
       ),

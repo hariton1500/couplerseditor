@@ -66,9 +66,20 @@ class _CouplersListState extends State<CouplersList> {
                 ? IconButton(
                     icon: const Icon(Icons.select_all_outlined),
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => MuftaScreen(mufta: Mufta.fromJson(jsonDecode(couplers[selectedCouplerIndex!])), callback: () => setState(() {}), lang: widget.lang))).then((value) => setState(() {
-                        widget.isFromBilling ? loadListFromBilling() : loadListFromDevice();
-                      },));
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(
+                              builder: (context) => MuftaScreen(
+                                  mufta: Mufta.fromJson(jsonDecode(
+                                      couplers[selectedCouplerIndex!])),
+                                  callback: () => setState(() {}),
+                                  lang: widget.lang)))
+                          .then((value) => setState(
+                                () {
+                                  widget.isFromBilling
+                                      ? loadListFromBilling()
+                                      : loadListFromDevice();
+                                },
+                              ));
                       //Navigator.of(context).pop(couplers[selectedCouplerIndex!]);
                     },
                   )
@@ -158,11 +169,9 @@ class _CouplersListState extends State<CouplersList> {
                             });
                           }),
                       layers: [
-                        
                         TileLayerOptions(
                             urlTemplate:
                                 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=ru-RU&scale=1&xss=1&yss=1&s=G5zdHJ1c3Q%3D&client=gme-google&style=api%3A1.0.0&key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'),
-                        
                         /*
                         TileLayerOptions(
                           urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -183,7 +192,10 @@ class _CouplersListState extends State<CouplersList> {
                                   selectedCouplerIndex != couplers.indexOf(e)
                                       ? IconButton(
                                           autofocus: true,
-                                          icon: const Icon(Icons.location_on, color: Colors.red,),
+                                          icon: const Icon(
+                                            Icons.location_on,
+                                            color: Colors.red,
+                                          ),
                                           onPressed: () {
                                             print(
                                                 'clicked on marker ${coupler['name']}');

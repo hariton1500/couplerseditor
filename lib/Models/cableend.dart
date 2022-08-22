@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import '../Helpers/fibers.dart';
 
 class CableEnd {
@@ -11,6 +12,7 @@ class CableEnd {
   //List<int> withSpliter = [];
   Map<int, double> fiberPosY = {};
   List<int> spliters = [];
+  LatLng? location;
   //Function callback = (Object asd) {};
 
   CableEnd(
@@ -27,7 +29,11 @@ class CableEnd {
   String toString() {
     return 'CableEnd{direction: $direction, fibersNumber: $fibersNumber, colorScheme: $colorScheme}';
   }
-  
+
+  String signature() {
+    return '$direction:$fibersNumber:$colorScheme';
+  }
+
   Widget widget(
       {required List<Color> colors,
       required void Function(MapEntry<Object, int>, int) callback}) {
@@ -47,7 +53,7 @@ class CableEnd {
                 if (data.key != this) {
                   callback(data, index);
                 }
-          }))),
+              }))),
     );
   }
 
@@ -73,6 +79,7 @@ class CableEnd {
         'colorScheme': colorScheme,
         'fiberComments': fiberComments,
         'spliter': spliters,
+        'location': location?.toJson(),
       };
 
   CableEnd.fromJson(Map<String, dynamic> json) {
@@ -83,5 +90,7 @@ class CableEnd {
     colorScheme = json['colorScheme'] ?? fiberColors.keys.first;
     fiberComments = List.castFrom<dynamic, String>(json['fiberComments']);
     spliters = json['spliters'] ?? List.filled(fibersNumber, 0);
+    location =
+        json['location'] != null ? LatLng.fromJson(json['location']) : null;
   }
 }
