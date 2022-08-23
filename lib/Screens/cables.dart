@@ -37,7 +37,7 @@ class _CableScreenState extends State<CableScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cable'),
+        title: const Text('Cables'),
         actions: <Widget>[
           IconButton(
             icon: isViewOnMap ? const Icon(Icons.list_outlined) : const Icon(Icons.map_outlined),
@@ -52,9 +52,11 @@ class _CableScreenState extends State<CableScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            ends.isNotEmpty ? Column(
+            const Divider(),
+            TranslateText('New cable:', language: widget.lang,),
+            Column(
               children: [
-                TranslateText('Cable:', language: widget.lang,),
+                
                 ListView.builder(
                   shrinkWrap: true,
                   itemCount: ends.length,
@@ -75,11 +77,13 @@ class _CableScreenState extends State<CableScreen> {
                   },
                 ),
               ],
-            ) : Container(),
-            isViewOnMap ? _buildMap() : _buildList(),
+            ),
+            const Divider(),
             ends.length == 2 ? TextButton.icon(onPressed: () {
               Navigator.of(context).pop(Cable(ends: ends));
             }, icon: const Icon(Icons.save_outlined), label: TranslateText('Save', language: widget.lang,)) : Container(),
+            isViewOnMap ? _buildMap() : _buildList(),
+            const Divider(),
           ],
         ),
       ),
@@ -89,7 +93,7 @@ class _CableScreenState extends State<CableScreen> {
   Widget _buildList() {
     return Column(
       children: [
-        couplers.isNotEmpty ? TranslateText('Couplers:', language: widget.lang) : Container(),
+        couplers.isNotEmpty ? TranslateText('Cable ends in couplers:', language: widget.lang) : Container(),
         ListView.builder(
           shrinkWrap: true,
           itemCount: couplers.length,
@@ -110,7 +114,7 @@ class _CableScreenState extends State<CableScreen> {
           },
         ),
         const Divider(),
-        nodes.isNotEmpty ? TranslateText('Nodes:', language: widget.lang) : Container(),
+        nodes.isNotEmpty ? TranslateText('Cable ends in nodes:', language: widget.lang) : Container(),
         ListView.builder(
           shrinkWrap: true,
           itemCount: nodes.length,
