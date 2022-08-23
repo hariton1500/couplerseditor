@@ -141,43 +141,20 @@ class _NodesScreenState extends State<NodesScreen> {
                 ],
               ),
             ),
-          widget.node.connections.isNotEmpty ? Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: TranslateText('Connections:', language: widget.lang),
-          ) : Container(),
+          widget.node.connections.isNotEmpty
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: TranslateText('Connections:', language: widget.lang),
+                )
+              : Container(),
           for (final connection in widget.node.connections)
             Padding(
               padding: const EdgeInsets.all(0.0),
-              /*child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            setState(() {
-                              widget.node.connections.remove(connection);
-                            });
-                          },
-                          icon: const Icon(Icons.delete_outline, size: 12)),
-                      Text(
-                        '${connection.connectionData!.key.key is CableEnd ? (connection.connectionData!.key.key as CableEnd).direction : (connection.connectionData!.key.key as ActiveDevice).ip}[${connection.connectionData!.key.value + 1}] ',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-                      ),
-                      const Icon(Icons.plumbing_outlined, size: 10),
-                      Text(
-                          ' ${connection.connectionData!.value.key is CableEnd ? (connection.connectionData!.value.key as CableEnd).direction : (connection.connectionData!.value.key as ActiveDevice).ip}[${connection.connectionData!.value.value + 1}]',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10)),
-                    ],
-                  ),
-                ],
-              ),*/
               child: ListTile(
                 dense: true,
                 leading: IconButton(
-                  splashRadius: 12,
-                  iconSize: 12,
+                    splashRadius: 12,
+                    iconSize: 12,
                     onPressed: () {
                       setState(() {
                         widget.node.connections.remove(connection);
@@ -185,21 +162,23 @@ class _NodesScreenState extends State<NodesScreen> {
                     },
                     icon: const Icon(Icons.delete_outline, size: 12)),
                 title: Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Text(
-                        '${connection.connectionData!.key.key is CableEnd ? (connection.connectionData!.key.key as CableEnd).direction : (connection.connectionData!.key.key as ActiveDevice).ip}[${connection.connectionData!.key.value + 1}] ',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
-                      ),
-                      const Icon(Icons.plumbing_outlined, size: 10),
-                      Text(
-                          ' ${connection.connectionData!.value.key is CableEnd ? (connection.connectionData!.value.key as CableEnd).direction : (connection.connectionData!.value.key as ActiveDevice).ip}[${connection.connectionData!.value.value + 1}]',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10)),
-                    ],
-                  ),
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      '${connection.connectionData!.key.key is CableEnd ? (connection.connectionData!.key.key as CableEnd).direction : (connection.connectionData!.key.key as ActiveDevice).ip}[${connection.connectionData!.key.value + 1}] ',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 10),
+                    ),
+                    const Icon(Icons.plumbing_outlined, size: 10),
+                    Text(
+                        ' ${connection.connectionData!.value.key is CableEnd ? (connection.connectionData!.value.key as CableEnd).direction : (connection.connectionData!.value.key as ActiveDevice).ip}[${connection.connectionData!.value.value + 1}]',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 10)),
+                  ],
                 ),
               ),
-            
+            ),
+
           Wrap(
             children: [
               TextButton.icon(
@@ -339,17 +318,27 @@ class _NodesScreenState extends State<NodesScreen> {
                   )),
               icon: const Icon(Icons.add),
               label: TranslateText('Add cable ending', language: widget.lang)),
-          if (widget.node.cableEnds.isNotEmpty ||
-              widget.node.equipments.isNotEmpty) ...[
+          if ((widget.node.cableEnds.isNotEmpty ||
+                  widget.node.equipments.isNotEmpty) &&
+              widget.node.location != null) ...[
             Wrap(
               children: [
+                TextButton.icon(
+                  onPressed: () {
+                    //print(node.toJson());
+                    widget.node.saveToServer();
+                  },
+                  icon: const Icon(Icons.save_outlined),
+                  label: TranslateText('Save to Server', language: widget.lang),
+                ),
                 TextButton.icon(
                   onPressed: () {
                     //print(node.toJson());
                     widget.node.saveToLocal();
                   },
                   icon: const Icon(Icons.save_outlined),
-                  label: TranslateText('Save to Server', language: widget.lang),
+                  label: TranslateText('Save to Local device',
+                      language: widget.lang),
                 ),
               ],
             ),

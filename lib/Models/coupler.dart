@@ -41,19 +41,24 @@ class Mufta {
   List<Connection> connections = [];
   LatLng? location;
 
+  @override
   String toString() {
     return 'Mufta: $name; cableEnds: $cableEnds; connections: $connections';
   }
-  
+
+  String signature() {
+    return '$name:${location?.latitude}:${location?.longitude}';
+  }
+
   Mufta.fromJson(Map<String, dynamic> json) {
-      print('loading Mufta from json:');
-      //print(json);
-      name = json['name'];
-      cableEnds =
-          List<CableEnd>.from(json['cables'].map((x) => CableEnd.fromJson(x)));
-      connections = List<Connection>.from(
-          json['connections'].map((x) => Connection.fromJson(x)));
-      location = LatLng.fromJson(json['location']);
+    print('loading Mufta from json:');
+    //print(json);
+    name = json['name'];
+    cableEnds =
+        List<CableEnd>.from(json['cables'].map((x) => CableEnd.fromJson(x)));
+    connections = List<Connection>.from(
+        json['connections'].map((x) => Connection.fromJson(x)));
+    location = LatLng.fromJson(json['location']);
   }
 
   String toJson() {
@@ -66,6 +71,9 @@ class Mufta {
   }
 
   void saveToLocal() async {
+    for (var cableEnd in cableEnds) {
+      cableEnd.location = location;
+    }
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String jsonString = toJson();
     print('saving to local: $jsonString');

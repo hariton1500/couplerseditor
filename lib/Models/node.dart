@@ -54,12 +54,21 @@ class Node {
     });
   }
 
+  String signature() {
+    return '$address:${location?.latitude}:${location?.longitude}';
+  }
+
   void saveToLocal() async {
+    for (var cableEnd in cableEnds) {
+      cableEnd.location = location;
+    }
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String jsonString = toJson();
     print('saving to local: $jsonString');
     sharedPreferences.setString('node: $address', jsonString);
   }
+
+  void saveToServer() {}
 }
 
 class Connection {
