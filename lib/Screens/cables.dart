@@ -35,7 +35,7 @@ class _CableScreenState extends State<CableScreen> {
   void initState() {
     super.initState();
     _loadCouplersAndNodes(isSourceLocal: !widget.isFromServer);
-    _loadCables();
+    _loadCables(isSourceLocal: !widget.isFromServer).then((_) => setState(() {}));
   }
 
   @override
@@ -59,9 +59,10 @@ class _CableScreenState extends State<CableScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            ends.isNotEmpty ? Column(
+            const Divider(),
+            Column(
               children: [
-                TranslateText('Cable:', language: widget.lang,),
+                TranslateText('New cable:', language: widget.lang,),
                 ListView.builder(
                   shrinkWrap: true,
                   itemCount: ends.length,
@@ -82,11 +83,26 @@ class _CableScreenState extends State<CableScreen> {
                   },
                 ),
               ],
-            ) : Container(),
-            isViewOnMap ? _buildMap() : _buildList(),
+            ),
+            const Divider(),
             ends.length == 2 ? TextButton.icon(onPressed: () {
-              Navigator.of(context).pop(Cable(ends: ends));
+              //Navigator.of(context).pop(Cable(ends: ends));
+              Cable cable = Cable(ends: ends);
+              cable.saveCable(widget.isFromServer);
+              setState(() {
+                cables.add(cable);
+                ends.clear();
+              });
             }, icon: const Icon(Icons.save_outlined), label: TranslateText('Save', language: widget.lang,)) : Container(),
+            isViewOnMap ? _buildMap() : _buildList(),
+            const Divider(),
+            TranslateText('Stored cables:', language: widget.lang,),
+            Column(
+              children: cables.map((cable) => ListTile(
+                leading: IconButton(onPressed: () {cable.remove(widget.isFromServer).then((value) => setState(() => cables.remove(cable)));}, icon: const Icon(Icons.delete_outline)),
+                title: Text(cable.ends.length.toString()),
+              )).toList(),
+            )
           ],
         ),
       ),
@@ -96,7 +112,7 @@ class _CableScreenState extends State<CableScreen> {
   Widget _buildList() {
     return Column(
       children: [
-        couplers.isNotEmpty ? TranslateText('Couplers:', language: widget.lang) : Container(),
+        couplers.isNotEmpty ? TranslateText('From couplers:', language: widget.lang) : Container(),
         ListView.builder(
           shrinkWrap: true,
           itemCount: couplers.length,
@@ -126,7 +142,7 @@ class _CableScreenState extends State<CableScreen> {
           },
         ),
         const Divider(),
-        nodes.isNotEmpty ? TranslateText('Nodes:', language: widget.lang) : Container(),
+        nodes.isNotEmpty ? TranslateText('From nodes:', language: widget.lang) : Container(),
         ListView.builder(
           shrinkWrap: true,
           itemCount: nodes.length,
@@ -235,16 +251,19 @@ class _CableScreenState extends State<CableScreen> {
     setState(() {});
   }
 
-  void _loadCables() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Set<String> cablesJsonStrings = prefs
-        .getKeys()
-        .where((element) => element.startsWith('cable:'))
-        .toSet();
-    cables = cablesJsonStrings
-        .map((element) =>
-            Cable.fromJson(jsonDecode(prefs.getString(element) ?? '')))
-        .toList();
-    //setState(() {});
+  Future<void> _loadCables({required bool isSourceLocal}) async {
+    if (isSourceLocal) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      Set<String> cablesJsonStrings = prefs
+          .getKeys()
+          .where((element) => element.startsWith('cable:'))
+          .toSet();
+      cables = cablesJsonStrings
+          .map((element) =>
+              Cable.fromJson(jsonDecode(prefs.getString(element) ?? '')))
+          .toList();
+    } else {
+      cables = [];
+    }
   }
 }

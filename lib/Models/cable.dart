@@ -19,10 +19,21 @@ class Cable {
     return '${ends[0].signature()}:${ends[1].signature()}';
   }
 
-  void saveCableToServer() async {}
+  void saveCable(bool isFromServer) async {
+    if (isFromServer) {
 
-  void saveCableToLocal() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('cable: ${signature()}', jsonEncode(toJson()));
+    } else {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('cable: ${signature()}', jsonEncode(toJson()));
+    }
+  }
+
+  Future<void> remove(bool isFromServer) async {
+    if (isFromServer) {
+
+    } else {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.remove('cable: ${signature()}');
+    }
   }
 }

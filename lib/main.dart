@@ -293,15 +293,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 isFromServer: true,
                                 lang: settings.language,
                                 cable: cable,
-                              )))
-                      .then((value) {
-                    if (value != null) {
-                      setState(() {
-                        cable = value;
-                        cable.saveCableToServer();
-                      });
-                    }
-                  });
+                              )));
                 },
                 icon: const Icon(Icons.create_outlined),
                 label: TranslateText('Create/edit cable from Server',
@@ -314,15 +306,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 isFromServer: false,
                                 lang: settings.language,
                                 cable: cable,
-                              )))
-                      .then((value) {
-                    if (value != null) {
-                      setState(() {
-                        cable = value;
-                        cable.saveCableToLocal();
-                      });
-                    }
-                  });
+                              )));
                 },
                 icon: const Icon(Icons.create_outlined),
                 label: TranslateText('Create/edit cable from Local device',
