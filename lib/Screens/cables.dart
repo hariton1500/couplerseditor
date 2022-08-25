@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:coupolerseditor/Helpers/location.dart';
 import 'package:coupolerseditor/Helpers/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
@@ -62,7 +63,8 @@ class _CableScreenState extends State<CableScreen> {
             },
           ),
           IconButton(onPressed: () {
-            _mapController.move(_currentPos ?? LatLng(0, 0), 16.0);
+            getLocation().then((locationData) {_mapController.move(
+              LatLng(locationData!.latitude!, locationData.longitude!), 16);});
           }, icon: const Icon(Icons.location_on_outlined))
         ],
       ),
