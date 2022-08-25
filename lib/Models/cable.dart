@@ -3,23 +3,27 @@ import 'package:coupolerseditor/Models/cableend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Cable {
-  List<CableEnd> ends = [];
+  CableEnd? end1, end2;
 
-  Cable({required this.ends});
+  Cable({required this.end1, required this.end2});
 
   Cable.fromJson(Map<String, dynamic> json) {
-    ends = List<CableEnd>.from(json['ends'].map((x) => CableEnd.fromJson(x)));
+    end1 = CableEnd.fromJson(json['end1']);
+    end2 = CableEnd.fromJson(json['end2']);
   }
 
   Map<String, dynamic> toJson() => {
-        'ends': ends,
+        'end1': end1,
+        'end2': end2
       };
 
   String signature() {
-    return '${ends[0].signature()}:${ends[1].signature()}';
+    print('signature of cable with ends: $end1 and $end2');
+    return '${end1!.signature()}:${end2!.signature()}';
   }
 
   void saveCable(bool isFromServer) async {
+    print('saving cable to ${isFromServer ? 'server' : 'local device'}');
     if (isFromServer) {
 
     } else {
@@ -29,6 +33,7 @@ class Cable {
   }
 
   Future<void> remove(bool isFromServer) async {
+    print('removing cable from ${isFromServer ? 'server' : 'local device'}');
     if (isFromServer) {
 
     } else {

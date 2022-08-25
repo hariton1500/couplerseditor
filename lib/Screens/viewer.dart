@@ -139,9 +139,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                 PolylineLayerOptions(
                   polylines: cables.map((cable) {
                     return Polyline(
-                      points: cable.ends.map((end) {
-                        return end.location ?? LatLng(45.200834, 33.351089);
-                      }).toList(),
+                      points: [cable.end1!.location!, cable.end2!.location!],
                       strokeWidth: 3.0,
                       color: Colors.red,
                     );
@@ -187,9 +185,9 @@ class _ViewerScreenState extends State<ViewerScreen> {
                           itemBuilder: (context, index) {
                             return ListTile(
                               title: Text(
-                                  'side 1: ${cables[index].ends[0].location} <---> '),
+                                  'side 1: ${cables[index].end1!.location} <---> '),
                               subtitle: Text(
-                                  'side 2: ${cables[index].ends[1].location}'),
+                                  'side 2: ${cables[index].end2!.location}'),
                             );
                           })
                       : Container(),

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:coupolerseditor/Helpers/strings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/plugin_api.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Models/cable.dart';
@@ -13,11 +15,11 @@ class CableScreen extends StatefulWidget {
   const CableScreen(
       {Key? key,
       required this.lang,
-      required this.cable,
+      //required this.cable,
       required this.isFromServer})
       : super(key: key);
   final String lang;
-  final Cable cable;
+  //final Cable cable;
   final bool isFromServer;
 
   @override
@@ -30,6 +32,10 @@ class _CableScreenState extends State<CableScreen> {
   List<Node> nodes = [];
   List<Mufta> couplers = [];
   List<Cable> cables = [];
+  
+  final MapController _mapController = MapController();
+
+  LatLng? _currentPos;
 
   @override
   void initState() {
@@ -40,6 +46,7 @@ class _CableScreenState extends State<CableScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(ends);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cables'),
@@ -54,10 +61,13 @@ class _CableScreenState extends State<CableScreen> {
               });
             },
           ),
+          IconButton(onPressed: () {
+            _mapController.move(_currentPos ?? LatLng(0, 0), 16.0);
+          }, icon: const Icon(Icons.location_on_outlined))
         ],
       ),
       body: SafeArea(
-        child: Column(
+        child: !isViewOnMap ? Column(
           children: [
             const Divider(),
             Column(
@@ -86,12 +96,16 @@ class _CableScreenState extends State<CableScreen> {
             ),
             const Divider(),
             ends.length == 2 ? TextButton.icon(onPressed: () {
-              //Navigator.of(context).pop(Cable(ends: ends));
-              Cable cable = Cable(ends: ends);
+              if (cables.any((cable) => cable.end1!.signature() == ends[0].signature() || cable.end1!.signature() == ends[1].signature() || cable.end2!.signature() == ends[0].signature() || cable.end2!.signature() == ends[1].signature())) {
+                return;
+              }
+              print('creating cable from $ends');
+              Cable cable = Cable(end1: ends[0], end2: ends[1]);
               cable.saveCable(widget.isFromServer);
               setState(() {
                 cables.add(cable);
                 ends.clear();
+                _loadCouplersAndNodes(isSourceLocal: !widget.isFromServer);
               });
             }, icon: const Icon(Icons.save_outlined), label: TranslateText('Save', language: widget.lang,)) : Container(),
             isViewOnMap ? _buildMap() : _buildList(),
@@ -99,10 +113,26 @@ class _CableScreenState extends State<CableScreen> {
             TranslateText('Stored cables:', language: widget.lang,),
             Column(
               children: cables.map((cable) => ListTile(
-                leading: IconButton(onPressed: () {cable.remove(widget.isFromServer).then((value) => setState(() => cables.remove(cable)));}, icon: const Icon(Icons.delete_outline)),
-                title: Text(cable.ends.length.toString()),
+                leading: IconButton(onPressed: () {cable.remove(widget.isFromServer).then((value) => setState(() {
+                  cables.remove(cable);
+                  ends.clear();
+                  _loadCouplersAndNodes(isSourceLocal: !widget.isFromServer);
+                  }));}, icon: const Icon(Icons.delete_outline)),
+                title: Text('${cable.end1!.signature()} - ${cable.end2!.signature()}'),
               )).toList(),
             )
+          ],
+        ) : FlutterMap(
+          options: MapOptions(
+            controller: _mapController,
+            zoom: 16.0,
+            maxZoom: 18.0
+          ),
+          layers: [
+            TileLayerOptions(
+              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              subdomains: ['a', 'b', 'c'],
+            ),
           ],
         ),
       ),
@@ -124,6 +154,7 @@ class _CableScreenState extends State<CableScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           for (var end in couplers[index].cableEnds)
+                            cables.any((cable) => cable.end1!.signature() == end.signature() || cable.end2!.signature() == end.signature()) ? Container() :
                             TextButton.icon(
                                 label: Text(
                                     '${end.direction} (${end.colorScheme}: ${end.fibersNumber})'),
@@ -154,6 +185,7 @@ class _CableScreenState extends State<CableScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           for (var end in nodes[index].cableEnds)
+                            cables.any((cable) => cable.end1!.signature() == end.signature() || cable.end2!.signature() == end.signature()) ? Container() :
                             TextButton.icon(
                                 label: Text(
                                     '${end.direction} (${end.colorScheme}: ${end.fibersNumber})'),
@@ -252,16 +284,19 @@ class _CableScreenState extends State<CableScreen> {
   }
 
   Future<void> _loadCables({required bool isSourceLocal}) async {
+    print('loading cables from ${isSourceLocal ? 'local device' : 'server'}');
     if (isSourceLocal) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Set<String> cablesJsonStrings = prefs
           .getKeys()
           .where((element) => element.startsWith('cable:'))
           .toSet();
+      print('cables keys: $cablesJsonStrings');
       cables = cablesJsonStrings
           .map((element) =>
               Cable.fromJson(jsonDecode(prefs.getString(element) ?? '')))
           .toList();
+      print('${cables.length} loaded');
     } else {
       cables = [];
     }

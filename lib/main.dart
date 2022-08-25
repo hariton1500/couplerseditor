@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Node node = Node(address: 'no address');
 
-  Cable cable = Cable(ends: []);
+  //Cable cable = Cable(ends: []);
 
   @override
   void initState() {
@@ -292,7 +292,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           builder: (context) => CableScreen(
                                 isFromServer: true,
                                 lang: settings.language,
-                                cable: cable,
+                                //cable: cable,
                               )));
                 },
                 icon: const Icon(Icons.create_outlined),
@@ -305,7 +305,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           builder: (context) => CableScreen(
                                 isFromServer: false,
                                 lang: settings.language,
-                                cable: cable,
+                                //cable: cable,
                               )));
                 },
                 icon: const Icon(Icons.create_outlined),

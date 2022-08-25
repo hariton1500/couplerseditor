@@ -3,6 +3,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
+
+import '../Helpers/location.dart';
 //import '../Helpers/epsg3395.dart';
 
 //import 'package:latlong/latlong.dart';
@@ -23,16 +25,16 @@ class _LocationPickerState extends State<LocationPicker> {
   @override
   void initState() {
     super.initState();
-    getLocation();
+    getMyLocation();
   }
 
-  getLocation() async {
+  getMyLocation() async {
     print('get location...');
     Location location = Location();
 
     bool serviceEnabled;
     PermissionStatus permissionGranted;
-    LocationData locationData;
+    LocationData? locationData;
 
     serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {
@@ -52,10 +54,10 @@ class _LocationPickerState extends State<LocationPicker> {
       }
     }
 
-    locationData = await location.getLocation();
-    print(locationData.toString());
-    _mapController.move(
-        LatLng(locationData.latitude!, locationData.longitude!), 16);
+    getLocation().then((locationData) {_mapController.move(
+        LatLng(locationData!.latitude!, locationData.longitude!), 16);});
+    //print(locationData.toString());
+    
   }
 
   @override
