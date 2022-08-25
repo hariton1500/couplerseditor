@@ -63,7 +63,7 @@ class _CableScreenState extends State<CableScreen> {
             },
           ),
           IconButton(onPressed: () {
-            getLocation().then((locationData) {_mapController.move(
+            getLocation().then((locationData) {print(locationData); _mapController.move(
               LatLng(locationData!.latitude!, locationData.longitude!), 16);});
           }, icon: const Icon(Icons.location_on_outlined))
         ],
