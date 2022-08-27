@@ -5,6 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Helpers/location.dart';
 import '../Models/cable.dart';
 import '../Models/coupler.dart';
 import '../Models/node.dart';
@@ -27,16 +28,22 @@ class _ViewerScreenState extends State<ViewerScreen> {
   bool isViewOnMap = false;
   bool isLoading = true;
   int selectedCouplerIndex = -1;
+  final MapController _mapController = MapController();
 
   @override
   void initState() {
     super.initState();
     _loadCouplersAndNodes(isSourceLocal: !widget.isFromServer)
         .then((value) => setState(
-              () {},
+              () {
+                print(nodes);
+                print(couplers);
+              },
             ));
     _loadCables(isSourceLocal: !widget.isFromServer).then((value) => setState(
-          () {},
+          () {
+            print(cables);
+          },
         ));
   }
 
@@ -46,6 +53,10 @@ class _ViewerScreenState extends State<ViewerScreen> {
       appBar: AppBar(
         title: const Text('Viewer'),
         actions: [
+          isViewOnMap ? IconButton(onPressed: () {
+            getLocation().then((locationData) {print(locationData); _mapController.move(
+              LatLng(locationData!.latitude!, locationData.longitude!), 16);});
+          }, icon: const Icon(Icons.location_on_outlined)) : Container(),
           IconButton(
             icon: isViewOnMap
                 ? const Icon(Icons.list_outlined)
@@ -62,7 +73,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
           ? FlutterMap(
               options: MapOptions(
                   //crs: const Epsg3395(),
-                  //controller: _mapController,
+                  controller: _mapController,
                   center: LatLng(45.200834, 33.351089),
                   zoom: 16.0,
                   maxZoom: 18.0,
@@ -139,9 +150,9 @@ class _ViewerScreenState extends State<ViewerScreen> {
                 PolylineLayerOptions(
                   polylines: cables.map((cable) {
                     return Polyline(
-                      points: [cable.end1!.location!, cable.end2!.location!],
+                      points: [cable.end1!.location ?? LatLng(0, 0), cable.end2!.location ?? LatLng(0, 0)],
                       strokeWidth: 3.0,
-                      color: Colors.red,
+                      color: Colors.green,
                     );
                   }).toList(),
                 ),

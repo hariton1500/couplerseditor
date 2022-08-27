@@ -52,6 +52,10 @@ class _CableScreenState extends State<CableScreen> {
       appBar: AppBar(
         title: const Text('Cables'),
         actions: <Widget>[
+          isViewOnMap ? IconButton(onPressed: () {
+            getLocation().then((locationData) {print(locationData); _mapController.move(
+              LatLng(locationData!.latitude!, locationData.longitude!), 16);});
+          }, icon: const Icon(Icons.location_on_outlined)) : Container(),
           IconButton(
             icon: isViewOnMap
                 ? const Icon(Icons.list_outlined)
@@ -62,10 +66,6 @@ class _CableScreenState extends State<CableScreen> {
               });
             },
           ),
-          IconButton(onPressed: () {
-            getLocation().then((locationData) {print(locationData); _mapController.move(
-              LatLng(locationData!.latitude!, locationData.longitude!), 16);});
-          }, icon: const Icon(Icons.location_on_outlined))
         ],
       ),
       body: SafeArea(

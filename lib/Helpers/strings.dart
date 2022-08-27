@@ -191,6 +191,34 @@ Map<String, Map<String, String>> strings = {
     'en': 'Nodes:',
     'ru': 'Узлы:'
   },
+  'Create/edit cable from Server': {
+    'en': 'Create/edit cable from Server',
+    'ru': 'Создеть/редактировать кабель на Сервер'
+  },
+  'Create/edit cable from Local device': {
+    'en': 'Create/edit cable from Local device',
+    'ru': 'Создеть/редактировать кабель на устройстве'
+  },
+  'FOSCs:': {
+    'en': 'FOSCs:',
+    'ru': 'Муфты:'
+  },
+  'Cables:': {
+    'en': 'Cables:',
+    'ru': 'Кабеля:'
+  },
+  'Viewer:': {
+    'en': 'Viewer:',
+    'ru': 'Просмотр:'
+  },
+  'Viewer from Server': {
+    'en': 'Viewer from Server',
+    'ru': 'Просмотр из Сервера'
+  },
+  'Viewer from Local device': {
+    'en': 'Viewer from Local device',
+    'ru': 'Просмотр из устройства'
+  }
 };
 
 class TranslateText extends Text {

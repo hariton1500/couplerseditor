@@ -22,6 +22,11 @@ class Cable {
     return '${end1!.signature()}:${end2!.signature()}';
   }
 
+  @override
+  String toString() {
+    return signature();
+  }
+
   void saveCable(bool isFromServer) async {
     print('saving cable to ${isFromServer ? 'server' : 'local device'}');
     if (isFromServer) {

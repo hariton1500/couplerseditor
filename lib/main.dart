@@ -73,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             const Divider(),
             Center(
-                child: TranslateText('Couplers:', language: settings.language)),
+                child: TranslateText('FOSCs:', language: settings.language)),
             TextButton.icon(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
