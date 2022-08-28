@@ -34,7 +34,6 @@ class _LocationPickerState extends State<LocationPicker> {
 
     bool serviceEnabled;
     PermissionStatus permissionGranted;
-    LocationData? locationData;
 
     serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {

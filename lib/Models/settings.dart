@@ -1,24 +1,24 @@
+import 'dart:convert';
+
+import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings {
-  String couplersListUrl = '', couplerUrl = '', language = 'en';
-  String nodesListUrl = '', nodeUrl = '';
+  String baseUrl = '';
+  String language = 'en';
+  LatLng? baseLocation;
 
   Future loadSettings() async {
     SharedPreferences shared = await SharedPreferences.getInstance();
-    couplersListUrl = shared.getString('couplersListUrl') ?? '';
-    couplerUrl = shared.getString('couplerUrl') ?? '';
-    nodesListUrl = shared.getString('nodesListUrl') ?? '';
-    nodeUrl = shared.getString('nodeUrl') ?? '';
+    baseUrl = shared.getString('baseUrl') ?? '';
     language = shared.getString('language') ?? 'en';
+    baseLocation = LatLng.fromJson(json.decode(shared.getString('baseLocation') ?? '{}'));
   }
 
   void saveSettings() async {
     SharedPreferences shared = await SharedPreferences.getInstance();
-    shared.setString('couplersListUrl', couplersListUrl);
-    shared.setString('couplerUrl', couplerUrl);
-    shared.setString('nodesListUrl', nodesListUrl);
-    shared.setString('nodeUrl', nodeUrl);
+    shared.setString('baseUrl', baseUrl);
     shared.setString('language', language);
+    shared.setString('baseLocation', json.encode(baseLocation?.toJson()));
   }
 }

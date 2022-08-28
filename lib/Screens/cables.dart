@@ -11,17 +11,19 @@ import '../Models/cable.dart';
 import '../Models/cableend.dart';
 import '../Models/coupler.dart';
 import '../Models/node.dart';
+import '../Models/settings.dart';
 
 class CableScreen extends StatefulWidget {
   const CableScreen(
       {Key? key,
       required this.lang,
       //required this.cable,
-      required this.isFromServer})
+      required this.isFromServer, required this.settings})
       : super(key: key);
   final String lang;
   //final Cable cable;
   final bool isFromServer;
+  final Settings settings;
 
   @override
   State<CableScreen> createState() => _CableScreenState();
@@ -210,7 +212,22 @@ class _CableScreenState extends State<CableScreen> {
   }
 
   Widget _buildMap() {
-    return Container();
+    print(widget.settings.baseLocation.toString());
+    return FlutterMap(
+      options: MapOptions(
+        zoom: 16.0,
+        maxZoom: 18.0,
+        controller: _mapController, 
+        center: widget.settings.baseLocation
+      ),
+      layers: [
+        TileLayerOptions(
+          urlTemplate:
+              'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          subdomains: ['a', 'b', 'c'],
+        ),
+      ],
+    );
   }
 
   Future<void> _loadCouplersAndNodes(

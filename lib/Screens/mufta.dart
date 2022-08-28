@@ -706,8 +706,8 @@ class MuftaScreenState extends State<MuftaScreen> {
                                                           const Text(
                                                               'Coupler name:'),
                                                           TranslateText(
-                                                              settings
-                                                                  .couplerUrl,
+                                                              '${settings
+                                                                  .baseUrl}/coupler',//couplerUrl,
                                                               language:
                                                                   widget.lang)
                                                         ],

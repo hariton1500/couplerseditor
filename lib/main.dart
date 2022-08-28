@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'Helpers/strings.dart';
-import 'Models/cable.dart';
 import 'Models/coupler.dart';
 import 'Models/node.dart';
 import 'Models/settings.dart';
@@ -10,6 +9,7 @@ import 'Screens/mufta.dart';
 import 'Screens/couplerslist.dart';
 import 'Screens/nodes.dart';
 import 'Screens/nodeslist.dart';
+import 'Screens/setup.dart';
 import 'Screens/viewer.dart';
 
 void main() {
@@ -66,7 +66,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          IconButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: ((context) => SetupScreen(lang: settings.language, settings: settings,)))).then((value) => setState((){})), icon: const Icon(Icons.settings_outlined))
+        ],
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (context) => CouplersList(
                           isFromBilling: true,
                           lang: settings.language,
-                          couplersListURL: settings.couplersListUrl,
+                          couplersListURL: '${settings.baseUrl}/couplerslist',
                         ),
                       ))
                           .then((value) {
@@ -127,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (context) => CouplersList(
                           isFromBilling: false,
                           lang: settings.language,
-                          couplersListURL: settings.couplersListUrl,
+                          couplersListURL: '${settings.baseUrl}/couplerslist',
                         ),
                       ))
                           .then((value) {
@@ -144,75 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         language: settings.language)),
               ],
             ),
-            TextButton.icon(
-                onPressed: () {
-                  setState(() {
-                    isShowSetup = !isShowSetup;
-                  });
-                },
-                icon: const Icon(Icons.settings_outlined),
-                label: TranslateText('Settings', language: settings.language)),
-            if (isShowSetup) ...[
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    //Settings
-                    TranslateText('Language:', language: settings.language),
-                    Row(
-                      children: [
-                        Radio<String>(
-                            value: 'en',
-                            groupValue: settings.language,
-                            onChanged: (lang) =>
-                                setState(() => settings.language = lang!)),
-                        const Text('English'),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Radio<String>(
-                            value: 'ru',
-                            groupValue: settings.language,
-                            onChanged: (lang) =>
-                                setState(() => settings.language = lang!)),
-                        const Text('Русский'),
-                      ],
-                    ),
-                    TranslateText('Load list of couplers URL:',
-                        language: settings.language),
-                    TextFormField(
-                      initialValue: settings.couplersListUrl,
-                      onChanged: (value) => settings.couplersListUrl = value,
-                    ),
-                    TranslateText('Load coupler URL:',
-                        language: settings.language),
-                    TextFormField(
-                      initialValue: settings.couplerUrl,
-                      onChanged: (value) => settings.couplerUrl = value,
-                    ),
-                    Row(
-                      children: [
-                        TextButton.icon(
-                            onPressed: () {
-                              setState(() {
-                                isShowSetup = false;
-                              });
-                            },
-                            icon: const Icon(Icons.arrow_upward_outlined),
-                            label: TranslateText('Hide',
-                                language: settings.language)),
-                        TextButton.icon(
-                            onPressed: () => settings.saveSettings(),
-                            icon: const Icon(Icons.save_outlined),
-                            label: TranslateText('Save to device',
-                                language: settings.language)),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ],
+            //],
             const Divider(),
             Center(child: TranslateText('Nodes:', language: settings.language)),
             TextButton.icon(
@@ -239,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (context) => NodesList(
                           isFromBilling: true,
                           lang: settings.language,
-                          nodesListURL: settings.nodesListUrl,
+                          nodesListURL: '${settings.baseUrl}/nodeslist',
                         ),
                       ))
                           .then((value) {
@@ -265,7 +201,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (context) => NodesList(
                           isFromBilling: false,
                           lang: settings.language,
-                          nodesListURL: settings.nodesListUrl,
+                          nodesListURL: '${settings.baseUrl}/nodeslist',
                         ),
                       ))
                           .then((value) {
@@ -292,7 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           builder: (context) => CableScreen(
                                 isFromServer: true,
                                 lang: settings.language,
-                                //cable: cable,
+                                settings: settings,
                               )));
                 },
                 icon: const Icon(Icons.create_outlined),
@@ -305,7 +241,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           builder: (context) => CableScreen(
                                 isFromServer: false,
                                 lang: settings.language,
-                                //cable: cable,
+                                settings: settings,
                               )));
                 },
                 icon: const Icon(Icons.create_outlined),
