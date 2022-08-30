@@ -1,6 +1,7 @@
 
 import 'package:coupolerseditor/Models/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../Helpers/strings.dart';
 import 'location_picker.dart';
@@ -69,7 +70,7 @@ class _SetupScreenState extends State<SetupScreen> {
               const Divider(),
               Column(
                 children: [
-                  TextButton.icon(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LocationPicker())).then((value) {
+                  TextButton.icon(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => LocationPicker(startLocation: LatLng(0, 0),))).then((value) {
                     setState(() {
                       widget.settings.baseLocation = value;
                     });

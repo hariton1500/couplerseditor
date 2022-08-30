@@ -106,7 +106,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                               ? IconButton(
                                   autofocus: true,
                                   icon: const Icon(
-                                    Icons.location_on,
+                                    Icons.blinds_rounded,
                                     color: Colors.red,
                                   ),
                                   onPressed: () {
@@ -132,7 +132,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                               ? IconButton(
                                   autofocus: true,
                                   icon: const Icon(
-                                    Icons.location_on,
+                                    Icons.api_outlined,
                                     color: Colors.red,
                                   ),
                                   onPressed: () {

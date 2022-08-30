@@ -5,7 +5,7 @@ import 'Models/coupler.dart';
 import 'Models/node.dart';
 import 'Models/settings.dart';
 import 'Screens/cables.dart';
-import 'Screens/mufta.dart';
+import 'Screens/fosc.dart';
 import 'Screens/couplerslist.dart';
 import 'Screens/nodes.dart';
 import 'Screens/nodeslist.dart';
@@ -157,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (context) => NodesScreen(
                           //node: Node(address: 'no Address'),
                           //callback: () => setState(() {}),
-                          lang: settings.language, node: node,
+                          lang: settings.language, node: node, settings: settings,
                         )));
               },
               icon: const Icon(Icons.create_outlined),
@@ -173,6 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       await Navigator.of(context)
                           .push(MaterialPageRoute<String>(
                         builder: (context) => NodesList(
+                          settings: settings,
                           isFromBilling: true,
                           lang: settings.language,
                           nodesListURL: '${settings.baseUrl}/nodeslist',
@@ -185,6 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => NodesScreen(
                                     node: node,
+                                    settings: settings,
                                     //callback: () => setState(() {}),
                                     lang: settings.language)));
                           }
@@ -199,6 +201,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Navigator.of(context)
                           .push(MaterialPageRoute<String>(
                         builder: (context) => NodesList(
+                          settings: settings,
                           isFromBilling: false,
                           lang: settings.language,
                           nodesListURL: '${settings.baseUrl}/nodeslist',

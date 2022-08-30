@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helpers/strings.dart';
 import '../Models/coupler.dart';
-import 'mufta.dart';
+import 'fosc.dart';
 
 class CouplersList extends StatefulWidget {
   final String lang;

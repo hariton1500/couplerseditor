@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helpers/strings.dart';
+import '../Models/settings.dart';
 import 'nodes.dart';
 
 class NodesList extends StatefulWidget {
@@ -12,11 +13,12 @@ class NodesList extends StatefulWidget {
       {Key? key,
       required this.lang,
       required this.nodesListURL,
-      required this.isFromBilling})
+      required this.isFromBilling, required this.settings})
       : super(key: key);
   final String lang;
   final String nodesListURL;
   final bool isFromBilling;
+  final Settings settings;
 
   @override
   State<NodesList> createState() => _NodesListState();
@@ -46,6 +48,7 @@ class _NodesListState extends State<NodesList> {
                             node: Node.fromJson(jsonDecode(
                                 nodesJsonStrings[selectedNodeIndex])),
                             lang: widget.lang,
+                            settings: widget.settings,
                           ))).then((value) => setState(() {widget.isFromBilling ? loadListFromBilling() : loadListFromDevice();}));
                 },
               )
@@ -90,8 +93,8 @@ class _NodesListState extends State<NodesList> {
                                 ),
                                 onPressed: () {
                                   Navigator.of(context).pop();
-                                  removeNode(1);
                                   setState(() {
+                                    removeNodeFromStore(nodesJsonStrings[index]);
                                     nodesJsonStrings.removeAt(index);
                                   });
                                 },
@@ -130,7 +133,7 @@ class _NodesListState extends State<NodesList> {
         .getKeys()
         .where((element) => element.startsWith('node: '))
         .toList();
-    print('codedNodessListKeys: $codedNodesListKeys');
+    print('codedNodesListKeys: $codedNodesListKeys');
     setState(() {
       nodesJsonStrings = codedNodesListKeys
           .map(
@@ -138,6 +141,11 @@ class _NodesListState extends State<NodesList> {
           .toList();
     });
   }
-
-  void removeNode(coupler) {}
+  
+  void removeNodeFromStore(String nodesJsonString) async {
+    print('removing: $nodesJsonString');
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String key = 'node: ${(json.decode(nodesJsonString) as Map<String, dynamic>)['address']}';
+    sharedPreferences.remove(key);
+  }
 }

@@ -49,7 +49,7 @@ class _CableScreenState extends State<CableScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(ends);
+    //print(ends);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cables'),
@@ -126,19 +126,7 @@ class _CableScreenState extends State<CableScreen> {
               )).toList(),
             )
           ],
-        ) : FlutterMap(
-          options: MapOptions(
-            controller: _mapController,
-            zoom: 16.0,
-            maxZoom: 18.0
-          ),
-          layers: [
-            TileLayerOptions(
-              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              subdomains: ['a', 'b', 'c'],
-            ),
-          ],
-        ),
+        ) : _buildMap(),
       ),
     );
   }
@@ -225,6 +213,12 @@ class _CableScreenState extends State<CableScreen> {
           urlTemplate:
               'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           subdomains: ['a', 'b', 'c'],
+        ),
+        PolylineLayerOptions(
+          polylines: cables.map((cable) => Polyline(
+            strokeWidth: 3,
+            points: [cable.end1!.location ?? LatLng(0, 0), cable.end2!.location ?? LatLng(0, 0)]
+          )).toList()
         ),
       ],
     );

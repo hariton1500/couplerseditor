@@ -10,7 +10,8 @@ import '../Helpers/location.dart';
 //import 'package:latlong/latlong.dart';
 
 class LocationPicker extends StatefulWidget {
-  const LocationPicker({Key? key}) : super(key: key);
+  const LocationPicker({Key? key, required this.startLocation}) : super(key: key);
+  final LatLng startLocation;
 
   @override
   State<LocationPicker> createState() => _LocationPickerState();
@@ -61,6 +62,7 @@ class _LocationPickerState extends State<LocationPicker> {
 
   @override
   Widget build(BuildContext context) {
+    print('run Location Picker with start location: ${widget.startLocation}');
     return Material(
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -68,7 +70,7 @@ class _LocationPickerState extends State<LocationPicker> {
           options: MapOptions(
               //crs: const Epsg3395(),
               controller: _mapController,
-              center: LatLng(45.200834, 33.351089),
+              center: widget.startLocation,
               zoom: 16.0,
               maxZoom: 18.0,
               onTap: (tapPos, latlng) {

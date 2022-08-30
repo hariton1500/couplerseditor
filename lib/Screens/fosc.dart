@@ -100,10 +100,10 @@ class MuftaScreenState extends State<MuftaScreen> {
                             'Location Picker',
                             language: widget.lang,
                           ),
-                          content: const LocationPicker(),
+                          content: LocationPicker(startLocation: widget.mufta.location ?? settings.baseLocation ?? ll.LatLng(0, 0),),
                         );
                       }).then((value) => setState(() {
-                        widget.mufta.location = value;
+                        widget.mufta.location = value ?? widget.mufta.location ?? settings.baseLocation ?? ll.LatLng(0, 0);
                       })),
                   child: Wrap(
                     children: [

@@ -1,5 +1,6 @@
 import 'package:coupolerseditor/Models/activedevice.dart';
 import 'package:coupolerseditor/Models/cableend.dart';
+import 'package:coupolerseditor/Models/settings.dart';
 import 'package:flutter/material.dart';
 import '../Helpers/fibers.dart';
 import '../Helpers/strings.dart';
@@ -12,8 +13,9 @@ import 'location_picker.dart';
 class NodesScreen extends StatefulWidget {
   final String lang;
   final Node node;
+  final Settings settings;
 
-  const NodesScreen({Key? key, required this.lang, required this.node})
+  const NodesScreen({Key? key, required this.lang, required this.node, required this.settings})
       : super(key: key);
 
   @override
@@ -72,10 +74,10 @@ class _NodesScreenState extends State<NodesScreen> {
                         'Location Picker',
                         language: widget.lang,
                       ),
-                      content: const LocationPicker(),
+                      content: LocationPicker(startLocation: widget.node.location ?? widget.settings.baseLocation ?? ll.LatLng(0, 0),),
                     );
                   }).then((value) => setState(() {
-                    widget.node.location = value;
+                    widget.node.location = value ?? widget.node.location ?? widget.settings.baseLocation ?? ll.LatLng(0, 0);
                   })),
               child: Wrap(
                 children: [
