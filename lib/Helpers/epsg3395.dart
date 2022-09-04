@@ -54,6 +54,7 @@ class Mercator extends Projection {
     var ts = math.exp(-point.y / r);
     var phi = math.pi / 2 - 2 * math.atan(ts);
 
+    // ignore: prefer_typing_uninitialized_variables
     for (var i = 0, dphi = 0.1, con; i < 15 && dphi.abs() > 1e-7; i++) {
       con = e * math.sin(phi);
       con = math.pow((1 - con) / (1 + con), e / 2);
