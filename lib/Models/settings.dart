@@ -12,7 +12,8 @@ class Settings {
     SharedPreferences shared = await SharedPreferences.getInstance();
     baseUrl = shared.getString('baseUrl') ?? '';
     language = shared.getString('language') ?? 'en';
-    baseLocation = LatLng.fromJson(json.decode(shared.getString('baseLocation') ?? '{}'));
+    baseLocation = LatLng.fromJson(json.decode(
+        shared.getString('baseLocation') ?? '{"coordinates":[0.0,0.0]}'));
   }
 
   void saveSettings() async {
