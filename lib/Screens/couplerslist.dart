@@ -2,6 +2,7 @@ import 'dart:convert';
 //import 'package:coupolerseditor/Helpers/epsg3395.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:http/http.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -45,11 +46,16 @@ class _CouplersListState extends State<CouplersList> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: TranslateText(
-            widget.isFromBilling
-                ? 'List of couplers from billing'
-                : 'List of couplers from device',
-            language: widget.lang,
+          title: Column(
+            children: [
+              TranslateText(
+                widget.isFromBilling
+                    ? 'List of couplers from billing'
+                    : 'List of couplers from device',
+                language: widget.lang,
+              ),
+              widget.isFromBilling ? Text('${widget.couplersListURL}/?getlist', style: const TextStyle(fontSize: 10),) : Container()
+            ],
           ),
           actions: [
             IconButton(
@@ -215,7 +221,19 @@ class _CouplersListState extends State<CouplersList> {
         ));
   }
 
-  loadListFromBilling() {}
+  loadListFromBilling() async {
+    print('loading list of FOSCs from server URL = ${widget.couplersListURL}/?getlist');
+    try {
+      var response = await get(Uri.parse('${widget.couplersListURL}/?getlist'));
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        setState(() {
+          couplers = json.decode(response.body).map((e) => json.encode(e));
+        });
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
 
   loadListFromDevice() async {
     print('loadListFromDevice');
