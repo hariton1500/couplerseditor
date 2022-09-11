@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 //import 'package:coupolerseditor/Helpers/epsg3395.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +56,12 @@ class _CouplersListState extends State<CouplersList> {
                     : 'List of couplers from device',
                 language: widget.lang,
               ),
-              widget.isFromBilling ? Text('${widget.couplersListURL}/?getlist', style: const TextStyle(fontSize: 10),) : Container()
+              widget.isFromBilling
+                  ? Text(
+                      '${widget.couplersListURL}/?getlist',
+                      style: const TextStyle(fontSize: 10),
+                    )
+                  : Container()
             ],
           ),
           actions: [
@@ -177,8 +184,7 @@ class _CouplersListState extends State<CouplersList> {
                       layers: [
                         TileLayerOptions(
                             urlTemplate:
-                                'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=ru-RU&scale=1&xss=1&yss=1&s=G5zdHJ1c3Q%3D&client=gme-google&style=api%3A1.0.0&key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
-                        ),
+                                'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=ru-RU&scale=1&xss=1&yss=1&s=G5zdHJ1c3Q%3D&client=gme-google&style=api%3A1.0.0&key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'),
                         /*
                         TileLayerOptions(
                           urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -222,7 +228,8 @@ class _CouplersListState extends State<CouplersList> {
   }
 
   loadListFromBilling() async {
-    print('loading list of FOSCs from server URL = ${widget.couplersListURL}/?getlist');
+    print(
+        'loading list of FOSCs from server URL = ${widget.couplersListURL}/?getlist');
     try {
       var response = await get(Uri.parse('${widget.couplersListURL}/?getlist'));
       if (response.statusCode == 200 || response.statusCode == 201) {

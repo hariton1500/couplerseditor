@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 import 'package:coupolerseditor/Models/cableend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,10 +14,7 @@ class Cable {
     end2 = CableEnd.fromJson(json['end2']);
   }
 
-  Map<String, dynamic> toJson() => {
-        'end1': end1,
-        'end2': end2
-      };
+  Map<String, dynamic> toJson() => {'end1': end1, 'end2': end2};
 
   String signature() {
     print('signature of cable with ends: $end1 and $end2');
@@ -30,7 +29,6 @@ class Cable {
   void saveCable(bool isFromServer) async {
     print('saving cable to ${isFromServer ? 'server' : 'local device'}');
     if (isFromServer) {
-
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('cable: ${signature()}', jsonEncode(toJson()));
@@ -40,7 +38,6 @@ class Cable {
   Future<void> remove(bool isFromServer) async {
     print('removing cable from ${isFromServer ? 'server' : 'local device'}');
     if (isFromServer) {
-
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.remove('cable: ${signature()}');

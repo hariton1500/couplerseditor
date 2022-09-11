@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'Helpers/strings.dart';
@@ -68,7 +70,15 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: ((context) => SetupScreen(lang: settings.language, settings: settings,)))).then((value) => setState((){})), icon: const Icon(Icons.settings_outlined))
+          IconButton(
+              onPressed: () => Navigator.of(context)
+                  .push(MaterialPageRoute(
+                      builder: ((context) => SetupScreen(
+                            lang: settings.language,
+                            settings: settings,
+                          ))))
+                  .then((value) => setState(() {})),
+              icon: const Icon(Icons.settings_outlined))
         ],
       ),
       body: SafeArea(
@@ -76,8 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Divider(),
-            Center(
-                child: TranslateText('FOSCs:', language: settings.language)),
+            Center(child: TranslateText('FOSCs:', language: settings.language)),
             TextButton.icon(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
@@ -157,7 +166,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (context) => NodesScreen(
                           //node: Node(address: 'no Address'),
                           //callback: () => setState(() {}),
-                          lang: settings.language, node: node, settings: settings,
+                          lang: settings.language, node: node,
+                          settings: settings,
                         )));
               },
               icon: const Icon(Icons.create_outlined),
@@ -226,26 +236,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: TranslateText('Cables:', language: settings.language)),
             TextButton.icon(
                 onPressed: () {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(
-                          builder: (context) => CableScreen(
-                                isFromServer: true,
-                                lang: settings.language,
-                                settings: settings,
-                              )));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => CableScreen(
+                            isFromServer: true,
+                            lang: settings.language,
+                            settings: settings,
+                          )));
                 },
                 icon: const Icon(Icons.create_outlined),
                 label: TranslateText('Create/edit cable from Server',
                     language: settings.language)),
             TextButton.icon(
                 onPressed: () {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(
-                          builder: (context) => CableScreen(
-                                isFromServer: false,
-                                lang: settings.language,
-                                settings: settings,
-                              )));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => CableScreen(
+                            isFromServer: false,
+                            lang: settings.language,
+                            settings: settings,
+                          )));
                 },
                 icon: const Icon(Icons.create_outlined),
                 label: TranslateText('Create/edit cable from Local device',
