@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:coupolerseditor/Models/activedevice.dart';
 import 'package:coupolerseditor/Models/cableend.dart';
+import 'package:coupolerseditor/services/jsonbin_io.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -68,7 +69,13 @@ class Node {
     sharedPreferences.setString('node: $address', jsonString);
   }
 
-  void saveToServer() {}
+  void saveToServer() {
+    JsonbinIO server = JsonbinIO();
+    server
+        .createJsonRecord(
+            name: signature().hashCode.toString(), jsonString: toJson())
+        .then((value) => print('node ${signature()} saved?: $value'));
+  }
 }
 
 class Connection {
