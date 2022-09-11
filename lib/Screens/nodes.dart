@@ -8,6 +8,7 @@ import '../Models/node.dart';
 import 'activedeviceportseditor.dart';
 import 'package:latlong2/latlong.dart' as ll;
 
+import 'fiberseditor.dart';
 import 'location_picker.dart';
 
 class NodesScreen extends StatefulWidget {
@@ -26,11 +27,13 @@ class _NodesScreenState extends State<NodesScreen> {
   //Node node = widget.node;
   int selectedAquipmentIndex = -1;
   bool isEdititingAddress = false;
+  CableEnd? selectedCableEnd;
 
   @override
   Widget build(BuildContext context) {
     print(
         'cableends: ${widget.node.cableEnds.length}; equipments: ${widget.node.equipments.length}');
+    print(selectedCableEnd);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -125,9 +128,14 @@ class _NodesScreenState extends State<NodesScreen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text(
-                      '[${widget.node.cableEnds.indexOf(cableEnd) + 1}] ${cableEnd.direction}: ${cableEnd.fibersNumber}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    child: TextButton(
+                      onPressed: () => setState(() {
+                        selectedCableEnd = cableEnd;
+                      }),
+                      child: Text(
+                        'ODF: ${cableEnd.direction}: ${cableEnd.fibersNumber}',
+                        style: TextStyle(color: selectedCableEnd != null && selectedCableEnd == cableEnd ? Colors.red : Colors.black),
+                      ),
                     ),
                   ),
                   cableEnd.widget(
@@ -224,102 +232,117 @@ class _NodesScreenState extends State<NodesScreen> {
               ]
             ],
           ),
-          TextButton.icon(
-              onPressed: () => showDialog<CableEnd>(
-                  context: context,
-                  builder: (context) {
-                    String direction = '';
-                    int fibersNumber = 1;
-                    List<DropdownMenuItem<int>> fibersList = fibers
-                        .map((e) => DropdownMenuItem<int>(
-                              value: e,
-                              child: Text(e.toString()),
-                            ))
-                        .toList();
-                    String colorScheme = fiberColors.keys.toList().first;
-                    return StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
-                      return AlertDialog(
-                        title: TranslateText('Adding of cable',
-                            language: widget.lang),
-                        content: Column(
-                          children: [
-                            TranslateText('Direction:', language: widget.lang),
-                            TextField(
-                              keyboardType: TextInputType.text,
-                              onChanged: (text) {
-                                direction = text;
-                              },
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TranslateText('Number of Fibers:',
-                                  language: widget.lang),
-                            ),
-                            DropdownButton<int>(
-                                value: fibersNumber,
-                                onChanged: (i) {
-                                  //print(i);
-                                  setState(() {
-                                    fibersNumber = i!;
-                                  });
+          Wrap(
+            children: [
+              TextButton.icon(
+                onPressed: () => showDialog<CableEnd>(
+                    context: context,
+                    builder: (context) {
+                      String direction = '';
+                      int fibersNumber = 1;
+                      List<DropdownMenuItem<int>> fibersList = fibers
+                          .map((e) => DropdownMenuItem<int>(
+                                value: e,
+                                child: Text(e.toString()),
+                              ))
+                          .toList();
+                      String colorScheme = fiberColors.keys.toList().first;
+                      return StatefulBuilder(
+                          builder: (BuildContext context, StateSetter setState) {
+                        return AlertDialog(
+                          title: TranslateText('Adding of cable',
+                              language: widget.lang),
+                          content: Column(
+                            children: [
+                              TranslateText('Direction:', language: widget.lang),
+                              TextField(
+                                keyboardType: TextInputType.text,
+                                onChanged: (text) {
+                                  direction = text;
                                 },
-                                items: fibersList),
-                            TranslateText(
-                              'Marking:',
-                              language: widget.lang,
-                            ),
-                            Column(
-                                children: fiberColors.entries
-                                    .map(
-                                      (e) => RadioListTile<String>(
-                                          title: Text(e.key),
-                                          subtitle: Wrap(
-                                            children: e.value
-                                                .map((color) => Container(
-                                                      width: 5,
-                                                      height: 15,
-                                                      color: color,
-                                                    ))
-                                                .toList(),
-                                          ),
-                                          value: e.key,
-                                          groupValue: colorScheme,
-                                          onChanged: (a) =>
-                                              setState(() => colorScheme = a!)),
-                                    )
-                                    .toList()),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: TranslateText('Number of Fibers:',
+                                    language: widget.lang),
+                              ),
+                              DropdownButton<int>(
+                                  value: fibersNumber,
+                                  onChanged: (i) {
+                                    //print(i);
+                                    setState(() {
+                                      fibersNumber = i!;
+                                    });
+                                  },
+                                  items: fibersList),
+                              TranslateText(
+                                'Marking:',
+                                language: widget.lang,
+                              ),
+                              Column(
+                                  children: fiberColors.entries
+                                      .map(
+                                        (e) => RadioListTile<String>(
+                                            title: Text(e.key),
+                                            subtitle: Wrap(
+                                              children: e.value
+                                                  .map((color) => Container(
+                                                        width: 5,
+                                                        height: 15,
+                                                        color: color,
+                                                      ))
+                                                  .toList(),
+                                            ),
+                                            value: e.key,
+                                            groupValue: colorScheme,
+                                            onChanged: (a) =>
+                                                setState(() => colorScheme = a!)),
+                                      )
+                                      .toList()),
+                            ],
+                          ),
+                          actions: [
+                            OutlinedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: TranslateText('Cancel',
+                                    language: widget.lang)),
+                            OutlinedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(CableEnd(
+                                    direction: direction,
+                                    fibersNumber: fibersNumber,
+                                    sideIndex: 0,
+                                    colorScheme: colorScheme,
+                                    id: -1,
+                                  ));
+                                },
+                                child:
+                                    TranslateText('Add', language: widget.lang))
                           ],
-                        ),
-                        actions: [
-                          OutlinedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: TranslateText('Cancel',
-                                  language: widget.lang)),
-                          OutlinedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(CableEnd(
-                                  direction: direction,
-                                  fibersNumber: fibersNumber,
-                                  sideIndex: 0,
-                                  colorScheme: colorScheme,
-                                  id: -1,
-                                ));
-                              },
-                              child:
-                                  TranslateText('Add', language: widget.lang))
-                        ],
-                      );
-                    });
-                  }).then((value) => setState(
-                    () => value != null
-                        ? widget.node.cableEnds.add(value)
-                        : print,
-                  )),
-              icon: const Icon(Icons.add),
-              label: TranslateText('Add cable ending', language: widget.lang)),
+                        );
+                      });
+                    }).then((value) => setState(
+                      () => value != null
+                          ? widget.node.cableEnds.add(value)
+                          : print,
+                    )),
+                icon: const Icon(Icons.add),
+                label: TranslateText('Add cable ending', language: widget.lang)
+              ),
+              selectedCableEnd != null ? TextButton.icon(onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: ((context) => FibersEditor(cableEnd: selectedCableEnd!, lang: widget.lang,)))).then((value) => setState((){}));
+              }, icon: const Icon(Icons.edit_rounded), label: TranslateText('Edit/View fibers', language: widget.lang,)) : Container(),
+              selectedCableEnd != null ? TextButton.icon(onPressed: () {
+                setState(() {
+                  widget.node.cableEnds.remove(selectedCableEnd);
+                  widget.node.connections.removeWhere((connection) => connection.connectionData!.key.key == selectedCableEnd || connection.connectionData!.value.key == selectedCableEnd);
+                  selectedCableEnd = null;
+                });
+              }, icon: const Icon(Icons.delete_rounded), label: TranslateText('Delete ODF', language: widget.lang)) : Container()
+            ]
+          ),
           if ((widget.node.cableEnds.isNotEmpty ||
                   widget.node.equipments.isNotEmpty) &&
               widget.node.location != null) ...[
