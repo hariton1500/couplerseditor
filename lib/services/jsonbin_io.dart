@@ -68,4 +68,6 @@ class JsonbinIO {
       return false;
     }
   }
+
+  Future<bool> updateJsonRecord() {}
 }
