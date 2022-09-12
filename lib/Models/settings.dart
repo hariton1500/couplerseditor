@@ -7,6 +7,7 @@ class Settings {
   String baseUrl = '';
   String language = 'en';
   LatLng? baseLocation;
+  String binsMapId = '';
 
   Future loadSettings() async {
     SharedPreferences shared = await SharedPreferences.getInstance();
@@ -14,6 +15,7 @@ class Settings {
     language = shared.getString('language') ?? 'en';
     baseLocation = LatLng.fromJson(json.decode(
         shared.getString('baseLocation') ?? '{"coordinates":[0.0,0.0]}'));
+    binsMapId = shared.getString('binsMapId') ?? '';
   }
 
   void saveSettings() async {
@@ -21,5 +23,6 @@ class Settings {
     shared.setString('baseUrl', baseUrl);
     shared.setString('language', language);
     shared.setString('baseLocation', json.encode(baseLocation?.toJson()));
+    shared.setString('binsMapId', binsMapId);
   }
 }

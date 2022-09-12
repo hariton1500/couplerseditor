@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:coupolerseditor/services/keys.dart';
+import 'package:coupolerseditor/Models/settings.dart';
+//import 'package:coupolerseditor/services/keys.dart';
 import 'package:http/http.dart';
 
 class JsonbinIO {
@@ -9,11 +10,10 @@ class JsonbinIO {
   String url = 'https://api.jsonbin.io/v3/b';
   Map<String, String> headers = {
     'Content-Type': 'application/json',
-    'X-Master-key': keys['jsonbin_io']!['X-Master-Key']!,
-    'X-Collection-Id': keys['jsonbin_io']!['collectionId']!,
+    'X-Master-key': '',// ['X-Master-Key']!,
+    'X-Collection-Id': '',//keys['jsonbin_io']!['collectionId']!,
   };
-
-  String binlistId = '631e2315e13e6063dca44944';
+  Settings settings = Settings()..loadSettings();
 
   Map<String, dynamic> bins = {};
 
@@ -21,7 +21,7 @@ class JsonbinIO {
     print('loading bins list');
     try {
       var response =
-          await get(Uri.parse('$url/$binlistId?meta=false'), headers: headers);
+          await get(Uri.parse('$url/${settings.binsMapId}?meta=false'), headers: headers);
       if (response.statusCode == 200) {
         print(response.body);
         bins = json.decode(response.body);
