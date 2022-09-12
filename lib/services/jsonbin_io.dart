@@ -6,12 +6,13 @@ import 'package:http/http.dart';
 class JsonbinIO {
   String url = 'https://api.jsonbin.io/v3/b';
   Map<String, String> headers = {'Content-Type': 'application/json'};
-  final Settings settings = Settings()..loadSettings();
+  final Settings settings; // = Settings()..loadSettings();
   Map<String, dynamic> bins = {};
 
-  JsonbinIO() {
+  JsonbinIO({required this.settings}) {
     headers['X-Master-key'] = settings.xMasterKey;
     headers['X-Collection-Id'] = settings.collectionId;
+    //settings.loadSettings();
     loadBins();
   }
 
