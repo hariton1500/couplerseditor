@@ -1,27 +1,26 @@
 import 'dart:convert';
 
 import 'package:coupolerseditor/Models/settings.dart';
-//import 'package:coupolerseditor/services/keys.dart';
 import 'package:http/http.dart';
 
 class JsonbinIO {
-  //String key = keys['jsonbin_io']!['X-Master-Key']!;
-  String collectionId = '';//keys['jsonbin_io']!['collectionId']!;
   String url = 'https://api.jsonbin.io/v3/b';
-  Map<String, String> headers = {
-    'Content-Type': 'application/json',
-    'X-Master-key': '',// ['X-Master-Key']!,
-    'X-Collection-Id': '',//keys['jsonbin_io']!['collectionId']!,
-  };
-  Settings settings = Settings()..loadSettings();
-
+  Map<String, String> headers = {'Content-Type': 'application/json'};
+  final Settings settings = Settings()..loadSettings();
   Map<String, dynamic> bins = {};
+
+  JsonbinIO() {
+    headers['X-Master-key'] = settings.xMasterKey;
+    headers['X-Collection-Id'] = settings.collectionId;
+    loadBins();
+  }
 
   Future<void> loadBins() async {
     print('loading bins list');
     try {
-      var response =
-          await get(Uri.parse('$url/${settings.binsMapId}?meta=false'), headers: headers);
+      var response = await get(
+          Uri.parse('$url/${settings.binsMapId}?meta=false'),
+          headers: headers);
       if (response.statusCode == 200) {
         print(response.body);
         bins = json.decode(response.body);
@@ -69,7 +68,15 @@ class JsonbinIO {
     }
   }
 
-  Future<bool> updateJsonRecord() {
-    return Future(()=>true);
+  Future<bool> updateJsonRecord(
+      {required String binId, required String jsonString}) async {
+    try {
+      var response = await put(Uri.parse('$url/$binId'),
+          headers: headers, body: jsonString);
+      return response.statusCode == 200;
+    } catch (e) {
+      print(e);
+      return false;
+    }
   }
 }
