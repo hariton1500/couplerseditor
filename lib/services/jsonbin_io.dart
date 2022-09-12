@@ -6,7 +6,7 @@ import 'package:http/http.dart';
 
 class JsonbinIO {
   //String key = keys['jsonbin_io']!['X-Master-Key']!;
-  String collectionId = keys['jsonbin_io']!['collectionId']!;
+  String collectionId = '';//keys['jsonbin_io']!['collectionId']!;
   String url = 'https://api.jsonbin.io/v3/b';
   Map<String, String> headers = {
     'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ class JsonbinIO {
     try {
       await loadBins();
       bins[hash] = id;
-      var response = await put(Uri.parse('$url/$binlistId'),
+      var response = await put(Uri.parse('$url/${settings.binsMapId}'),
           headers: headers, body: json.encode(bins));
       return response.statusCode == 200;
     } catch (e) {
@@ -69,5 +69,7 @@ class JsonbinIO {
     }
   }
 
-  Future<bool> updateJsonRecord() {}
+  Future<bool> updateJsonRecord() {
+    return Future(()=>true);
+  }
 }
