@@ -349,9 +349,10 @@ class _NodesScreenState extends State<NodesScreen> {
             Wrap(
               children: [
                 TextButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     //print(node.toJson());
-                    widget.node.saveToServer();
+                    bool res = await widget.node.saveToServer();
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: TranslateText(res ? 'Saved' : 'Not Saved'), backgroundColor: res ? Colors.green : Colors.red,));
                   },
                   icon: const Icon(Icons.save_outlined),
                   label: TranslateText('Save to Server', language: widget.lang),

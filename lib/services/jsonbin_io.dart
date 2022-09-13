@@ -13,7 +13,7 @@ class JsonbinIO {
     headers['X-Master-key'] = settings.xMasterKey;
     headers['X-Collection-Id'] = settings.collectionId;
     //settings.loadSettings();
-    loadBins();
+    //loadBins();
   }
 
   Future<void> loadBins() async {

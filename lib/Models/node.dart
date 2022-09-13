@@ -70,14 +70,22 @@ class Node {
     sharedPreferences.setString('node: $address', jsonString);
   }
 
-  void saveToServer() async {
+  Future<bool> saveToServer() async {
+    print('/////////saveToServer////////////');
     Settings settings = Settings();
     await settings.loadSettings();
     JsonbinIO server = JsonbinIO(settings: settings);
-    server
-        .createJsonRecord(
-            name: signature().hashCode.toString(), jsonString: toJson())
-        .then((value) => print('node ${signature()} saved?: $value'));
+    await server.loadBins();
+    print('current bins = ${server.bins}');
+    String binId = signature().hashCode.toString();
+    print('binId = $binId');
+    if (!server.bins.containsKey(binId)) {
+      print('creating new bin');
+      return await server.createJsonRecord(name: binId, jsonString: toJson());
+    } else {
+      print('updating bin $binId');
+      return await server.updateJsonRecord(binId: server.bins[binId], jsonString: toJson());
+    }
   }
 }
 

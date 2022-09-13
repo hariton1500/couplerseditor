@@ -67,6 +67,21 @@ class _SetupScreenState extends State<SetupScreen> {
                 initialValue: widget.settings.baseUrl,
                 onChanged: (value) => widget.settings.baseUrl = value,
               ),
+              TranslateText('Master key:', language: widget.settings.language),
+              TextFormField(
+                initialValue: widget.settings.xMasterKey,
+                onChanged: (value) => widget.settings.xMasterKey = value,
+              ),
+              TranslateText('Collection ID:', language: widget.settings.language),
+              TextFormField(
+                initialValue: widget.settings.collectionId,
+                onChanged: (value) => widget.settings.collectionId = value,
+              ),
+              TranslateText('Map bin ID:', language: widget.settings.language),
+              TextFormField(
+                initialValue: widget.settings.binsMapId,
+                onChanged: (value) => widget.settings.binsMapId = value,
+              ),
               const Divider(),
               Column(
                 children: [
