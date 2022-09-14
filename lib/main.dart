@@ -9,7 +9,7 @@ import 'Models/settings.dart';
 import 'Screens/cables.dart';
 import 'Screens/fosc.dart';
 import 'Screens/couplerslist.dart';
-import 'Screens/nodes.dart';
+import 'Screens/node_page.dart';
 import 'Screens/nodeslist.dart';
 import 'Screens/setup.dart';
 import 'Screens/viewer.dart';

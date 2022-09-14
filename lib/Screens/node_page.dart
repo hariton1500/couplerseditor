@@ -24,7 +24,6 @@ class NodesScreen extends StatefulWidget {
 }
 
 class _NodesScreenState extends State<NodesScreen> {
-  //Node node = widget.node;
   int selectedAquipmentIndex = -1;
   bool isEdititingAddress = false;
   CableEnd? selectedCableEnd;
@@ -349,10 +348,8 @@ class _NodesScreenState extends State<NodesScreen> {
             Wrap(
               children: [
                 TextButton.icon(
-                  onPressed: () async {
-                    //print(node.toJson());
-                    bool res = await widget.node.saveToServer();
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: TranslateText(res ? 'Saved' : 'Not Saved'), backgroundColor: res ? Colors.green : Colors.red,));
+                  onPressed: () {
+                    widget.node.saveToServer().then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: TranslateText(value ? 'Saved' : 'Not Saved'), backgroundColor: value ? Colors.green : Colors.red,)));
                   },
                   icon: const Icon(Icons.save_outlined),
                   label: TranslateText('Save to Server', language: widget.lang),

@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:coupolerseditor/Models/node.dart';
+import 'package:coupolerseditor/services/jsonbin_io.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helpers/strings.dart';
 import '../Models/settings.dart';
-import 'nodes.dart';
+import 'node_page.dart';
 
 class NodesList extends StatefulWidget {
   const NodesList(
@@ -59,6 +60,7 @@ class _NodesListState extends State<NodesList> {
             ? ListView.builder(
                 itemCount: nodesJsonStrings.length,
                 itemBuilder: (ctx, index) {
+                  print(nodesJsonStrings);
                   Map<String, dynamic> node =
                       jsonDecode(nodesJsonStrings[index]);
                   return ListTile(
@@ -124,7 +126,23 @@ class _NodesListState extends State<NodesList> {
     );
   }
 
-  loadListFromBilling() {}
+  loadListFromBilling() {
+    JsonbinIO server = JsonbinIO(settings: widget.settings);
+    server.loadBins().then((_) async {
+      List<MapEntry<String, dynamic>> nodeBinsList = server.bins.entries.where((element) {
+        Map<String, dynamic> data = (element.value is Map) ? element.value : {'id': element.value, 'type': 'unknown'};
+        return data['type'] == 'node';
+      }).toList();
+      print('nodeBinsList = $nodeBinsList');
+      for (var bin in nodeBinsList) {
+        String data = await server.loadDataFromBin(binId: bin.value['id']);
+        if (data != '') {
+        setState(() {
+          nodesJsonStrings.add(data);
+        });}
+      }
+    });
+  }
 
   loadListFromDevice() async {
     print('loadListFromDevice');

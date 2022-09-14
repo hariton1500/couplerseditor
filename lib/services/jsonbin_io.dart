@@ -32,11 +32,29 @@ class JsonbinIO {
     }
   }
 
-  Future<bool> saveBin({required String id, required String hash}) async {
+  Future<String> loadDataFromBin({required String binId}) async {
+    print('loading data from bin = $binId');
+    try {
+      print('headers = $headers');
+      var response = await get(Uri.parse('$url/$binId?meta=false'), headers: headers);
+      print(response.body);
+      if (response.statusCode == 200) {
+        
+        return response.body;
+      } else {
+        return '';
+      }
+    } catch (e) {
+      print(e);
+      return '';
+    }
+  }
+
+  Future<bool> saveBin({required String id, required String hash, required String type}) async {
     print('saving bins list');
     try {
       await loadBins();
-      bins[hash] = id;
+      bins[hash] = {'id': id, 'type': type};
       var response = await put(Uri.parse('$url/${settings.binsMapId}'),
           headers: headers, body: json.encode(bins));
       return response.statusCode == 200;
@@ -46,7 +64,7 @@ class JsonbinIO {
   }
 
   Future<bool> createJsonRecord(
-      {required String name, required String jsonString}) async {
+      {required String name, required String jsonString, required String type}) async {
     try {
       headers['X-Bin-Name'] = name;
       var response =
@@ -59,7 +77,7 @@ class JsonbinIO {
         String id = (json.decode(response.body)
             as Map<String, dynamic>)['metadata']['id'];
         print('id = $id');
-        return await saveBin(hash: name, id: id);
+        return await saveBin(hash: name, id: id, type: type);
       } else {
         return false;
       }
