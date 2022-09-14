@@ -30,6 +30,7 @@ class MuftaScreenState extends State<MuftaScreen> {
   int longestSideHeight = 10;
   bool isShowAddConnections = false;
   Settings settings = Settings();
+  bool isNetworkProcess = false;
 
   @override
   void initState() {
@@ -40,10 +41,10 @@ class MuftaScreenState extends State<MuftaScreen> {
   @override
   Widget build(BuildContext context) {
     int tmp0 = 0, tmp1 = 0;
-    for (var _cableEnd in widget.mufta.cableEnds) {
-      _cableEnd.sideIndex == 0
-          ? tmp0 += _cableEnd.fibersNumber
-          : tmp1 += _cableEnd.fibersNumber;
+    for (var cableEnd in widget.mufta.cableEnds) {
+      cableEnd.sideIndex == 0
+          ? tmp0 += cableEnd.fibersNumber
+          : tmp1 += cableEnd.fibersNumber;
     }
     tmp0 >= tmp1 ? longestSideHeight = tmp0 : longestSideHeight = tmp1;
     //print('List of connections:');
@@ -100,10 +101,17 @@ class MuftaScreenState extends State<MuftaScreen> {
                             'Location Picker',
                             language: widget.lang,
                           ),
-                          content: LocationPicker(startLocation: widget.mufta.location ?? settings.baseLocation ?? ll.LatLng(0, 0),),
+                          content: LocationPicker(
+                            startLocation: widget.mufta.location ??
+                                settings.baseLocation ??
+                                ll.LatLng(0, 0),
+                          ),
                         );
                       }).then((value) => setState(() {
-                        widget.mufta.location = value ?? widget.mufta.location ?? settings.baseLocation ?? ll.LatLng(0, 0);
+                        widget.mufta.location = value ??
+                            widget.mufta.location ??
+                            settings.baseLocation ??
+                            ll.LatLng(0, 0);
                       })),
                   child: Wrap(
                     children: [
@@ -650,92 +658,42 @@ class MuftaScreenState extends State<MuftaScreen> {
                   )
                 ])
               ],
+              widget.mufta.cableEnds.isNotEmpty && widget.mufta.location != null
+                  ? Wrap(
+                      children: [
+                        TextButton.icon(
+                            onPressed: () => widget.mufta.saveToLocal(),
+                            icon: const Icon(Icons.save_outlined),
+                            label: TranslateText('Save to Local Device',
+                                language: settings.language)),
+                        !isNetworkProcess
+                            ? TextButton.icon(
+                                onPressed: () async {
+                                  setState(() {
+                                    isNetworkProcess = true;
+                                  });
+                                  widget.mufta.saveToServer().then((value) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: TranslateText(
+                                          value ? 'Saved' : 'Not Saved'),
+                                      backgroundColor:
+                                          value ? Colors.green : Colors.red,
+                                    ));
+                                    setState(() {
+                                      isNetworkProcess = false;
+                                    });
+                                  });
+                                },
+                                icon: const Icon(Icons.save_outlined),
+                                label: TranslateText('Save to Server',
+                                    language: settings.language))
+                            : const CircularProgressIndicator.adaptive()
+                      ],
+                    )
+                  : Container(),
               Row(
                 children: [
-                  widget.mufta.cableEnds.isNotEmpty
-                      ? TextButton.icon(
-                          onPressed: (widget.mufta.location == null ||
-                                  widget.mufta.cableEnds.isEmpty)
-                              ? null
-                              : () {
-                                  var variants = const [
-                                    'to Device',
-                                    'to billing software (json)',
-                                  ]
-                                      .map((e) => DropdownMenuItem<String>(
-                                          value: e, child: TranslateText(e)))
-                                      .toList();
-                                  String exportVariant = variants.first.value!;
-                                  showDialog<String>(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return StatefulBuilder(builder:
-                                            (BuildContext context,
-                                                StateSetter setState) {
-                                          return AlertDialog(
-                                            title: TranslateText('Export',
-                                                language: widget.lang),
-                                            content: Column(
-                                              children: [
-                                                DropdownButton<String>(
-                                                    value: exportVariant,
-                                                    items: variants,
-                                                    onChanged: (variant) {
-                                                      setState(() {
-                                                        exportVariant =
-                                                            variant!;
-                                                      });
-                                                    }),
-                                                exportVariant ==
-                                                        variants[0].value
-                                                    ? Column(
-                                                        children: [
-                                                          const Text(
-                                                              'Coupler name:'),
-                                                          TranslateText(
-                                                              widget.mufta.name,
-                                                              language:
-                                                                  widget.lang)
-                                                        ],
-                                                      )
-                                                    : Container(),
-                                                exportVariant ==
-                                                        variants[1].value
-                                                    ? Column(
-                                                        children: [
-                                                          const Text(
-                                                              'Coupler name:'),
-                                                          TranslateText(
-                                                              '${settings
-                                                                  .baseUrl}/coupler',//couplerUrl,
-                                                              language:
-                                                                  widget.lang)
-                                                        ],
-                                                      )
-                                                    : Container()
-                                              ],
-                                            ),
-                                            actions: [
-                                              OutlinedButton(
-                                                  onPressed: () {
-                                                    if (exportVariant ==
-                                                        variants[0].value) {
-                                                      widget.mufta
-                                                          .saveToLocal();
-                                                    }
-                                                    Navigator.of(context)
-                                                        .pop(exportVariant);
-                                                  },
-                                                  child:
-                                                      TranslateText('Export'))
-                                            ],
-                                          );
-                                        });
-                                      }).then((value) => print(value));
-                                },
-                          icon: const Icon(Icons.save_outlined),
-                          label: TranslateText('Export', language: widget.lang))
-                      : Container(),
                   TextButton.icon(
                       onPressed: () {
                         widget.callback();

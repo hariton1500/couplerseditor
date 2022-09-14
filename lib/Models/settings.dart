@@ -8,10 +8,9 @@ class Settings {
   String language = 'en';
   LatLng? baseLocation;
   String binsMapId = '';
-
   String xMasterKey = '';
-
   String collectionId = '';
+  String xAccessKey = '';
 
   Future loadSettings() async {
     SharedPreferences shared = await SharedPreferences.getInstance();
@@ -21,6 +20,7 @@ class Settings {
         shared.getString('baseLocation') ?? '{"coordinates":[0.0,0.0]}'));
     binsMapId = shared.getString('binsMapId') ?? '';
     xMasterKey = shared.getString('xMasterKey') ?? '';
+    xAccessKey = shared.getString('xAccessKey') ?? '';
     collectionId = shared.getString('collectionId') ?? '';
   }
 
@@ -31,6 +31,7 @@ class Settings {
     shared.setString('baseLocation', json.encode(baseLocation?.toJson()));
     shared.setString('binsMapId', binsMapId);
     shared.setString('xMasterKey', xMasterKey);
+    shared.setString('xAccessKey', xAccessKey);
     shared.setString('collectionId', collectionId);
   }
 }

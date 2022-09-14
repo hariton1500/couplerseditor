@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 //import 'package:coupolerseditor/Helpers/epsg3395.dart';
+import 'package:coupolerseditor/Models/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:http/http.dart';
@@ -10,17 +11,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helpers/strings.dart';
 import '../Models/coupler.dart';
+import '../services/jsonbin_io.dart';
 import 'fosc.dart';
 
 class CouplersList extends StatefulWidget {
   final String lang;
-  final String couplersListURL;
+  final Settings settings;
   final bool isFromBilling;
 
   const CouplersList(
       {Key? key,
       required this.lang,
-      required this.couplersListURL,
+      required this.settings,
       required this.isFromBilling})
       : super(key: key);
 
@@ -56,12 +58,6 @@ class _CouplersListState extends State<CouplersList> {
                     : 'List of couplers from device',
                 language: widget.lang,
               ),
-              widget.isFromBilling
-                  ? Text(
-                      '${widget.couplersListURL}/?getlist',
-                      style: const TextStyle(fontSize: 10),
-                    )
-                  : Container()
             ],
           ),
           actions: [
@@ -84,15 +80,16 @@ class _CouplersListState extends State<CouplersList> {
                               builder: (context) => MuftaScreen(
                                   mufta: Mufta.fromJson(jsonDecode(
                                       couplers[selectedCouplerIndex!])),
-                                  callback: () => setState(() {}),
+                                  callback: () {
+                                    setState(() {
+                                      couplers.clear();
+                                      widget.isFromBilling
+                                          ? loadListFromBilling()
+                                          : loadListFromDevice();
+                                    });
+                                  },
                                   lang: widget.lang)))
-                          .then((value) => setState(
-                                () {
-                                  widget.isFromBilling
-                                      ? loadListFromBilling()
-                                      : loadListFromDevice();
-                                },
-                              ));
+                          .then((value) {});
                       //Navigator.of(context).pop(couplers[selectedCouplerIndex!]);
                     },
                   )
@@ -228,10 +225,30 @@ class _CouplersListState extends State<CouplersList> {
   }
 
   loadListFromBilling() async {
-    print(
-        'loading list of FOSCs from server URL = ${widget.couplersListURL}/?getlist');
+    print('loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
+    JsonbinIO server = JsonbinIO(settings: widget.settings);
+    server.loadBins().then((_) async {
+      List<MapEntry<String, dynamic>> nodeBinsList =
+          server.bins.entries.where((element) {
+        Map<String, dynamic> data = (element.value is Map)
+            ? element.value
+            : {'id': element.value, 'type': 'unknown'};
+        return data['type'] == 'fosc';
+      }).toList();
+      print('nodeBinsList = $nodeBinsList');
+      for (var bin in nodeBinsList) {
+        String data = await server.loadDataFromBin(binId: bin.value['id']);
+        if (data != '') {
+          setState(() {
+            couplers.add(data);
+          });
+        }
+      }
+    });
+
+    /*
     try {
-      var response = await get(Uri.parse('${widget.couplersListURL}/?getlist'));
+      var response = await get(Uri.parse('${widget.settings.baseUrl}/?getlist'));
       if (response.statusCode == 200 || response.statusCode == 201) {
         setState(() {
           couplers = json.decode(response.body).map((e) => json.encode(e));
@@ -239,7 +256,7 @@ class _CouplersListState extends State<CouplersList> {
       }
     } catch (e) {
       throw Exception(e);
-    }
+    }*/
   }
 
   loadListFromDevice() async {

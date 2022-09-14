@@ -114,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (context) => CouplersList(
                           isFromBilling: true,
                           lang: settings.language,
-                          couplersListURL: '${settings.baseUrl}/couplerslist',
+                          settings: settings,
                         ),
                       ))
                           .then((value) {
@@ -140,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (context) => CouplersList(
                           isFromBilling: false,
                           lang: settings.language,
-                          couplersListURL: '${settings.baseUrl}/couplerslist',
+                          settings: settings,
                         ),
                       ))
                           .then((value) {

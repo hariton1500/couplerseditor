@@ -81,13 +81,14 @@ class Node {
     print('binId = $binId');
     if (!server.bins.containsKey(binId)) {
       print('creating new bin');
-      return await server.createJsonRecord(name: binId, jsonString: toJson(), type: 'node');
+      return await server.createJsonRecord(
+          name: binId, jsonString: toJson(), type: 'node');
     } else {
       print('updating bin $binId');
-      return await server.updateJsonRecord(binId: server.bins[binId], jsonString: toJson());
+      return await server.updateJsonRecord(
+          binId: server.bins[binId]['id'], jsonString: toJson());
     }
   }
-
 }
 
 class Connection {

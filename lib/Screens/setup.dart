@@ -1,4 +1,3 @@
-
 import 'package:coupolerseditor/Models/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
@@ -7,7 +6,8 @@ import '../Helpers/strings.dart';
 import 'location_picker.dart';
 
 class SetupScreen extends StatefulWidget {
-  const SetupScreen({Key? key, required this.lang, required this.settings}) : super(key: key);
+  const SetupScreen({Key? key, required this.lang, required this.settings})
+      : super(key: key);
   final String lang;
   final Settings settings;
 
@@ -16,9 +16,7 @@ class SetupScreen extends StatefulWidget {
 }
 
 class _SetupScreenState extends State<SetupScreen> {
-
   String lang = '';
-  
 
   @override
   void initState() {
@@ -72,7 +70,15 @@ class _SetupScreenState extends State<SetupScreen> {
                 initialValue: widget.settings.xMasterKey,
                 onChanged: (value) => widget.settings.xMasterKey = value,
               ),
-              TranslateText('Collection ID:', language: widget.settings.language),
+              /*
+              TranslateText('Access key:', language: widget.settings.language),
+              TextFormField(
+                initialValue: widget.settings.xAccessKey,
+                onChanged: (value) => widget.settings.xAccessKey = value,
+              ),
+              */
+              TranslateText('Collection ID:',
+                  language: widget.settings.language),
               TextFormField(
                 initialValue: widget.settings.collectionId,
                 onChanged: (value) => widget.settings.collectionId = value,
@@ -85,12 +91,23 @@ class _SetupScreenState extends State<SetupScreen> {
               const Divider(),
               Column(
                 children: [
-                  TextButton.icon(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => LocationPicker(startLocation: LatLng(0, 0),))).then((value) {
-                    setState(() {
-                      widget.settings.baseLocation = value;
-                    });
-                  }), icon: const Icon(Icons.location_on_outlined), label: TranslateText('Set base location')),
-                  widget.settings.baseLocation != null ? Text('[${widget.settings.baseLocation?.latitude}, ${widget.settings.baseLocation?.longitude}]') : Container()
+                  TextButton.icon(
+                      onPressed: () => Navigator.of(context)
+                              .push(MaterialPageRoute(
+                                  builder: (context) => LocationPicker(
+                                        startLocation: LatLng(0, 0),
+                                      )))
+                              .then((value) {
+                            setState(() {
+                              widget.settings.baseLocation = value;
+                            });
+                          }),
+                      icon: const Icon(Icons.location_on_outlined),
+                      label: TranslateText('Set base location')),
+                  widget.settings.baseLocation != null
+                      ? Text(
+                          '[${widget.settings.baseLocation?.latitude}, ${widget.settings.baseLocation?.longitude}]')
+                      : Container()
                 ],
               ),
               const SizedBox(

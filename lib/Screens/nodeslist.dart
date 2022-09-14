@@ -14,7 +14,8 @@ class NodesList extends StatefulWidget {
       {Key? key,
       required this.lang,
       required this.nodesListURL,
-      required this.isFromBilling, required this.settings})
+      required this.isFromBilling,
+      required this.settings})
       : super(key: key);
   final String lang;
   final String nodesListURL;
@@ -44,13 +45,20 @@ class _NodesListState extends State<NodesList> {
             ? IconButton(
                 icon: const Icon(Icons.select_all_outlined),
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => NodesScreen(
-                            node: Node.fromJson(jsonDecode(
-                                nodesJsonStrings[selectedNodeIndex])),
-                            lang: widget.lang,
-                            settings: widget.settings,
-                          ))).then((value) => setState(() {widget.isFromBilling ? loadListFromBilling() : loadListFromDevice();}));
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(
+                          builder: (context) => NodesScreen(
+                                node: Node.fromJson(jsonDecode(
+                                    nodesJsonStrings[selectedNodeIndex])),
+                                lang: widget.lang,
+                                settings: widget.settings,
+                              )))
+                      .then((value) => setState(() {
+                            nodesJsonStrings.clear();
+                            widget.isFromBilling
+                                ? loadListFromBilling()
+                                : loadListFromDevice();
+                          }));
                 },
               )
             : Container(),
@@ -60,7 +68,7 @@ class _NodesListState extends State<NodesList> {
             ? ListView.builder(
                 itemCount: nodesJsonStrings.length,
                 itemBuilder: (ctx, index) {
-                  print(nodesJsonStrings);
+                  //print(nodesJsonStrings);
                   Map<String, dynamic> node =
                       jsonDecode(nodesJsonStrings[index]);
                   return ListTile(
@@ -96,7 +104,15 @@ class _NodesListState extends State<NodesList> {
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   setState(() {
-                                    removeNodeFromStore(nodesJsonStrings[index]);
+                                    widget.isFromBilling
+                                        ? removeFromServer(
+                                            name: Node.fromJson(jsonDecode(
+                                                    nodesJsonStrings[index]))
+                                                .signature()
+                                                .hashCode
+                                                .toString())
+                                        : removeNodeFromStore(
+                                            nodesJsonStrings[index]);
                                     nodesJsonStrings.removeAt(index);
                                   });
                                 },
@@ -129,17 +145,21 @@ class _NodesListState extends State<NodesList> {
   loadListFromBilling() {
     JsonbinIO server = JsonbinIO(settings: widget.settings);
     server.loadBins().then((_) async {
-      List<MapEntry<String, dynamic>> nodeBinsList = server.bins.entries.where((element) {
-        Map<String, dynamic> data = (element.value is Map) ? element.value : {'id': element.value, 'type': 'unknown'};
+      List<MapEntry<String, dynamic>> nodeBinsList =
+          server.bins.entries.where((element) {
+        Map<String, dynamic> data = (element.value is Map)
+            ? element.value
+            : {'id': element.value, 'type': 'unknown'};
         return data['type'] == 'node';
       }).toList();
       print('nodeBinsList = $nodeBinsList');
       for (var bin in nodeBinsList) {
         String data = await server.loadDataFromBin(binId: bin.value['id']);
         if (data != '') {
-        setState(() {
-          nodesJsonStrings.add(data);
-        });}
+          setState(() {
+            nodesJsonStrings.add(data);
+          });
+        }
       }
     });
   }
@@ -159,11 +179,24 @@ class _NodesListState extends State<NodesList> {
           .toList();
     });
   }
-  
+
   void removeNodeFromStore(String nodesJsonString) async {
     print('removing: $nodesJsonString');
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String key = 'node: ${(json.decode(nodesJsonString) as Map<String, dynamic>)['address']}';
+    String key =
+        'node: ${(json.decode(nodesJsonString) as Map<String, dynamic>)['address']}';
     sharedPreferences.remove(key);
+  }
+
+  void removeFromServer({required String name}) async {
+    print('removing: node with hash = $name');
+    JsonbinIO server = JsonbinIO(settings: widget.settings);
+    /*
+    server.loadBins().then((value) {
+      print(server.bins);
+      server.bins[name]['type'] = 'deleted by at ${DateTime.now()}';
+      server.saveBin(id: id, hash: hash, type: type)
+    });*/
+    server.saveBin(id: '', hash: name, type: 'deleted by at ${DateTime.now()}');
   }
 }

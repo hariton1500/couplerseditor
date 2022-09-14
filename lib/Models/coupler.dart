@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/jsonbin_io.dart';
 import 'cableend.dart';
+import 'settings.dart';
 
 class Connection {
   //List<int> connectionData = [];
@@ -88,5 +90,25 @@ class Mufta {
           cableIndex2: 0,
           fiberNumber2: 0));
     };
+  }
+
+  Future<bool> saveToServer() async {
+    print('/////////saveToServer////////////');
+    Settings settings = Settings();
+    await settings.loadSettings();
+    JsonbinIO server = JsonbinIO(settings: settings);
+    await server.loadBins();
+    print('current bins = ${server.bins}');
+    String binId = signature().hashCode.toString();
+    print('binId = $binId');
+    if (!server.bins.containsKey(binId)) {
+      print('creating new bin');
+      return await server.createJsonRecord(
+          name: binId, jsonString: toJson(), type: 'fosc');
+    } else {
+      print('updating bin $binId');
+      return await server.updateJsonRecord(
+          binId: server.bins[binId]['id'], jsonString: toJson());
+    }
   }
 }

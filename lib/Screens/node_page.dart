@@ -16,7 +16,11 @@ class NodesScreen extends StatefulWidget {
   final Node node;
   final Settings settings;
 
-  const NodesScreen({Key? key, required this.lang, required this.node, required this.settings})
+  const NodesScreen(
+      {Key? key,
+      required this.lang,
+      required this.node,
+      required this.settings})
       : super(key: key);
 
   @override
@@ -27,6 +31,7 @@ class _NodesScreenState extends State<NodesScreen> {
   int selectedAquipmentIndex = -1;
   bool isEdititingAddress = false;
   CableEnd? selectedCableEnd;
+  bool isNetworkProcess = false;
 
   @override
   Widget build(BuildContext context) {
@@ -76,10 +81,17 @@ class _NodesScreenState extends State<NodesScreen> {
                         'Location Picker',
                         language: widget.lang,
                       ),
-                      content: LocationPicker(startLocation: widget.node.location ?? widget.settings.baseLocation ?? ll.LatLng(0, 0),),
+                      content: LocationPicker(
+                        startLocation: widget.node.location ??
+                            widget.settings.baseLocation ??
+                            ll.LatLng(0, 0),
+                      ),
                     );
                   }).then((value) => setState(() {
-                    widget.node.location = value ?? widget.node.location ?? widget.settings.baseLocation ?? ll.LatLng(0, 0);
+                    widget.node.location = value ??
+                        widget.node.location ??
+                        widget.settings.baseLocation ??
+                        ll.LatLng(0, 0);
                   })),
               child: Wrap(
                 children: [
@@ -133,7 +145,11 @@ class _NodesScreenState extends State<NodesScreen> {
                       }),
                       child: Text(
                         'ODF: ${cableEnd.direction}: ${cableEnd.fibersNumber}',
-                        style: TextStyle(color: selectedCableEnd != null && selectedCableEnd == cableEnd ? Colors.red : Colors.black),
+                        style: TextStyle(
+                            color: selectedCableEnd != null &&
+                                    selectedCableEnd == cableEnd
+                                ? Colors.red
+                                : Colors.black),
                       ),
                     ),
                   ),
@@ -231,9 +247,8 @@ class _NodesScreenState extends State<NodesScreen> {
               ]
             ],
           ),
-          Wrap(
-            children: [
-              TextButton.icon(
+          Wrap(children: [
+            TextButton.icon(
                 onPressed: () => showDialog<CableEnd>(
                     context: context,
                     builder: (context) {
@@ -246,14 +261,15 @@ class _NodesScreenState extends State<NodesScreen> {
                               ))
                           .toList();
                       String colorScheme = fiberColors.keys.toList().first;
-                      return StatefulBuilder(
-                          builder: (BuildContext context, StateSetter setState) {
+                      return StatefulBuilder(builder:
+                          (BuildContext context, StateSetter setState) {
                         return AlertDialog(
                           title: TranslateText('Adding of cable',
                               language: widget.lang),
                           content: Column(
                             children: [
-                              TranslateText('Direction:', language: widget.lang),
+                              TranslateText('Direction:',
+                                  language: widget.lang),
                               TextField(
                                 keyboardType: TextInputType.text,
                                 onChanged: (text) {
@@ -294,8 +310,8 @@ class _NodesScreenState extends State<NodesScreen> {
                                             ),
                                             value: e.key,
                                             groupValue: colorScheme,
-                                            onChanged: (a) =>
-                                                setState(() => colorScheme = a!)),
+                                            onChanged: (a) => setState(
+                                                () => colorScheme = a!)),
                                       )
                                       .toList()),
                             ],
@@ -328,32 +344,47 @@ class _NodesScreenState extends State<NodesScreen> {
                           : print,
                     )),
                 icon: const Icon(Icons.add),
-                label: TranslateText('Add cable ending', language: widget.lang)
-              ),
-              selectedCableEnd != null ? TextButton.icon(onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: ((context) => FibersEditor(cableEnd: selectedCableEnd!, lang: widget.lang,)))).then((value) => setState((){}));
-              }, icon: const Icon(Icons.edit_rounded), label: TranslateText('Edit/View fibers', language: widget.lang,)) : Container(),
-              selectedCableEnd != null ? TextButton.icon(onPressed: () {
-                setState(() {
-                  widget.node.cableEnds.remove(selectedCableEnd);
-                  widget.node.connections.removeWhere((connection) => connection.connectionData!.key.key == selectedCableEnd || connection.connectionData!.value.key == selectedCableEnd);
-                  selectedCableEnd = null;
-                });
-              }, icon: const Icon(Icons.delete_rounded), label: TranslateText('Delete ODF', language: widget.lang)) : Container()
-            ]
-          ),
+                label:
+                    TranslateText('Add cable ending', language: widget.lang)),
+            selectedCableEnd != null
+                ? TextButton.icon(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(
+                              builder: ((context) => FibersEditor(
+                                    cableEnd: selectedCableEnd!,
+                                    lang: widget.lang,
+                                  ))))
+                          .then((value) => setState(() {}));
+                    },
+                    icon: const Icon(Icons.edit_rounded),
+                    label: TranslateText(
+                      'Edit/View fibers',
+                      language: widget.lang,
+                    ))
+                : Container(),
+            selectedCableEnd != null
+                ? TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        widget.node.cableEnds.remove(selectedCableEnd);
+                        widget.node.connections.removeWhere((connection) =>
+                            connection.connectionData!.key.key ==
+                                selectedCableEnd ||
+                            connection.connectionData!.value.key ==
+                                selectedCableEnd);
+                        selectedCableEnd = null;
+                      });
+                    },
+                    icon: const Icon(Icons.delete_rounded),
+                    label: TranslateText('Delete ODF', language: widget.lang))
+                : Container()
+          ]),
           if ((widget.node.cableEnds.isNotEmpty ||
                   widget.node.equipments.isNotEmpty) &&
               widget.node.location != null) ...[
             Wrap(
               children: [
-                TextButton.icon(
-                  onPressed: () {
-                    widget.node.saveToServer().then((value) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: TranslateText(value ? 'Saved' : 'Not Saved'), backgroundColor: value ? Colors.green : Colors.red,)));
-                  },
-                  icon: const Icon(Icons.save_outlined),
-                  label: TranslateText('Save to Server', language: widget.lang),
-                ),
                 TextButton.icon(
                   onPressed: () {
                     //print(node.toJson());
@@ -363,6 +394,33 @@ class _NodesScreenState extends State<NodesScreen> {
                   label: TranslateText('Save to Local device',
                       language: widget.lang),
                 ),
+                !isNetworkProcess
+                    ? TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            isNetworkProcess = true;
+                          });
+                          widget.node.saveToServer().then((value) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content:
+                                  TranslateText(value ? 'Saved' : 'Not Saved'),
+                              backgroundColor:
+                                  value ? Colors.green : Colors.red,
+                            ));
+                            setState(() {
+                              isNetworkProcess = false;
+                            });
+                          });
+                        },
+                        icon: isNetworkProcess
+                            ? const CircularProgressIndicator.adaptive(
+                                strokeWidth: 2,
+                              )
+                            : const Icon(Icons.save_outlined),
+                        label: TranslateText('Save to Server',
+                            language: widget.lang),
+                      )
+                    : const CircularProgressIndicator.adaptive(),
               ],
             ),
           ],
