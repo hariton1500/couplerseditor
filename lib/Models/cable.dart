@@ -4,6 +4,9 @@ import 'dart:convert';
 import 'package:coupolerseditor/Models/cableend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/jsonbin_io.dart';
+import 'settings.dart';
+
 class Cable {
   CableEnd? end1, end2;
 
@@ -26,12 +29,29 @@ class Cable {
     return signature();
   }
 
-  void saveCable(bool isFromServer) async {
+  Future<bool> saveCable(bool isFromServer) async {
     print('saving cable to ${isFromServer ? 'server' : 'local device'}');
     if (isFromServer) {
+      Settings settings = Settings();
+      await settings.loadSettings();
+      JsonbinIO server = JsonbinIO(settings: settings);
+      await server.loadBins();
+      print('current bins = ${server.bins}');
+      String binId = signature().hashCode.toString();
+      print('binId = $binId');
+      if (!server.bins.containsKey(binId)) {
+        print('creating new bin');
+        return await server.createJsonRecord(
+            name: binId, jsonString: json.encode(toJson()), type: 'cable');
+      } else {
+        print('updating bin $binId');
+        return await server.updateJsonRecord(
+            binId: server.bins[binId]['id'], jsonString: json.encode(toJson()));
+      }
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('cable: ${signature()}', jsonEncode(toJson()));
+      return true;
     }
   }
 

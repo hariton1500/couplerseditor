@@ -12,6 +12,7 @@ import '../Models/cableend.dart';
 import '../Models/coupler.dart';
 import '../Models/node.dart';
 import '../Models/settings.dart';
+import '../services/jsonbin_io.dart';
 
 class CableScreen extends StatefulWidget {
   const CableScreen(
@@ -243,7 +244,28 @@ class _CableScreenState extends State<CableScreen> {
               Mufta.fromJson(jsonDecode(prefs.getString(element) ?? '')))
           .toList();
     } else {
-      couplers = [];
+      //couplers = [];
+      print('loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
+      JsonbinIO server = JsonbinIO(settings: widget.settings);
+      server.loadBins().then((_) async {
+        List<MapEntry<String, dynamic>> nodeBinsList =
+            server.bins.entries.where((element) {
+          Map<String, dynamic> data = (element.value is Map)
+              ? element.value
+              : {'id': element.value, 'type': 'unknown'};
+          return data['type'] == 'fosc';
+        }).toList();
+        print('nodeBinsList = $nodeBinsList');
+        for (var bin in nodeBinsList) {
+          String data = await server.loadDataFromBin(binId: bin.value['id']);
+          if (data != '') {
+            setState(() {
+              couplers.add(Mufta.fromJson(json.decode(data)));
+            });
+          }
+        }
+      });
+
     }
     if (isSourceLocal) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -256,7 +278,27 @@ class _CableScreenState extends State<CableScreen> {
               Node.fromJson(jsonDecode(prefs.getString(element) ?? '')))
           .toList();
     } else {
-      nodes = [];
+      //nodes = [];
+      JsonbinIO server = JsonbinIO(settings: widget.settings);
+      server.loadBins().then((_) async {
+        List<MapEntry<String, dynamic>> nodeBinsList =
+            server.bins.entries.where((element) {
+          Map<String, dynamic> data = (element.value is Map)
+              ? element.value
+              : {'id': element.value, 'type': 'unknown'};
+          return data['type'] == 'node';
+        }).toList();
+        print('nodeBinsList = $nodeBinsList');
+        for (var bin in nodeBinsList) {
+          String data = await server.loadDataFromBin(binId: bin.value['id']);
+          if (data != '') {
+            setState(() {
+              nodes.add(Node.fromJson(json.decode(data)));
+            });
+          }
+        }
+      });
+
     }
     if (enableFilter) {
       print('filter couplers and nodes');
@@ -311,7 +353,27 @@ class _CableScreenState extends State<CableScreen> {
           .toList();
       print('${cables.length} loaded');
     } else {
-      cables = [];
+      //cables = [];
+      print('loading list of stored cables from server URL = ${widget.settings.baseUrl}');
+      JsonbinIO server = JsonbinIO(settings: widget.settings);
+      server.loadBins().then((_) async {
+        List<MapEntry<String, dynamic>> nodeBinsList =
+            server.bins.entries.where((element) {
+          Map<String, dynamic> data = (element.value is Map)
+              ? element.value
+              : {'id': element.value, 'type': 'unknown'};
+          return data['type'] == 'cable';
+        }).toList();
+        print('nodeBinsList = $nodeBinsList');
+        for (var bin in nodeBinsList) {
+          String data = await server.loadDataFromBin(binId: bin.value['id']);
+          if (data != '') {
+            setState(() {
+              cables.add(Cable.fromJson(json.decode(data)));
+            });
+          }
+        }
+      });
     }
   }
 }

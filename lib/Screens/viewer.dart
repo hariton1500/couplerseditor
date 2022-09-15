@@ -9,12 +9,14 @@ import '../Helpers/location.dart';
 import '../Models/cable.dart';
 import '../Models/coupler.dart';
 import '../Models/node.dart';
+import '../Models/settings.dart';
+import '../services/jsonbin_io.dart';
 
 class ViewerScreen extends StatefulWidget {
   final bool isFromServer;
-  final String lang;
+  final Settings settings;
 
-  const ViewerScreen({Key? key, required this.lang, required this.isFromServer})
+  const ViewerScreen({Key? key, required this.settings, required this.isFromServer})
       : super(key: key);
 
   @override
@@ -103,20 +105,29 @@ class _ViewerScreenState extends State<ViewerScreen> {
                       point: coupler.location!,
                       builder: (ctx) =>
                           selectedCouplerIndex != couplers.indexOf(coupler)
-                              ? IconButton(
-                                  autofocus: true,
-                                  icon: const Icon(
-                                    Icons.blinds_rounded,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () {
-                                    print('clicked on marker ${coupler.name}');
-                                    setState(() {
-                                      selectedCouplerIndex =
-                                          couplers.indexOf(coupler);
-                                    });
-                                  },
-                                )
+                              ? Stack(
+                                alignment: AlignmentDirectional.center,
+                                children: [
+                                  IconButton(
+                                      autofocus: true,
+                                      icon: const Icon(
+                                        Icons.blinds_rounded,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () {
+                                        print('clicked on marker ${coupler.name}');
+                                        setState(() {
+                                          selectedCouplerIndex =
+                                              couplers.indexOf(coupler);
+                                        });
+                                      },
+                                    ),
+                                  Positioned(
+                                    bottom: 10,
+                                    child: Text(coupler.name)
+                                  )
+                                ],
+                              )
                               : Text(coupler.name),
                     );
                   }).toList(),
@@ -129,21 +140,30 @@ class _ViewerScreenState extends State<ViewerScreen> {
                       point: node.location!,
                       builder: (ctx) =>
                           selectedCouplerIndex != nodes.indexOf(node)
-                              ? IconButton(
-                                  autofocus: true,
-                                  icon: const Icon(
-                                    Icons.api_outlined,
-                                    color: Colors.red,
+                              ? Stack(
+                                alignment: AlignmentDirectional.center,
+                                children: [
+                                  IconButton(
+                                    autofocus: true,
+                                    icon: const Icon(
+                                      Icons.api_outlined,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      print('clicked on marker ${node.address}');
+                                      setState(() {
+                                        selectedCouplerIndex =
+                                            nodes.indexOf(node);
+                                      });
+                                    },
                                   ),
-                                  onPressed: () {
-                                    print('clicked on marker ${node.address}');
-                                    setState(() {
-                                      selectedCouplerIndex =
-                                          nodes.indexOf(node);
-                                    });
-                                  },
-                                )
-                              : Text(node.address),
+                                  Positioned(
+                                    bottom: 10,
+                                    child: Text(node.address)
+                                  )
+                                ]
+                              )
+                              : GestureDetector(child: Text(node.address), onTap: () => print('asdf'),),
                     );
                   }).toList(),
                 ),
@@ -220,7 +240,46 @@ class _ViewerScreenState extends State<ViewerScreen> {
               Mufta.fromJson(jsonDecode(prefs.getString(element) ?? '')))
           .toList();
     } else {
-      couplers = [];
+      //couplers = [];
+      print('loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
+      JsonbinIO server = JsonbinIO(settings: widget.settings);
+      server.loadBins().then((_) async {
+        List<MapEntry<String, dynamic>> nodeBinsList =
+            server.bins.entries.where((element) {
+          Map<String, dynamic> data = (element.value is Map)
+              ? element.value
+              : {'id': element.value, 'type': 'unknown'};
+          return data['type'] == 'fosc';
+        }).toList();
+        print('nodeBinsList = $nodeBinsList');
+        for (var bin in nodeBinsList) {
+          String data = await server.loadDataFromBin(binId: bin.value['id']);
+          if (data != '') {
+            setState(() {
+              couplers.add(Mufta.fromJson(json.decode(data)));
+            });
+          }
+        }
+      });
+    server.loadBins().then((_) async {
+      List<MapEntry<String, dynamic>> nodeBinsList =
+          server.bins.entries.where((element) {
+        Map<String, dynamic> data = (element.value is Map)
+            ? element.value
+            : {'id': element.value, 'type': 'unknown'};
+        return data['type'] == 'node';
+      }).toList();
+      print('nodeBinsList = $nodeBinsList');
+      for (var bin in nodeBinsList) {
+        String data = await server.loadDataFromBin(binId: bin.value['id']);
+        if (data != '') {
+          setState(() {
+            nodes.add(Node.fromJson(json.decode(data)));
+          });
+        }
+      }
+    });
+
     }
     if (isSourceLocal) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -249,7 +308,27 @@ class _ViewerScreenState extends State<ViewerScreen> {
               Cable.fromJson(jsonDecode(prefs.getString(element) ?? '')))
           .toList();
     } else {
-      cables = [];
+      //cables = [];
+      print('loading list of stored cables from server URL = ${widget.settings.baseUrl}');
+      JsonbinIO server = JsonbinIO(settings: widget.settings);
+      server.loadBins().then((_) async {
+        List<MapEntry<String, dynamic>> nodeBinsList =
+            server.bins.entries.where((element) {
+          Map<String, dynamic> data = (element.value is Map)
+              ? element.value
+              : {'id': element.value, 'type': 'unknown'};
+          return data['type'] == 'cable';
+        }).toList();
+        print('nodeBinsList = $nodeBinsList');
+        for (var bin in nodeBinsList) {
+          String data = await server.loadDataFromBin(binId: bin.value['id']);
+          if (data != '') {
+            setState(() {
+              cables.add(Cable.fromJson(json.decode(data)));
+            });
+          }
+        }
+      });
     }
   }
 }
