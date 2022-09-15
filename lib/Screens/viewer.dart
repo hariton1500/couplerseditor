@@ -163,7 +163,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                                   )
                                 ]
                               )
-                              : GestureDetector(child: Text(node.address), onTap: () => print('asdf'),),
+                              : Text(node.address),
                     );
                   }).toList(),
                 ),
