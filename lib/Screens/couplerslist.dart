@@ -138,8 +138,14 @@ class _CouplersListState extends State<CouplersList> {
                                       ),
                                       onPressed: () {
                                         Navigator.of(context).pop();
-                                        removeCoupler(coupler['name']);
                                         setState(() {
+                                          widget.isFromBilling
+                                              ? removeFromServer(
+                                                  name: Mufta.fromJson(coupler)
+                                                      .signature()
+                                                      .hashCode
+                                                      .toString())
+                                              : removeCoupler(coupler['name']);
                                           couplers.removeAt(index);
                                         });
                                       },
@@ -278,5 +284,11 @@ class _CouplersListState extends State<CouplersList> {
   void removeCoupler(String couplerName) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.remove('coupler: $couplerName');
+  }
+
+  void removeFromServer({required String name}) async {
+    print('removing: node with hash = $name');
+    JsonbinIO server = JsonbinIO(settings: widget.settings);
+    server.saveBin(id: '', hash: name, type: 'deleted by at ${DateTime.now()}');
   }
 }

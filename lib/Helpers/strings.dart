@@ -179,38 +179,23 @@ Map<String, Map<String, String>> strings = {
     'en': 'Fibers with comments and spliters:',
     'ru': 'Волокона с комментариями и делителями:'
   },
-  'Spliter on': {
-    'en': 'Spliter of ',
-    'ru': 'Делитель на '
-  },
+  'Spliter on': {'en': 'Spliter of ', 'ru': 'Делитель на '},
   'Create/edit node': {
     'en': 'Create/edit node',
     'ru': 'Создать/редактировать узел'
   },
-  'Nodes:': {
-    'en': 'Nodes:',
-    'ru': 'Узлы:'
-  },
+  'Nodes:': {'en': 'Nodes:', 'ru': 'Узлы:'},
   'Create/edit cable from Server': {
     'en': 'Create/edit cable from Server',
-    'ru': 'Создеть/редактировать кабель на Сервер'
+    'ru': 'Создать/редактировать кабель на Сервер'
   },
   'Create/edit cable from Local device': {
     'en': 'Create/edit cable from Local device',
-    'ru': 'Создеть/редактировать кабель на устройстве'
+    'ru': 'Создать/редактировать кабель на устройстве'
   },
-  'FOSCs:': {
-    'en': 'FOSCs:',
-    'ru': 'Муфты:'
-  },
-  'Cables:': {
-    'en': 'Cables:',
-    'ru': 'Кабеля:'
-  },
-  'Viewer:': {
-    'en': 'Viewer:',
-    'ru': 'Просмотр:'
-  },
+  'FOSCs:': {'en': 'FOSCs:', 'ru': 'Муфты:'},
+  'Cables:': {'en': 'Cables:', 'ru': 'Кабеля:'},
+  'Viewer:': {'en': 'Viewer:', 'ru': 'Просмотр:'},
   'Viewer from Server': {
     'en': 'Viewer from Server',
     'ru': 'Просмотр из Сервера'
@@ -222,7 +207,8 @@ Map<String, Map<String, String>> strings = {
 };
 
 class TranslateText extends Text {
-  TranslateText(String text, {Key? key, String language = 'en', double size = 10.0})
+  TranslateText(String text,
+      {Key? key, String language = 'en', double size = 10.0})
       : super(
           strings[text]?[language] ?? text,
           key: key,

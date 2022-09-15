@@ -27,7 +27,7 @@ class CableEnd {
 
   @override
   String toString() {
-    return 'CableEnd{direction: $direction, fibersNumber: $fibersNumber, colorScheme: $colorScheme, location: $location}';
+    return '$direction [$fibersNumber: $colorScheme]';
   }
 
   String signature() {

@@ -191,12 +191,6 @@ class _NodesListState extends State<NodesList> {
   void removeFromServer({required String name}) async {
     print('removing: node with hash = $name');
     JsonbinIO server = JsonbinIO(settings: widget.settings);
-    /*
-    server.loadBins().then((value) {
-      print(server.bins);
-      server.bins[name]['type'] = 'deleted by at ${DateTime.now()}';
-      server.saveBin(id: id, hash: hash, type: type)
-    });*/
     server.saveBin(id: '', hash: name, type: 'deleted by at ${DateTime.now()}');
   }
 }

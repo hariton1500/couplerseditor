@@ -244,7 +244,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           )));
                 },
                 icon: const Icon(Icons.create_outlined),
-                label: TranslateText('Create/edit cable from Server',
+                label: TranslateText('Create/edit cable on billing (json)',
                     language: settings.language)),
             TextButton.icon(
                 onPressed: () {

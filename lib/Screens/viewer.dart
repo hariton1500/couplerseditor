@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helpers/location.dart';
+import '../Helpers/strings.dart';
 import '../Models/cable.dart';
 import '../Models/coupler.dart';
 import '../Models/node.dart';
@@ -16,7 +17,8 @@ class ViewerScreen extends StatefulWidget {
   final bool isFromServer;
   final Settings settings;
 
-  const ViewerScreen({Key? key, required this.settings, required this.isFromServer})
+  const ViewerScreen(
+      {Key? key, required this.settings, required this.isFromServer})
       : super(key: key);
 
   @override
@@ -55,10 +57,19 @@ class _ViewerScreenState extends State<ViewerScreen> {
       appBar: AppBar(
         title: const Text('Viewer'),
         actions: [
-          isViewOnMap ? IconButton(onPressed: () {
-            getLocation().then((locationData) {print(locationData); _mapController.move(
-              LatLng(locationData!.latitude!, locationData.longitude!), 16);});
-          }, icon: const Icon(Icons.location_on_outlined)) : Container(),
+          isViewOnMap
+              ? IconButton(
+                  onPressed: () {
+                    getLocation().then((locationData) {
+                      print(locationData);
+                      _mapController.move(
+                          LatLng(
+                              locationData!.latitude!, locationData.longitude!),
+                          16);
+                    });
+                  },
+                  icon: const Icon(Icons.location_on_outlined))
+              : Container(),
           IconButton(
             icon: isViewOnMap
                 ? const Icon(Icons.list_outlined)
@@ -103,32 +114,30 @@ class _ViewerScreenState extends State<ViewerScreen> {
                       width: 80.0,
                       height: 80.0,
                       point: coupler.location!,
-                      builder: (ctx) =>
-                          selectedCouplerIndex != couplers.indexOf(coupler)
-                              ? Stack(
-                                alignment: AlignmentDirectional.center,
-                                children: [
-                                  IconButton(
-                                      autofocus: true,
-                                      icon: const Icon(
-                                        Icons.blinds_rounded,
-                                        color: Colors.red,
-                                      ),
-                                      onPressed: () {
-                                        print('clicked on marker ${coupler.name}');
-                                        setState(() {
-                                          selectedCouplerIndex =
-                                              couplers.indexOf(coupler);
-                                        });
-                                      },
-                                    ),
-                                  Positioned(
-                                    bottom: 10,
-                                    child: Text(coupler.name)
-                                  )
-                                ],
-                              )
-                              : Text(coupler.name),
+                      builder: (ctx) => selectedCouplerIndex !=
+                              couplers.indexOf(coupler)
+                          ? Stack(
+                              alignment: AlignmentDirectional.center,
+                              children: [
+                                IconButton(
+                                  autofocus: true,
+                                  icon: const Icon(
+                                    Icons.blinds_rounded,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    print('clicked on marker ${coupler.name}');
+                                    setState(() {
+                                      selectedCouplerIndex =
+                                          couplers.indexOf(coupler);
+                                    });
+                                  },
+                                ),
+                                Positioned(
+                                    bottom: 10, child: Text(coupler.name))
+                              ],
+                            )
+                          : Text(coupler.name),
                     );
                   }).toList(),
                 ),
@@ -141,28 +150,26 @@ class _ViewerScreenState extends State<ViewerScreen> {
                       builder: (ctx) =>
                           selectedCouplerIndex != nodes.indexOf(node)
                               ? Stack(
-                                alignment: AlignmentDirectional.center,
-                                children: [
-                                  IconButton(
-                                    autofocus: true,
-                                    icon: const Icon(
-                                      Icons.api_outlined,
-                                      color: Colors.red,
-                                    ),
-                                    onPressed: () {
-                                      print('clicked on marker ${node.address}');
-                                      setState(() {
-                                        selectedCouplerIndex =
-                                            nodes.indexOf(node);
-                                      });
-                                    },
-                                  ),
-                                  Positioned(
-                                    bottom: 10,
-                                    child: Text(node.address)
-                                  )
-                                ]
-                              )
+                                  alignment: AlignmentDirectional.center,
+                                  children: [
+                                      IconButton(
+                                        autofocus: true,
+                                        icon: const Icon(
+                                          Icons.api_outlined,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed: () {
+                                          print(
+                                              'clicked on marker ${node.address}');
+                                          setState(() {
+                                            selectedCouplerIndex =
+                                                nodes.indexOf(node);
+                                          });
+                                        },
+                                      ),
+                                      Positioned(
+                                          bottom: 10, child: Text(node.address))
+                                    ])
                               : Text(node.address),
                     );
                   }).toList(),
@@ -170,7 +177,10 @@ class _ViewerScreenState extends State<ViewerScreen> {
                 PolylineLayerOptions(
                   polylines: cables.map((cable) {
                     return Polyline(
-                      points: [cable.end1!.location ?? LatLng(0, 0), cable.end2!.location ?? LatLng(0, 0)],
+                      points: [
+                        cable.end1!.location ?? LatLng(0, 0),
+                        cable.end2!.location ?? LatLng(0, 0)
+                      ],
                       strokeWidth: 3.0,
                       color: Colors.green,
                     );
@@ -182,10 +192,12 @@ class _ViewerScreenState extends State<ViewerScreen> {
               child: Column(
                 children: [
                   nodes.isEmpty && couplers.isEmpty && cables.isEmpty
-                      ? const Center(
-                          child: Text('Empty or loading...'),
+                      ? Center(
+                          child: TranslateText('Empty or loading...',
+                              language: widget.settings.language),
                         )
                       : Container(),
+                  TranslateText('Nodes:', language: widget.settings.language),
                   !isViewOnMap && nodes.isNotEmpty
                       ? ListView.builder(
                           shrinkWrap: true,
@@ -193,10 +205,14 @@ class _ViewerScreenState extends State<ViewerScreen> {
                           itemBuilder: (context, index) {
                             return ListTile(
                               title: Text(nodes[index].address),
-                              subtitle: Text(nodes[index].location.toString()),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text(nodes[index].cableEnds.join('\n')),
+                              ),
                             );
                           })
                       : Container(),
+                  TranslateText('FOSCs:', language: widget.settings.language),
                   !isViewOnMap && couplers.isNotEmpty
                       ? ListView.builder(
                           shrinkWrap: true,
@@ -204,11 +220,15 @@ class _ViewerScreenState extends State<ViewerScreen> {
                           itemBuilder: (context, index) {
                             return ListTile(
                               title: Text(couplers[index].name),
-                              subtitle:
-                                  Text(couplers[index].location.toString()),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child:
+                                    Text(couplers[index].cableEnds.join('\n')),
+                              ),
                             );
                           })
                       : Container(),
+                  TranslateText('Cables:', language: widget.settings.language),
                   !isViewOnMap && cables.isNotEmpty
                       ? ListView.builder(
                           shrinkWrap: true,
@@ -216,9 +236,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                           itemBuilder: (context, index) {
                             return ListTile(
                               title: Text(
-                                  'side 1: ${cables[index].end1!.location} <---> '),
-                              subtitle: Text(
-                                  'side 2: ${cables[index].end2!.location}'),
+                                  '${cables[index].end1} <=(${cables[index].end1?.fibersNumber})=> ${cables[index].end2}'),
                             );
                           })
                       : Container(),
@@ -239,29 +257,36 @@ class _ViewerScreenState extends State<ViewerScreen> {
           .map((element) =>
               Mufta.fromJson(jsonDecode(prefs.getString(element) ?? '')))
           .toList();
+      Set<String> nodesJsonStrings = prefs
+          .getKeys()
+          .where((element) => element.startsWith('node:'))
+          .toSet();
+      nodes = nodesJsonStrings
+          .map((element) =>
+              Node.fromJson(jsonDecode(prefs.getString(element) ?? '')))
+          .toList();
     } else {
       //couplers = [];
-      print('loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
+      print(
+          'loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
       JsonbinIO server = JsonbinIO(settings: widget.settings);
-      server.loadBins().then((_) async {
-        List<MapEntry<String, dynamic>> nodeBinsList =
-            server.bins.entries.where((element) {
-          Map<String, dynamic> data = (element.value is Map)
-              ? element.value
-              : {'id': element.value, 'type': 'unknown'};
-          return data['type'] == 'fosc';
-        }).toList();
-        print('nodeBinsList = $nodeBinsList');
-        for (var bin in nodeBinsList) {
-          String data = await server.loadDataFromBin(binId: bin.value['id']);
-          if (data != '') {
-            setState(() {
-              couplers.add(Mufta.fromJson(json.decode(data)));
-            });
-          }
+      await server.loadBins();
+      List<MapEntry<String, dynamic>> foscBinsList =
+          server.bins.entries.where((element) {
+        Map<String, dynamic> data = (element.value is Map)
+            ? element.value
+            : {'id': element.value, 'type': 'unknown'};
+        return data['type'] == 'fosc';
+      }).toList();
+      print('foscBinsList = $foscBinsList');
+      for (var bin in foscBinsList) {
+        String data = await server.loadDataFromBin(binId: bin.value['id']);
+        if (data != '') {
+          setState(() {
+            couplers.add(Mufta.fromJson(json.decode(data)));
+          });
         }
-      });
-    server.loadBins().then((_) async {
+      }
       List<MapEntry<String, dynamic>> nodeBinsList =
           server.bins.entries.where((element) {
         Map<String, dynamic> data = (element.value is Map)
@@ -278,21 +303,6 @@ class _ViewerScreenState extends State<ViewerScreen> {
           });
         }
       }
-    });
-
-    }
-    if (isSourceLocal) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      Set<String> nodesJsonStrings = prefs
-          .getKeys()
-          .where((element) => element.startsWith('node:'))
-          .toSet();
-      nodes = nodesJsonStrings
-          .map((element) =>
-              Node.fromJson(jsonDecode(prefs.getString(element) ?? '')))
-          .toList();
-    } else {
-      nodes = [];
     }
   }
 
@@ -303,13 +313,18 @@ class _ViewerScreenState extends State<ViewerScreen> {
           .getKeys()
           .where((element) => element.startsWith('cable:'))
           .toSet();
-      cables = cablesJsonStrings
-          .map((element) =>
-              Cable.fromJson(jsonDecode(prefs.getString(element) ?? '')))
-          .toList();
+      try {
+        cables = cablesJsonStrings
+            .map((element) =>
+                Cable.fromJson(jsonDecode(prefs.getString(element) ?? '')))
+            .toList();
+      } catch (e) {
+        print(e);
+      }
     } else {
       //cables = [];
-      print('loading list of stored cables from server URL = ${widget.settings.baseUrl}');
+      print(
+          'loading list of stored cables from server URL = ${widget.settings.baseUrl}');
       JsonbinIO server = JsonbinIO(settings: widget.settings);
       server.loadBins().then((_) async {
         List<MapEntry<String, dynamic>> nodeBinsList =
