@@ -70,6 +70,12 @@ class JsonbinIO {
       required String type}) async {
     try {
       headers['X-Bin-Name'] = name;
+      if (settings.altServer != '') {
+        post(Uri.parse('${settings.altServer}/add.php'), body: jsonString).then((altResp) {
+          print(altResp.statusCode);
+          print(altResp.body);
+        });
+      }
       var response =
           await post(Uri.parse(url), headers: headers, body: jsonString);
       //print(response.statusCode);
@@ -93,6 +99,12 @@ class JsonbinIO {
   Future<bool> updateJsonRecord(
       {required String binId, required String jsonString}) async {
     try {
+      if (settings.altServer != '') {
+        put(Uri.parse('${settings.altServer}/?id=$binId'), body: jsonString).then((altResp) {
+          print(altResp.statusCode);
+          print(altResp.body);
+        });
+      }
       var response = await put(Uri.parse('$url/$binId'),
           headers: headers, body: jsonString);
       return response.statusCode == 200;
