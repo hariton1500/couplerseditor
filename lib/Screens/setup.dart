@@ -88,6 +88,11 @@ class _SetupScreenState extends State<SetupScreen> {
                 initialValue: widget.settings.binsMapId,
                 onChanged: (value) => widget.settings.binsMapId = value,
               ),
+              TranslateText('alt server:', language: widget.settings.language),
+              TextFormField(
+                initialValue: widget.settings.altServer,
+                onChanged: (value) => widget.settings.altServer = value,
+              ),
               const Divider(),
               Column(
                 children: [

@@ -11,6 +11,7 @@ class Settings {
   String xMasterKey = '';
   String collectionId = '';
   String xAccessKey = '';
+  String altServer = '';
 
   Future loadSettings() async {
     SharedPreferences shared = await SharedPreferences.getInstance();
@@ -22,6 +23,7 @@ class Settings {
     xMasterKey = shared.getString('xMasterKey') ?? '';
     xAccessKey = shared.getString('xAccessKey') ?? '';
     collectionId = shared.getString('collectionId') ?? '';
+    altServer = shared.getString('altServer') ?? '';
   }
 
   void saveSettings() async {
@@ -33,5 +35,6 @@ class Settings {
     shared.setString('xMasterKey', xMasterKey);
     shared.setString('xAccessKey', xAccessKey);
     shared.setString('collectionId', collectionId);
+    shared.setString('altServer', altServer);
   }
 }
