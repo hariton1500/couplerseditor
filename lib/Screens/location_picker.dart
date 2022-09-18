@@ -66,7 +66,8 @@ class _LocationPickerState extends State<LocationPicker> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(onPressed: () => Navigator.of(context).pop(_mapController.center), icon: const Icon(Icons.task_alt_outlined))
+          IconButton(onPressed: () => Navigator.of(context).pop(_mapController.center), icon: const Icon(Icons.task_alt_outlined)),
+          IconButton(onPressed: getMyLocation, icon: const Icon(Icons.navigation_outlined))
         ],
       ),
       body: SizedBox(
