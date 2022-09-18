@@ -98,11 +98,6 @@ class _LocationPickerState extends State<LocationPicker> {
             /*
             TileLayerOptions(
                 urlTemplate:
-                    'http://vec{s}.maps.yandex.net/tiles?l=map&v=20.26.0&z={z}&x={x}&y={y}&scale=1&lang=ru_RU',
-                subdomains: ['01', '02', '03', '04'],
-                backgroundColor: Colors.transparent),
-            TileLayerOptions(
-                urlTemplate:
                     'http://vec{s}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=1.0&lang=ru_RU',
                 subdomains: ['01', '02', '03', '04'],
                 backgroundColor: Colors.transparent),*/
