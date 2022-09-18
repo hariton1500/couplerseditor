@@ -63,8 +63,13 @@ class _LocationPickerState extends State<LocationPicker> {
   @override
   Widget build(BuildContext context) {
     print('run Location Picker with start location: ${widget.startLocation}');
-    return Material(
-      child: SizedBox(
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(onPressed: () => Navigator.of(context).pop(_mapController.center), icon: const Icon(Icons.task_alt_outlined))
+        ],
+      ),
+      body: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: FlutterMap(
           options: MapOptions(
