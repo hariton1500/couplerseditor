@@ -12,13 +12,13 @@ import 'fiberseditor.dart';
 import 'location_picker.dart';
 
 class NodesScreen extends StatefulWidget {
-  final String lang;
+  //final String lang;
   final Node node;
   final Settings settings;
 
   const NodesScreen(
       {Key? key,
-      required this.lang,
+      //required this.lang,
       required this.node,
       required this.settings})
       : super(key: key);
@@ -47,7 +47,7 @@ class _NodesScreenState extends State<NodesScreen> {
             padding: const EdgeInsets.all(8.0),
             child: TranslateText(
               'node address:',
-              language: widget.lang,
+              language: widget.settings.language,
             ),
           ),
           isEdititingAddress
@@ -79,7 +79,7 @@ class _NodesScreenState extends State<NodesScreen> {
                     return AlertDialog(
                       title: TranslateText(
                         'Location Picker',
-                        language: widget.lang,
+                        language: widget.settings.language,
                       ),
                       content: LocationPicker(
                         startLocation: widget.node.location ??
@@ -97,7 +97,7 @@ class _NodesScreenState extends State<NodesScreen> {
                 children: [
                   TranslateText(
                     'Location:',
-                    language: widget.lang,
+                    language: widget.settings.language,
                   ),
                   Text(
                       (widget.node.location != null
@@ -119,7 +119,7 @@ class _NodesScreenState extends State<NodesScreen> {
                         widget.node.equipments.indexOf(equipment));
                   },
                   child: equipment.widget(
-                      language: widget.lang,
+                      language: widget.settings.language,
                       callback: (o, i) {
                         print('$o; $i');
                         Connection connection = Connection(
@@ -169,7 +169,7 @@ class _NodesScreenState extends State<NodesScreen> {
           widget.node.connections.isNotEmpty
               ? Padding(
                   padding: const EdgeInsets.only(left: 8.0),
-                  child: TranslateText('Connections:', language: widget.lang),
+                  child: TranslateText('Connections:', language: widget.settings.language),
                 )
               : Container(),
           for (final connection in widget.node.connections)
@@ -210,7 +210,7 @@ class _NodesScreenState extends State<NodesScreen> {
                   onPressed: () async {
                     var res =
                         await ActiveDevice(id: -1, ip: '', model: '', ports: 8)
-                            .fromDialog(context, widget.lang);
+                            .fromDialog(context, widget.settings.language);
                     print(res?.toJson());
                     if (res?.ports != 0 || res?.ip != '' || res?.model != '') {
                       res != null ? widget.node.equipments.add(res) : null;
@@ -218,7 +218,7 @@ class _NodesScreenState extends State<NodesScreen> {
                     setState(() {});
                   },
                   icon: const Icon(Icons.add),
-                  label: TranslateText('Add equipment', language: widget.lang)),
+                  label: TranslateText('Add equipment', language: widget.settings.language)),
               if (selectedAquipmentIndex != -1) ...[
                 TextButton.icon(
                   onPressed: () => showDialog(
@@ -227,11 +227,11 @@ class _NodesScreenState extends State<NodesScreen> {
                         ActiveDevice activeDevice =
                             widget.node.equipments[selectedAquipmentIndex];
                         return AvtiveDevicePortsEditor(
-                            lang: widget.lang, activeDevice: activeDevice);
+                            lang: widget.settings.language, activeDevice: activeDevice);
                       }).then((value) => setState(() {})),
                   icon: const Icon(Icons.edit),
                   label: TranslateText('Edit/View comments',
-                      language: widget.lang),
+                      language: widget.settings.language),
                 ),
                 TextButton.icon(
                   onPressed: () {
@@ -242,7 +242,7 @@ class _NodesScreenState extends State<NodesScreen> {
                   },
                   icon: const Icon(Icons.delete),
                   label:
-                      TranslateText('Delete equipment', language: widget.lang),
+                      TranslateText('Delete equipment', language: widget.settings.language),
                 ),
               ]
             ],
@@ -265,11 +265,11 @@ class _NodesScreenState extends State<NodesScreen> {
                           (BuildContext context, StateSetter setState) {
                         return AlertDialog(
                           title: TranslateText('Adding of cable',
-                              language: widget.lang),
+                              language: widget.settings.language),
                           content: Column(
                             children: [
                               TranslateText('Direction:',
-                                  language: widget.lang),
+                                  language: widget.settings.language),
                               TextField(
                                 keyboardType: TextInputType.text,
                                 onChanged: (text) {
@@ -279,7 +279,7 @@ class _NodesScreenState extends State<NodesScreen> {
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: TranslateText('Number of Fibers:',
-                                    language: widget.lang),
+                                    language: widget.settings.language),
                               ),
                               DropdownButton<int>(
                                   value: fibersNumber,
@@ -292,7 +292,7 @@ class _NodesScreenState extends State<NodesScreen> {
                                   items: fibersList),
                               TranslateText(
                                 'Marking:',
-                                language: widget.lang,
+                                language: widget.settings.language,
                               ),
                               Column(
                                   children: fiberColors.entries
@@ -322,7 +322,7 @@ class _NodesScreenState extends State<NodesScreen> {
                                   Navigator.of(context).pop();
                                 },
                                 child: TranslateText('Cancel',
-                                    language: widget.lang)),
+                                    language: widget.settings.language)),
                             OutlinedButton(
                                 onPressed: () {
                                   Navigator.of(context).pop(CableEnd(
@@ -334,7 +334,7 @@ class _NodesScreenState extends State<NodesScreen> {
                                   ));
                                 },
                                 child:
-                                    TranslateText('Add', language: widget.lang))
+                                    TranslateText('Add', language: widget.settings.language))
                           ],
                         );
                       });
@@ -345,7 +345,7 @@ class _NodesScreenState extends State<NodesScreen> {
                     )),
                 icon: const Icon(Icons.add),
                 label:
-                    TranslateText('Add cable ending', language: widget.lang)),
+                    TranslateText('Add cable ending', language: widget.settings.language)),
             selectedCableEnd != null
                 ? TextButton.icon(
                     onPressed: () {
@@ -353,14 +353,14 @@ class _NodesScreenState extends State<NodesScreen> {
                           .push(MaterialPageRoute(
                               builder: ((context) => FibersEditor(
                                     cableEnd: selectedCableEnd!,
-                                    lang: widget.lang,
+                                    lang: widget.settings.language,
                                   ))))
                           .then((value) => setState(() {}));
                     },
                     icon: const Icon(Icons.edit_rounded),
                     label: TranslateText(
                       'Edit/View fibers',
-                      language: widget.lang,
+                      language: widget.settings.language,
                     ))
                 : Container(),
             selectedCableEnd != null
@@ -377,7 +377,7 @@ class _NodesScreenState extends State<NodesScreen> {
                       });
                     },
                     icon: const Icon(Icons.delete_rounded),
-                    label: TranslateText('Delete ODF', language: widget.lang))
+                    label: TranslateText('Delete ODF', language: widget.settings.language))
                 : Container()
           ]),
           if ((widget.node.cableEnds.isNotEmpty ||
@@ -392,7 +392,7 @@ class _NodesScreenState extends State<NodesScreen> {
                   },
                   icon: const Icon(Icons.save_outlined),
                   label: TranslateText('Save to Local device',
-                      language: widget.lang),
+                      language: widget.settings.language),
                 ),
                 !isNetworkProcess
                     ? TextButton.icon(
@@ -418,7 +418,7 @@ class _NodesScreenState extends State<NodesScreen> {
                               )
                             : const Icon(Icons.save_outlined),
                         label: TranslateText('Save to Server',
-                            language: widget.lang),
+                            language: widget.settings.language),
                       )
                     : const CircularProgressIndicator.adaptive(),
               ],
@@ -429,7 +429,7 @@ class _NodesScreenState extends State<NodesScreen> {
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.arrow_back_outlined),
-            label: TranslateText('back', language: widget.lang),
+            label: TranslateText('back', language: widget.settings.language),
           ),
         ])),
       ),

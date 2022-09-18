@@ -50,7 +50,7 @@ class _NodesListState extends State<NodesList> {
                           builder: (context) => NodesScreen(
                                 node: Node.fromJson(jsonDecode(
                                     nodesJsonStrings[selectedNodeIndex])),
-                                lang: widget.lang,
+                                //lang: widget.lang,
                                 settings: widget.settings,
                               )))
                       .then((value) => setState(() {

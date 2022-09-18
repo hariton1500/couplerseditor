@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:math';
 
+import 'package:coupolerseditor/Screens/fosc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -12,6 +14,7 @@ import '../Models/coupler.dart';
 import '../Models/node.dart';
 import '../Models/settings.dart';
 import '../services/jsonbin_io.dart';
+import 'node_page.dart';
 
 class ViewerScreen extends StatefulWidget {
   final bool isFromServer;
@@ -32,6 +35,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
   bool isViewOnMap = false;
   bool isLoading = true;
   int selectedCouplerIndex = -1;
+  int selectedNodeIndex = -1;
   final MapController _mapController = MapController();
 
   @override
@@ -40,23 +44,27 @@ class _ViewerScreenState extends State<ViewerScreen> {
     _loadCouplersAndNodes(isSourceLocal: !widget.isFromServer)
         .then((value) => setState(
               () {
-                print(nodes);
-                print(couplers);
+                //print(nodes);
+                //print(couplers);
               },
             ));
     _loadCables(isSourceLocal: !widget.isFromServer).then((value) => setState(
           () {
-            print(cables);
+            //print(cables);
           },
         ));
   }
 
   @override
   Widget build(BuildContext context) {
+    print(selectedCouplerIndex);
+    print(selectedNodeIndex);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Viewer'),
         actions: [
+          selectedCouplerIndex >= 0 ? IconButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => MuftaScreen(mufta: couplers[selectedCouplerIndex], callback: (){}, lang: widget.settings.language))), icon: const Icon(Icons.task_alt_outlined)) : Container(),
+          selectedNodeIndex >= 0 ? IconButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => NodesScreen(node: nodes[selectedNodeIndex], settings: widget.settings))), icon: const Icon(Icons.task_alt_outlined)) : Container(),
           isViewOnMap
               ? IconButton(
                   onPressed: () {
@@ -91,11 +99,13 @@ class _ViewerScreenState extends State<ViewerScreen> {
                   zoom: 16.0,
                   maxZoom: 18.0,
                   onTap: (tapPos, latlng) {
-                    print(tapPos.relative.toString());
+                    print(latlng);
                     setState(() {
-                      selectedCouplerIndex = -1;
+                      selectedCouplerIndex = selectedFOSC(latlng);
+                      selectedNodeIndex = selectedNode(latlng);
                     });
-                  }),
+                  }
+              ),
               layers: [
                 /*
                 TileLayerOptions(
@@ -111,7 +121,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                 MarkerLayerOptions(
                   markers: couplers.map((coupler) {
                     return Marker(
-                      width: 80.0,
+                      width: MediaQuery.of(context).size.width,
                       height: 80.0,
                       point: coupler.location!,
                       builder: (ctx) => selectedCouplerIndex !=
@@ -144,7 +154,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                 MarkerLayerOptions(
                   markers: nodes.map((node) {
                     return Marker(
-                      width: 80.0,
+                      width: MediaQuery.of(context).size.width,
                       height: 80.0,
                       point: node.location!,
                       builder: (ctx) =>
@@ -152,24 +162,13 @@ class _ViewerScreenState extends State<ViewerScreen> {
                               ? Stack(
                                   alignment: AlignmentDirectional.center,
                                   children: [
-                                      IconButton(
-                                        autofocus: true,
-                                        icon: const Icon(
-                                          Icons.api_outlined,
-                                          color: Colors.red,
-                                        ),
-                                        onPressed: () {
-                                          print(
-                                              'clicked on marker ${node.address}');
-                                          setState(() {
-                                            selectedCouplerIndex =
-                                                nodes.indexOf(node);
-                                          });
-                                        },
+                                    const Icon(
+                                        Icons.api_outlined,
+                                        color: Colors.red,
                                       ),
-                                      Positioned(
-                                          bottom: 10, child: Text(node.address))
-                                    ])
+                                    Positioned(
+                                        bottom: 10, child: Text(node.address, softWrap: true, maxLines: 2, textScaleFactor: 0.7,))
+                                  ])
                               : Text(node.address),
                     );
                   }).toList(),
@@ -304,6 +303,18 @@ class _ViewerScreenState extends State<ViewerScreen> {
         }
       }
     }
+  }
+
+  bool isTapedOnIt(LatLng a, b) {
+    return pow(a.latitude - b.latitude, 2) + pow(a.longitude - b.longitude, 2) <= 0.00000001;
+  }
+  
+  int selectedFOSC(LatLng latLng) {
+    return couplers.indexWhere((fosc) => isTapedOnIt(fosc.location!, latLng));
+  }
+
+  int selectedNode(LatLng latLng) {
+    return nodes.indexWhere((node) => isTapedOnIt(node.location!, latLng));
   }
 
   Future<void> _loadCables({required bool isSourceLocal}) async {
