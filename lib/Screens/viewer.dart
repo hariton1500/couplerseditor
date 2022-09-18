@@ -124,30 +124,17 @@ class _ViewerScreenState extends State<ViewerScreen> {
                       width: MediaQuery.of(context).size.width,
                       height: 80.0,
                       point: coupler.location!,
-                      builder: (ctx) => selectedCouplerIndex !=
-                              couplers.indexOf(coupler)
-                          ? Stack(
+                      builder: (ctx) => Stack(
                               alignment: AlignmentDirectional.center,
                               children: [
-                                IconButton(
-                                  autofocus: true,
-                                  icon: const Icon(
-                                    Icons.blinds_rounded,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () {
-                                    print('clicked on marker ${coupler.name}');
-                                    setState(() {
-                                      selectedCouplerIndex =
-                                          couplers.indexOf(coupler);
-                                    });
-                                  },
+                                const Icon(
+                                  Icons.blinds_rounded,
+                                  color: Colors.red,
                                 ),
                                 Positioned(
-                                    bottom: 10, child: Text(coupler.name))
+                                  bottom: 10, child: Text(coupler.name, softWrap: true, maxLines: 2, textScaleFactor: 0.7, style: TextStyle(color: couplers.indexOf(coupler) == selectedCouplerIndex ? Colors.red : Colors.black)))
                               ],
-                            )
-                          : Text(coupler.name),
+                            ),
                     );
                   }).toList(),
                 ),
@@ -157,19 +144,16 @@ class _ViewerScreenState extends State<ViewerScreen> {
                       width: MediaQuery.of(context).size.width,
                       height: 80.0,
                       point: node.location!,
-                      builder: (ctx) =>
-                          selectedCouplerIndex != nodes.indexOf(node)
-                              ? Stack(
-                                  alignment: AlignmentDirectional.center,
-                                  children: [
-                                    const Icon(
-                                        Icons.api_outlined,
-                                        color: Colors.red,
-                                      ),
-                                    Positioned(
-                                        bottom: 10, child: Text(node.address, softWrap: true, maxLines: 2, textScaleFactor: 0.7,))
-                                  ])
-                              : Text(node.address),
+                      builder: (ctx) => Stack(
+                          alignment: AlignmentDirectional.center,
+                          children: [
+                            const Icon(
+                                Icons.api_outlined,
+                                color: Colors.red,
+                              ),
+                            Positioned(
+                                bottom: 10, child: Text(node.address, softWrap: true, maxLines: 2, textScaleFactor: 0.7, style: TextStyle(color: nodes.indexOf(node) == selectedNodeIndex ? Colors.red : Colors.black),))
+                          ]),
                     );
                   }).toList(),
                 ),
