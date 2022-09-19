@@ -17,7 +17,7 @@ class Cable {
     end2 = CableEnd.fromJson(json['end2']);
   }
 
-  Map<String, dynamic> toJson() => {'end1': end1, 'end2': end2};
+  Map<String, dynamic> toJson() => {'end1': end1, 'end2': end2, 'name': '${end1!.direction}<=>${end2!.direction}'};
 
   String signature() {
     print('signature of cable with ends: $end1 and $end2');
@@ -26,7 +26,7 @@ class Cable {
 
   @override
   String toString() {
-    return signature();
+    return '${end1!.direction} <=> ${end2!.direction}';
   }
 
   Future<bool> saveCable(bool isFromServer) async {
@@ -46,6 +46,7 @@ class Cable {
       } else {
         print('updating bin $binId');
         return await server.updateJsonRecord(
+            type: 'cable',
             binId: server.bins[binId]['id'], jsonString: json.encode(toJson()));
       }
     } else {

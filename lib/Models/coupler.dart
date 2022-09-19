@@ -108,6 +108,7 @@ class Mufta {
     } else {
       print('updating bin $binId');
       return await server.updateJsonRecord(
+          type: 'fosc',
           binId: server.bins[binId]['id'], jsonString: toJson());
     }
   }
