@@ -57,7 +57,8 @@ class Node {
   }
 
   String signature() {
-    return '$address:${location?.latitude}:${location?.longitude}';
+    //return '$address:${location?.latitude}:${location?.longitude}';
+    return address;
   }
 
   void saveToLocal() async {

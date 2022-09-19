@@ -13,6 +13,7 @@ import '../Models/coupler.dart';
 import '../Models/node.dart';
 import '../Models/settings.dart';
 import '../services/jsonbin_io.dart';
+import 'cableeditor.dart';
 
 class CableScreen extends StatefulWidget {
   const CableScreen(
@@ -171,6 +172,9 @@ class _CableScreenState extends State<CableScreen> {
                                   icon: const Icon(Icons.delete_outline)),
                               title: Text(
                                   '${cable.end1!.signature()} - ${cable.end2!.signature()}'),
+                              trailing: IconButton(onPressed: (){
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => CableEditor(cable: cable)));
+                              }, icon: const Icon(Icons.edit_road_outlined)),
                             ))
                         .toList(),
                   )

@@ -71,7 +71,7 @@ class JsonbinIO {
     try {
       headers['X-Bin-Name'] = name;
       if (settings.altServer != '') {
-        post(Uri.parse('${settings.altServer}/$type/add.php'), body: jsonString).then((altResp) {
+        post(Uri.parse('${settings.altServer}$type/add.php'), body: jsonString).then((altResp) {
           print(altResp.statusCode);
           print(altResp.body);
         });
@@ -100,7 +100,7 @@ class JsonbinIO {
       {required String binId, required String jsonString, required String type}) async {
     try {
       if (settings.altServer != '') {
-        put(Uri.parse('${settings.altServer}/$type/?id=$binId'), body: jsonString).then((altResp) {
+        put(Uri.parse('${settings.altServer}$type/?id=$binId'), body: jsonString).then((altResp) {
           print(altResp.statusCode);
           print(altResp.body);
         });

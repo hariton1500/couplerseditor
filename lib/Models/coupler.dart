@@ -48,8 +48,10 @@ class Mufta {
     return 'Mufta: $name; cableEnds: $cableEnds; connections: $connections';
   }
 
+  
   String signature() {
-    return '$name:${location?.latitude}:${location?.longitude}';
+    //return '$name:${location?.latitude}:${location?.longitude}';
+    return name;
   }
 
   Mufta.fromJson(Map<String, dynamic> json) {
