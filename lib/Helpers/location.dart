@@ -8,7 +8,7 @@ Future<LocationData?> getLocation() async {
 
   bool serviceEnabled;
   PermissionStatus permissionGranted;
-  LocationData locationData;
+  //LocationData locationData;
 
   serviceEnabled = await location.serviceEnabled();
   if (!serviceEnabled) {

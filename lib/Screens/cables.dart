@@ -172,9 +172,18 @@ class _CableScreenState extends State<CableScreen> {
                                   icon: const Icon(Icons.delete_outline)),
                               title: Text(
                                   '${cable.end1!.signature()} - ${cable.end2!.signature()}'),
-                              trailing: IconButton(onPressed: (){
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => CableEditor(cable: cable)));
-                              }, icon: const Icon(Icons.edit_road_outlined)),
+                              trailing: IconButton(
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                            builder: (context) => CableEditor(
+                                                  cable: cable,
+                                                  settings: widget.settings,
+                                                  isFromServer:
+                                                      widget.isFromServer,
+                                                )));
+                                  },
+                                  icon: const Icon(Icons.edit_road_outlined)),
                             ))
                         .toList(),
                   )

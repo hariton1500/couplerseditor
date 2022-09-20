@@ -67,22 +67,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-              onPressed: () => Navigator.of(context)
-                  .push(MaterialPageRoute(
-                      builder: ((context) => SetupScreen(
-                            lang: settings.language,
-                            settings: settings,
-                          ))))
-                  .then((value) => setState(() {})),
-              icon: const Icon(Icons.settings_outlined))
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          actions: [
+            IconButton(
+                onPressed: () => Navigator.of(context)
+                    .push(MaterialPageRoute(
+                        builder: ((context) => SetupScreen(
+                              lang: settings.language,
+                              settings: settings,
+                            ))))
+                    .then((value) => setState(() {})),
+                icon: const Icon(Icons.settings_outlined))
+          ],
+        ),
+        body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Divider(),
@@ -195,11 +195,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             mufta = Mufta.fromJson(jsonDecode(value));
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => NodesScreen(
-                                    node: node,
-                                    settings: settings,
-                                    //callback: () => setState(() {}),
-                                    //lang: settings.language
-                                )));
+                                      node: node,
+                                      settings: settings,
+                                      //callback: () => setState(() {}),
+                                      //lang: settings.language
+                                    )));
                           }
                         });
                       });

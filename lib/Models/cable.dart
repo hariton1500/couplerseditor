@@ -20,13 +20,19 @@ class Cable {
     end1 = CableEnd.fromJson(json['end1']);
     end2 = CableEnd.fromJson(json['end2']);
     try {
-      points = List.from(json['points']).map((x) => LatLng.fromJson(x)).toList();
+      points =
+          List.from(json['points']).map((x) => LatLng.fromJson(x)).toList();
     } catch (e) {
       print(e);
     }
   }
 
-  Map<String, dynamic> toJson() => {'end1': end1, 'end2': end2, 'name': '${end1!.direction}<=>${end2!.direction}', 'points': points};
+  Map<String, dynamic> toJson() => {
+        'end1': end1,
+        'end2': end2,
+        'name': '${end1!.direction}<=>${end2!.direction}',
+        'points': points
+      };
 
   String signature() {
     //print('signature of cable with ends: $end1 and $end2');
@@ -56,7 +62,8 @@ class Cable {
         print('updating bin $binId');
         return await server.updateJsonRecord(
             type: 'cable',
-            binId: server.bins[binId]['id'], jsonString: json.encode(toJson()));
+            binId: server.bins[binId]['id'],
+            jsonString: json.encode(toJson()));
       }
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -75,14 +82,17 @@ class Cable {
   }
 
   List<Polyline> polylines() {
+    /*
     List<LatLng> list = [];
     list.add(end1!.location!);
-    if (points != null) {
-      for (var point in points!) {
-        list.add(point);
-      }
-    }
+    list.addAll(points);
     list.add(end2!.location!);
-    return [Polyline(points: list, strokeWidth: 2, color: Colors.red)];
+    */
+    return [
+      Polyline(
+          points: [end1!.location!, ...points, end2!.location!],
+          strokeWidth: 2,
+          color: Colors.red)
+    ];
   }
 }
