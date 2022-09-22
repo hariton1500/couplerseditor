@@ -93,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (context) => MuftaScreen(
                         mufta: mufta,
                         callback: () => setState(() {}),
-                        lang: settings.language)));
+                        settings: settings)));
                 /*
                       setState(() {
                         isShowMuftu = true;
@@ -125,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 builder: (context) => MuftaScreen(
                                     mufta: mufta,
                                     callback: () => setState(() {}),
-                                    lang: settings.language)));
+                                    settings: settings)));
                           }
                         });
                       });

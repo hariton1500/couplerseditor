@@ -63,8 +63,23 @@ class _ViewerScreenState extends State<ViewerScreen> {
       appBar: AppBar(
         title: const Text('Viewer'),
         actions: [
-          selectedCouplerIndex >= 0 ? IconButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => MuftaScreen(mufta: couplers[selectedCouplerIndex], callback: (){}, lang: widget.settings.language))), icon: const Icon(Icons.task_alt_outlined)) : Container(),
-          selectedNodeIndex >= 0 ? IconButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => NodesScreen(node: nodes[selectedNodeIndex], settings: widget.settings))), icon: const Icon(Icons.task_alt_outlined)) : Container(),
+          selectedCouplerIndex >= 0
+              ? IconButton(
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => MuftaScreen(
+                          mufta: couplers[selectedCouplerIndex],
+                          callback: () {},
+                          settings: widget.settings))),
+                  icon: const Icon(Icons.task_alt_outlined))
+              : Container(),
+          selectedNodeIndex >= 0
+              ? IconButton(
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => NodesScreen(
+                          node: nodes[selectedNodeIndex],
+                          settings: widget.settings))),
+                  icon: const Icon(Icons.task_alt_outlined))
+              : Container(),
           isViewOnMap
               ? IconButton(
                   onPressed: () {
@@ -104,8 +119,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                       selectedCouplerIndex = selectedFOSC(latlng);
                       selectedNodeIndex = selectedNode(latlng);
                     });
-                  }
-              ),
+                  }),
               layers: [
                 /*
                 TileLayerOptions(
@@ -125,16 +139,25 @@ class _ViewerScreenState extends State<ViewerScreen> {
                       height: 80.0,
                       point: coupler.location!,
                       builder: (ctx) => Stack(
-                              alignment: AlignmentDirectional.center,
-                              children: [
-                                const Icon(
-                                  Icons.blinds_rounded,
-                                  color: Colors.red,
-                                ),
-                                Positioned(
-                                  bottom: 10, child: Text(coupler.name, softWrap: true, maxLines: 2, textScaleFactor: 0.7, style: TextStyle(color: couplers.indexOf(coupler) == selectedCouplerIndex ? Colors.red : Colors.black)))
-                              ],
-                            ),
+                        alignment: AlignmentDirectional.center,
+                        children: [
+                          const Icon(
+                            Icons.blinds_rounded,
+                            color: Colors.red,
+                          ),
+                          Positioned(
+                              bottom: 10,
+                              child: Text(coupler.name,
+                                  softWrap: true,
+                                  maxLines: 2,
+                                  textScaleFactor: 0.7,
+                                  style: TextStyle(
+                                      color: couplers.indexOf(coupler) ==
+                                              selectedCouplerIndex
+                                          ? Colors.red
+                                          : Colors.black)))
+                        ],
+                      ),
                     );
                   }).toList(),
                 ),
@@ -148,11 +171,22 @@ class _ViewerScreenState extends State<ViewerScreen> {
                           alignment: AlignmentDirectional.center,
                           children: [
                             const Icon(
-                                Icons.api_outlined,
-                                color: Colors.red,
-                              ),
+                              Icons.api_outlined,
+                              color: Colors.red,
+                            ),
                             Positioned(
-                                bottom: 10, child: Text(node.address, softWrap: true, maxLines: 2, textScaleFactor: 0.7, style: TextStyle(color: nodes.indexOf(node) == selectedNodeIndex ? Colors.red : Colors.black),))
+                                bottom: 10,
+                                child: Text(
+                                  node.address,
+                                  softWrap: true,
+                                  maxLines: 2,
+                                  textScaleFactor: 0.7,
+                                  style: TextStyle(
+                                      color: nodes.indexOf(node) ==
+                                              selectedNodeIndex
+                                          ? Colors.red
+                                          : Colors.black),
+                                ))
                           ]),
                     );
                   }).toList(),
@@ -290,9 +324,11 @@ class _ViewerScreenState extends State<ViewerScreen> {
   }
 
   bool isTapedOnIt(LatLng a, b) {
-    return pow(a.latitude - b.latitude, 2) + pow(a.longitude - b.longitude, 2) <= 0.00000001;
+    return pow(a.latitude - b.latitude, 2) +
+            pow(a.longitude - b.longitude, 2) <=
+        0.00000001;
   }
-  
+
   int selectedFOSC(LatLng latLng) {
     return couplers.indexWhere((fosc) => isTapedOnIt(fosc.location!, latLng));
   }

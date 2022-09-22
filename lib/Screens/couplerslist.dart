@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:coupolerseditor/Models/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
-import 'package:http/http.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -88,7 +87,7 @@ class _CouplersListState extends State<CouplersList> {
                                           : loadListFromDevice();
                                     });
                                   },
-                                  lang: widget.lang)))
+                                  settings: widget.settings)))
                           .then((value) {});
                       //Navigator.of(context).pop(couplers[selectedCouplerIndex!]);
                     },

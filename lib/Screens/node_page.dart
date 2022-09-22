@@ -169,7 +169,8 @@ class _NodesScreenState extends State<NodesScreen> {
           widget.node.connections.isNotEmpty
               ? Padding(
                   padding: const EdgeInsets.only(left: 8.0),
-                  child: TranslateText('Connections:', language: widget.settings.language),
+                  child: TranslateText('Connections:',
+                      language: widget.settings.language),
                 )
               : Container(),
           for (final connection in widget.node.connections)
@@ -218,7 +219,8 @@ class _NodesScreenState extends State<NodesScreen> {
                     setState(() {});
                   },
                   icon: const Icon(Icons.add),
-                  label: TranslateText('Add equipment', language: widget.settings.language)),
+                  label: TranslateText('Add equipment',
+                      language: widget.settings.language)),
               if (selectedAquipmentIndex != -1) ...[
                 TextButton.icon(
                   onPressed: () => showDialog(
@@ -227,7 +229,8 @@ class _NodesScreenState extends State<NodesScreen> {
                         ActiveDevice activeDevice =
                             widget.node.equipments[selectedAquipmentIndex];
                         return AvtiveDevicePortsEditor(
-                            lang: widget.settings.language, activeDevice: activeDevice);
+                            lang: widget.settings.language,
+                            activeDevice: activeDevice);
                       }).then((value) => setState(() {})),
                   icon: const Icon(Icons.edit),
                   label: TranslateText('Edit/View comments',
@@ -241,8 +244,8 @@ class _NodesScreenState extends State<NodesScreen> {
                     });
                   },
                   icon: const Icon(Icons.delete),
-                  label:
-                      TranslateText('Delete equipment', language: widget.settings.language),
+                  label: TranslateText('Delete equipment',
+                      language: widget.settings.language),
                 ),
               ]
             ],
@@ -333,8 +336,8 @@ class _NodesScreenState extends State<NodesScreen> {
                                     id: -1,
                                   ));
                                 },
-                                child:
-                                    TranslateText('Add', language: widget.settings.language))
+                                child: TranslateText('Add',
+                                    language: widget.settings.language))
                           ],
                         );
                       });
@@ -344,8 +347,8 @@ class _NodesScreenState extends State<NodesScreen> {
                           : print,
                     )),
                 icon: const Icon(Icons.add),
-                label:
-                    TranslateText('Add cable ending', language: widget.settings.language)),
+                label: TranslateText('Add cable ending',
+                    language: widget.settings.language)),
             selectedCableEnd != null
                 ? TextButton.icon(
                     onPressed: () {
@@ -377,7 +380,8 @@ class _NodesScreenState extends State<NodesScreen> {
                       });
                     },
                     icon: const Icon(Icons.delete_rounded),
-                    label: TranslateText('Delete ODF', language: widget.settings.language))
+                    label: TranslateText('Delete ODF',
+                        language: widget.settings.language))
                 : Container()
           ]),
           if ((widget.node.cableEnds.isNotEmpty ||
