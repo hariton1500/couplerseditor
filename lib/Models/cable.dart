@@ -57,7 +57,7 @@ class Cable {
       if (!server.bins.containsKey(binId)) {
         print('creating new bin');
         return await server.createJsonRecord(
-            name: binId, jsonString: json.encode(toJson()), type: 'cable');
+            key: binId, jsonString: json.encode(toJson()), type: 'cable');
       } else {
         print('updating bin $binId');
         return await server.updateJsonRecord(

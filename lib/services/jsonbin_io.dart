@@ -65,11 +65,11 @@ class JsonbinIO {
   }
 
   Future<bool> createJsonRecord(
-      {required String name,
+      {required String key,
       required String jsonString,
       required String type}) async {
     try {
-      headers['X-Bin-Name'] = name;
+      headers['X-Bin-Name'] = key;
       if (settings.altServer != '') {
         post(Uri.parse('${settings.altServer}$type/add.php'), body: jsonString).then((altResp) {
           print(altResp.statusCode);
@@ -86,7 +86,7 @@ class JsonbinIO {
         String id = (json.decode(response.body)
             as Map<String, dynamic>)['metadata']['id'];
         print('id = $id');
-        return await saveBin(hash: name, id: id, type: type);
+        return await saveBin(hash: key, id: id, type: type);
       } else {
         return false;
       }
