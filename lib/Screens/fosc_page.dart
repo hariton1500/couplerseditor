@@ -6,7 +6,7 @@ import 'package:latlong2/latlong.dart' as ll;
 import '../Helpers/fibers.dart';
 import '../Helpers/strings.dart';
 import '../Models/cableend.dart';
-import '../Models/coupler.dart';
+import '../Models/fosc.dart';
 import '../Models/settings.dart';
 import 'location_picker.dart';
 

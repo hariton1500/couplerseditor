@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Models/cable.dart';
 import '../Models/cableend.dart';
-import '../Models/coupler.dart';
+import '../Models/fosc.dart';
 import '../Models/node.dart';
 import '../Models/settings.dart';
 import '../services/jsonbin_io.dart';

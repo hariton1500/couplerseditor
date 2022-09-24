@@ -30,6 +30,9 @@ class _SetupScreenState extends State<SetupScreen> {
         actions: [
           TextButton.icon(
               onPressed: () {
+                if (!widget.settings.altServer.endsWith('/')) {
+                  widget.settings.altServer += '/';
+                }
                 widget.settings.saveSettings();
                 Navigator.of(context).pop();
               },
@@ -113,13 +116,13 @@ class _SetupScreenState extends State<SetupScreen> {
               TranslateText('Login:', language: widget.settings.language),
               TextFormField(
                 initialValue: widget.settings.login,
-                onChanged: (value) => widget.settings.altServer = value,
+                onChanged: (value) => widget.settings.login = value,
               ),
               TranslateText('Password:', language: widget.settings.language),
               TextFormField(
                 initialValue: widget.settings.password,
                 obscureText: true,
-                onChanged: (value) => widget.settings.altServer = value,
+                onChanged: (value) => widget.settings.password = value,
               ),
               const Divider(),
               Column(

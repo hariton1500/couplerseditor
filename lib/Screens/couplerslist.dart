@@ -9,9 +9,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helpers/strings.dart';
-import '../Models/coupler.dart';
+import '../Models/fosc.dart';
 import '../services/jsonbin_io.dart';
-import 'fosc.dart';
+import 'fosc_page.dart';
 
 class CouplersList extends StatefulWidget {
   final String lang;

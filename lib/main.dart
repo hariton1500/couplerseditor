@@ -3,11 +3,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'Helpers/strings.dart';
-import 'Models/coupler.dart';
+import 'Models/fosc.dart';
 import 'Models/node.dart';
 import 'Models/settings.dart';
 import 'Screens/cables.dart';
-import 'Screens/fosc.dart';
+import 'Screens/fosc_page.dart';
 import 'Screens/couplerslist.dart';
 import 'Screens/node_page.dart';
 import 'Screens/nodeslist.dart';
