@@ -52,7 +52,7 @@ class Mufta {
   
   String signature() {
     //return '$name:${location?.latitude}:${location?.longitude}';
-    return key ?? name;
+    return key ?? name + location.toString();
   }
 
   Mufta.fromJson(Map<String, dynamic> json) {

@@ -66,11 +66,12 @@ class MuftaScreenState extends State<MuftaScreen> {
                     showDialog<String>(
                         context: context,
                         builder: (BuildContext context) {
-                          String name = '';
+                          String name = widget.mufta.name;
                           return AlertDialog(
                             title: TranslateText('Name editing',
                                 language: widget.settings.language),
                             content: TextField(
+                              controller: TextEditingController(text: name),
                               onChanged: (text) => name = text,
                             ),
                             actions: [
