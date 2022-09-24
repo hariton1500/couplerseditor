@@ -83,7 +83,7 @@ class Node {
     if (!server.bins.containsKey(binId)) {
       print('creating new bin');
       return await server.createJsonRecord(
-          name: binId, jsonString: toJson(), type: 'node');
+          key: binId, jsonString: toJson(), type: 'node');
     } else {
       print('updating bin $binId');
       return await server.updateJsonRecord(

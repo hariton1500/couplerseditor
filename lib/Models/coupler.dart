@@ -31,6 +31,12 @@ class Connection {
 }
 
 class Mufta {
+  String name = '';
+  List<CableEnd> cableEnds = [];
+  List<Connection> connections = [];
+  LatLng? location;
+  String? key;
+
   Mufta({
     required this.name,
     required this.cableEnds,
@@ -38,20 +44,15 @@ class Mufta {
     this.location,
   });
 
-  String name = '';
-  List<CableEnd> cableEnds = [];
-  List<Connection> connections = [];
-  LatLng? location;
-
   @override
   String toString() {
-    return 'Mufta: $name; cableEnds: $cableEnds; connections: $connections';
+    return 'Key: $key; Mufta: $name; cableEnds: $cableEnds; connections: $connections';
   }
 
   
   String signature() {
     //return '$name:${location?.latitude}:${location?.longitude}';
-    return name;
+    return key ?? name;
   }
 
   Mufta.fromJson(Map<String, dynamic> json) {
@@ -63,6 +64,7 @@ class Mufta {
     connections = List<Connection>.from(
         json['connections'].map((x) => Connection.fromJson(x)));
     location = LatLng.fromJson(json['location']);
+    key = json['key'];
   }
 
   String toJson() {
@@ -70,7 +72,8 @@ class Mufta {
       'name': name,
       'cables': cableEnds,
       'connections': connections,
-      'location': location!.toJson()
+      'location': location!.toJson(),
+      'key': key
     });
   }
 
@@ -81,7 +84,7 @@ class Mufta {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String jsonString = toJson();
     print('saving to local: $jsonString');
-    sharedPreferences.setString('coupler: $name', jsonString);
+    sharedPreferences.setString('coupler: ${key ?? name}', jsonString);
   }
 
   Function addConnection() {
@@ -101,12 +104,13 @@ class Mufta {
     JsonbinIO server = JsonbinIO(settings: settings);
     await server.loadBins();
     print('current bins = ${server.bins}');
-    String binId = signature().hashCode.toString();
+    String binId = key ?? signature().hashCode.toString();
     print('binId = $binId');
     if (!server.bins.containsKey(binId)) {
       print('creating new bin');
+      key = binId;
       return await server.createJsonRecord(
-          name: binId, jsonString: toJson(), type: 'fosc');
+          key: binId, jsonString: toJson(), type: 'fosc');
     } else {
       print('updating bin $binId');
       return await server.updateJsonRecord(
