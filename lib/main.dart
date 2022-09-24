@@ -26,9 +26,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(primarySwatch: Colors.blue, canvasColor: Colors.white),
+      theme: ThemeData(
+          primarySwatch: Colors.blue,
+          canvasColor: Colors.white,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.white,
+            iconTheme: IconThemeData(color: Colors.blue),
+            actionsIconTheme: IconThemeData(color: Colors.blue),
+          )),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'FOSCs, Nodes & Cables keeper'),
     );
   }
 }
@@ -82,12 +89,22 @@ class _MyHomePageState extends State<MyHomePage> {
                     .then((value) => setState(() {})),
                 icon: const Icon(Icons.settings_outlined))
           ],
+          title: TranslateText(
+            widget.title,
+            language: settings.language,
+            color: Colors.blue,
+            size: 16,
+          ),
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Divider(),
-            Center(child: TranslateText('FOSCs:', language: settings.language)),
+            Center(
+                child: TranslateText('FOSCs:',
+                    language: settings.language,
+                    size: 16,
+                    color: Colors.black)),
             TextButton.icon(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
@@ -160,7 +177,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             //],
             const Divider(),
-            Center(child: TranslateText('Nodes:', language: settings.language)),
+            Center(
+                child: TranslateText('Nodes:',
+                    language: settings.language,
+                    size: 16,
+                    color: Colors.black)),
             TextButton.icon(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
@@ -235,7 +256,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const Divider(),
             Center(
-                child: TranslateText('Cables:', language: settings.language)),
+                child: TranslateText('Cables:',
+                    language: settings.language,
+                    size: 16,
+                    color: Colors.black)),
             TextButton.icon(
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
@@ -262,7 +286,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     language: settings.language)),
             const Divider(),
             Center(
-                child: TranslateText('Viewer:', language: settings.language)),
+                child: TranslateText(
+              'Viewer:',
+              language: settings.language,
+              size: 16,
+              color: Colors.black,
+            )),
             TextButton.icon(
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(

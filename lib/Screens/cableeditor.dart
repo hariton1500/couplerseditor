@@ -30,7 +30,16 @@ class _CableEditorState extends State<CableEditor> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.cable.toString()),
+          title: Column(
+            children: [
+              TranslateText(
+                'Cable editor',
+                language: widget.settings.language,
+                size: 16,
+              ),
+              Text(widget.cable.toString()),
+            ],
+          ),
           actions: [
             _point != null
                 ? Row(

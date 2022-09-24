@@ -26,7 +26,11 @@ class _SetupScreenState extends State<SetupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: TranslateText('Settings', language: lang),
+        title: TranslateText(
+          'Settings',
+          language: lang,
+          size: 16,
+        ),
         actions: [
           TextButton.icon(
               onPressed: () {
@@ -38,10 +42,9 @@ class _SetupScreenState extends State<SetupScreen> {
               },
               icon: const Icon(
                 Icons.save_outlined,
-                color: Colors.black,
+                //color: Colors.black,
               ),
-              label: TranslateText('Save to device',
-                  language: widget.settings.language))
+              label: TranslateText('Save', language: widget.settings.language))
         ],
       ),
       body: SingleChildScrollView(

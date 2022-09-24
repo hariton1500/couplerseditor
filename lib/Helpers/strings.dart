@@ -208,11 +208,15 @@ Map<String, Map<String, String>> strings = {
 
 class TranslateText extends Text {
   TranslateText(String text,
-      {Key? key, String language = 'en', double size = 10.0})
+      {Key? key,
+      String language = 'en',
+      double size = 10.0,
+      Color color = Colors.blue})
       : super(
           strings[text]?[language] ?? text,
           key: key,
           style: TextStyle(
+            color: color,
             fontSize: size,
             fontWeight: FontWeight.bold,
           ),

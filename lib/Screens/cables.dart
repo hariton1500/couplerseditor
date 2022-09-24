@@ -54,140 +54,146 @@ class _CableScreenState extends State<CableScreen> {
   @override
   Widget build(BuildContext context) {
     //print(ends);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cables'),
-        actions: <Widget>[
-          isViewOnMap
-              ? IconButton(
-                  onPressed: () {
-                    getLocation().then((locationData) {
-                      print(locationData);
-                      _mapController.move(
-                          LatLng(
-                              locationData!.latitude!, locationData.longitude!),
-                          16);
-                    });
-                  },
-                  icon: const Icon(Icons.location_on_outlined))
-              : Container(),
-          IconButton(
-            icon: isViewOnMap
-                ? const Icon(Icons.list_outlined)
-                : const Icon(Icons.map_outlined),
-            onPressed: () {
-              setState(() {
-                isViewOnMap = !isViewOnMap;
-              });
-            },
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: TranslateText(
+            'Cables',
+            language: widget.settings.language,
+            size: 16,
           ),
-        ],
-      ),
-      body: SafeArea(
-        child: !isViewOnMap
-            ? Column(
-                children: [
-                  const Divider(),
-                  Column(
-                    children: [
-                      TranslateText(
-                        'New cable:',
-                        language: widget.lang,
-                      ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: ends.length,
-                        itemBuilder: (ctx, index) {
-                          return ListTile(
-                            title: Text(ends[index].direction),
-                            leading: Text('side ${index + 1}:'),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              onPressed: () {
-                                setState(() {
-                                  ends.removeAt(index);
-                                  _loadCouplersAndNodes(
-                                      isSourceLocal: !widget.isFromServer,
-                                      enableFilter: ends.length == 1);
-                                });
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  const Divider(),
-                  ends.length == 2
-                      ? TextButton.icon(
-                          onPressed: () {
-                            if (cables.any((cable) =>
-                                cable.end1!.signature() ==
-                                    ends[0].signature() ||
-                                cable.end1!.signature() ==
-                                    ends[1].signature() ||
-                                cable.end2!.signature() ==
-                                    ends[0].signature() ||
-                                cable.end2!.signature() ==
-                                    ends[1].signature())) {
-                              return;
-                            }
-                            print('creating cable from $ends');
-                            Cable cable = Cable(end1: ends[0], end2: ends[1]);
-                            cable.saveCable(widget.isFromServer);
-                            setState(() {
-                              cables.add(cable);
-                              ends.clear();
-                              _loadCouplersAndNodes(
-                                  isSourceLocal: !widget.isFromServer);
-                            });
-                          },
-                          icon: const Icon(Icons.save_outlined),
-                          label: TranslateText(
-                            'Save',
-                            language: widget.lang,
-                          ))
-                      : Container(),
-                  isViewOnMap ? _buildMap() : _buildList(),
-                  const Divider(),
-                  TranslateText(
-                    'Stored cables:',
-                    language: widget.lang,
-                  ),
-                  Column(
-                    children: cables
-                        .map((cable) => ListTile(
-                              leading: IconButton(
-                                  onPressed: () {
-                                    cable
-                                        .remove(widget.isFromServer)
-                                        .then((value) => setState(() {
-                                              cables.remove(cable);
-                                              ends.clear();
-                                              _loadCouplersAndNodes(
-                                                  isSourceLocal:
-                                                      !widget.isFromServer);
-                                            }));
-                                  },
-                                  icon: const Icon(Icons.delete_outline)),
-                              title: Text(
-                                  '${cable.end1!.signature()} - ${cable.end2!.signature()}'),
+          actions: <Widget>[
+            isViewOnMap
+                ? IconButton(
+                    onPressed: () {
+                      getLocation().then((locationData) {
+                        print(locationData);
+                        _mapController.move(
+                            LatLng(locationData!.latitude!,
+                                locationData.longitude!),
+                            16);
+                      });
+                    },
+                    icon: const Icon(Icons.location_on_outlined))
+                : Container(),
+            IconButton(
+              icon: isViewOnMap
+                  ? const Icon(Icons.list_outlined)
+                  : const Icon(Icons.map_outlined),
+              onPressed: () {
+                setState(() {
+                  isViewOnMap = !isViewOnMap;
+                });
+              },
+            ),
+          ],
+        ),
+        body: !isViewOnMap
+            ? SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const Divider(),
+                    Column(
+                      children: [
+                        TranslateText(
+                          'New cable:',
+                          language: widget.lang,
+                        ),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: ends.length,
+                          itemBuilder: (ctx, index) {
+                            return ListTile(
+                              title: Text(ends[index].direction),
+                              leading: Text('side ${index + 1}:'),
                               trailing: IconButton(
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                            builder: (context) => CableEditor(
-                                                  cable: cable,
-                                                  settings: widget.settings,
-                                                  isFromServer:
-                                                      widget.isFromServer,
-                                                )));
-                                  },
-                                  icon: const Icon(Icons.edit_road_outlined)),
+                                icon: const Icon(Icons.delete_outline),
+                                onPressed: () {
+                                  setState(() {
+                                    ends.removeAt(index);
+                                    _loadCouplersAndNodes(
+                                        isSourceLocal: !widget.isFromServer,
+                                        enableFilter: ends.length == 1);
+                                  });
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    const Divider(),
+                    ends.length == 2
+                        ? TextButton.icon(
+                            onPressed: () {
+                              if (cables.any((cable) =>
+                                  cable.end1!.signature() ==
+                                      ends[0].signature() ||
+                                  cable.end1!.signature() ==
+                                      ends[1].signature() ||
+                                  cable.end2!.signature() ==
+                                      ends[0].signature() ||
+                                  cable.end2!.signature() ==
+                                      ends[1].signature())) {
+                                return;
+                              }
+                              print('creating cable from $ends');
+                              Cable cable = Cable(end1: ends[0], end2: ends[1]);
+                              cable.saveCable(widget.isFromServer);
+                              setState(() {
+                                cables.add(cable);
+                                ends.clear();
+                                _loadCouplersAndNodes(
+                                    isSourceLocal: !widget.isFromServer);
+                              });
+                            },
+                            icon: const Icon(Icons.save_outlined),
+                            label: TranslateText(
+                              'Save',
+                              language: widget.lang,
                             ))
-                        .toList(),
-                  )
-                ],
+                        : Container(),
+                    isViewOnMap ? _buildMap() : _buildList(),
+                    const Divider(),
+                    TranslateText(
+                      'Stored cables:',
+                      language: widget.lang,
+                    ),
+                    Column(
+                      children: cables
+                          .map((cable) => ListTile(
+                                leading: IconButton(
+                                    onPressed: () {
+                                      cable
+                                          .remove(widget.isFromServer)
+                                          .then((value) => setState(() {
+                                                cables.remove(cable);
+                                                ends.clear();
+                                                _loadCouplersAndNodes(
+                                                    isSourceLocal:
+                                                        !widget.isFromServer);
+                                              }));
+                                    },
+                                    icon: const Icon(Icons.delete_outline)),
+                                title: Text(
+                                    '${cable.end1!.signature()} - ${cable.end2!.signature()}'),
+                                trailing: IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                              builder: (context) => CableEditor(
+                                                    cable: cable,
+                                                    settings: widget.settings,
+                                                    isFromServer:
+                                                        widget.isFromServer,
+                                                  )));
+                                    },
+                                    icon: const Icon(Icons.edit_road_outlined)),
+                              ))
+                          .toList(),
+                    )
+                  ],
+                ),
               )
             : _buildMap(),
       ),
@@ -283,7 +289,7 @@ class _CableScreenState extends State<CableScreen> {
           zoom: 16.0,
           maxZoom: 18.0,
           controller: _mapController,
-          center: widget.settings.baseLocation),
+          center: widget.settings.baseLocation ?? LatLng(0, 0)),
       layers: [
         TileLayerOptions(
           urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',

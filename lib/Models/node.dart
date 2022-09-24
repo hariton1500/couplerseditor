@@ -7,6 +7,8 @@ import 'package:coupolerseditor/services/jsonbin_io.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/server.dart';
+
 class Node {
   LatLng? location;
   List<ActiveDevice> equipments = [];
@@ -46,14 +48,14 @@ class Node {
     return 'Node: $address; equipments: $equipments; cableEnds: $cableEnds; connections: $connections';
   }
 
-  String toJson() {
-    return jsonEncode({
+  Map<String, dynamic> toJson() {
+    return {
       'address': address,
       'location': location!.toJson(),
       'equipments': equipments,
       'cableEnds': cableEnds,
       'connections': connections,
-    });
+    };
   }
 
   String signature() {
@@ -66,7 +68,7 @@ class Node {
       cableEnd.location = location;
     }
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String jsonString = toJson();
+    String jsonString = json.encode(toJson());
     print('saving to local: $jsonString');
     sharedPreferences.setString('node: $address', jsonString);
   }
@@ -75,20 +77,36 @@ class Node {
     print('/////////saveToServer////////////');
     Settings settings = Settings();
     await settings.loadSettings();
-    JsonbinIO server = JsonbinIO(settings: settings);
-    await server.loadBins();
-    print('current bins = ${server.bins}');
-    String binId = signature().hashCode.toString();
-    print('binId = $binId');
-    if (!server.bins.containsKey(binId)) {
-      print('creating new bin');
-      return await server.createJsonRecord(
-          key: binId, jsonString: toJson(), type: 'node');
+
+    if (settings.altServer == '' ||
+        settings.login == '' ||
+        settings.password == '') {
+      JsonbinIO server = JsonbinIO(settings: settings);
+      await server.loadBins();
+      print('current bins = ${server.bins}');
+      String binId = signature().hashCode.toString();
+      print('binId = $binId');
+      if (!server.bins.containsKey(binId)) {
+        print('creating new bin');
+        return await server.createJsonRecord(
+            key: binId, jsonString: json.encode(toJson()), type: 'node');
+      } else {
+        print('updating bin $binId');
+        return await server.updateJsonRecord(
+            type: 'node',
+            binId: server.bins[binId]['id'],
+            jsonString: json.encode(toJson()));
+      }
     } else {
-      print('updating bin $binId');
-      return await server.updateJsonRecord(
-          type: 'node',
-          binId: server.bins[binId]['id'], jsonString: toJson());
+      Server server = Server(settings: settings);
+      String type = 'fosc';
+      Map<String, dynamic> data = toJson();
+      List<String> fields = ['cables', 'connections', 'location'];
+      return await server.add(
+          key: signature().hashCode.toString(),
+          type: type,
+          data: data,
+          fields: fields);
     }
   }
 }
