@@ -6,9 +6,7 @@ import '../Helpers/strings.dart';
 import 'location_picker.dart';
 
 class SetupScreen extends StatefulWidget {
-  const SetupScreen({Key? key, required this.lang, required this.settings})
-      : super(key: key);
-  final String lang;
+  const SetupScreen({Key? key, required this.settings}) : super(key: key);
   final Settings settings;
 
   @override
@@ -20,7 +18,7 @@ class _SetupScreenState extends State<SetupScreen> {
 
   @override
   void initState() {
-    lang = widget.lang;
+    //lang = widget.lang;
     super.initState;
   }
 
@@ -29,6 +27,19 @@ class _SetupScreenState extends State<SetupScreen> {
     return Scaffold(
       appBar: AppBar(
         title: TranslateText('Settings', language: lang),
+        actions: [
+          TextButton.icon(
+              onPressed: () {
+                widget.settings.saveSettings();
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(
+                Icons.save_outlined,
+                color: Colors.black,
+              ),
+              label: TranslateText('Save to device',
+                  language: widget.settings.language))
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -88,9 +99,26 @@ class _SetupScreenState extends State<SetupScreen> {
                 initialValue: widget.settings.binsMapId,
                 onChanged: (value) => widget.settings.binsMapId = value,
               ),
-              TranslateText('alt server:', language: widget.settings.language),
+              const Divider(
+                thickness: 5,
+                height: 10,
+                color: Colors.black,
+              ),
+              TranslateText('Main server URL:',
+                  language: widget.settings.language),
               TextFormField(
                 initialValue: widget.settings.altServer,
+                onChanged: (value) => widget.settings.altServer = value,
+              ),
+              TranslateText('Login:', language: widget.settings.language),
+              TextFormField(
+                initialValue: widget.settings.login,
+                onChanged: (value) => widget.settings.altServer = value,
+              ),
+              TranslateText('Password:', language: widget.settings.language),
+              TextFormField(
+                initialValue: widget.settings.password,
+                obscureText: true,
                 onChanged: (value) => widget.settings.altServer = value,
               ),
               const Divider(),
@@ -118,14 +146,6 @@ class _SetupScreenState extends State<SetupScreen> {
               const SizedBox(
                 height: 100,
               ),
-              TextButton.icon(
-                  onPressed: () {
-                    widget.settings.saveSettings();
-                    Navigator.of(context).pop();
-                  },
-                  icon: const Icon(Icons.save_outlined),
-                  label: TranslateText('Save to device',
-                      language: widget.settings.language))
             ],
           ),
         ),

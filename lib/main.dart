@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(primarySwatch: Colors.blue, canvasColor: Colors.white),
+      debugShowCheckedModeBanner: false,
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -75,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: () => Navigator.of(context)
                     .push(MaterialPageRoute(
                         builder: ((context) => SetupScreen(
-                              lang: settings.language,
+                              //lang: settings.language,
                               settings: settings,
                             ))))
                     .then((value) => setState(() {})),
