@@ -16,16 +16,12 @@ class Server {
   Future<bool> add(
       {required String key,
       required String type,
-      required Map<String, dynamic> data,
-      required List<String> fields}) async {
-    print('server.add($url$type/add.php?name=$key)');
+      required Map<String, dynamic> data}) async {
+    print('server.add($url$type/add.php?key=$key)');
+    data['key'] = key;
     try {
-      Map<String, dynamic> body = {'name': key};
-      for (var field in fields) {
-        body[field] = data[field];
-      }
-      var response = await post(Uri.parse('$url$type/add.php?name=$key'),
-          headers: headers, body: json.encode(body));
+      var response = await post(Uri.parse('$url$type/add.php?key=$key'),
+          headers: headers, body: json.encode(data));
       if (response.statusCode == 200) {
         print(response.body);
         return true;
@@ -42,16 +38,11 @@ class Server {
   Future<bool> edit(
       {required String key,
       required String type,
-      required Map<String, dynamic> data,
-      required List<String> fields}) async {
-    print('server.edit()');
+      required Map<String, dynamic> data}) async {
+    print('server.edit($url$type/put.php?key=$key');
     try {
-      Map<String, dynamic> body = {'name': data['name']};
-      for (var field in fields) {
-        body[field] = data[field];
-      }
-      var response = await put(Uri.parse('$url$type/put.php?name=$key'),
-          headers: headers, body: json.encode(body));
+      var response = await put(Uri.parse('$url$type/put.php?key=$key'),
+          headers: headers, body: json.encode(data));
       if (response.statusCode == 200) {
         return true;
       } else {

@@ -15,6 +15,7 @@ class Node {
   List<CableEnd> cableEnds = [];
   String address = '';
   List<Connection> connections = [];
+  String? key;
 
   Node({required this.address});
 
@@ -41,11 +42,12 @@ class Node {
           connectionData: MapEntry(
               MapEntry(s1, side1['port']), MapEntry(s2, side2['port'])));
     }).toList();
+    key = json['key'];
   }
 
   @override
   String toString() {
-    return 'Node: $address; equipments: $equipments; cableEnds: $cableEnds; connections: $connections';
+    return 'Key: $key; Node: $address; equipments: $equipments; cableEnds: $cableEnds; connections: $connections';
   }
 
   Map<String, dynamic> toJson() {
@@ -55,12 +57,13 @@ class Node {
       'equipments': equipments,
       'cableEnds': cableEnds,
       'connections': connections,
+      'key': key
     };
   }
 
   String signature() {
     //return '$address:${location?.latitude}:${location?.longitude}';
-    return address;
+    return key ?? address + location.toString();
   }
 
   void saveToLocal() async {
@@ -70,7 +73,7 @@ class Node {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String jsonString = json.encode(toJson());
     print('saving to local: $jsonString');
-    sharedPreferences.setString('node: $address', jsonString);
+    sharedPreferences.setString('node: ${key ?? address}', jsonString);
   }
 
   Future<bool> saveToServer() async {
@@ -99,14 +102,16 @@ class Node {
       }
     } else {
       Server server = Server(settings: settings);
-      String type = 'fosc';
+      String type = 'node';
       Map<String, dynamic> data = toJson();
-      List<String> fields = ['cables', 'connections', 'location'];
-      return await server.add(
-          key: signature().hashCode.toString(),
-          type: type,
-          data: data,
-          fields: fields);
+      if (key == null) {
+        key = signature().hashCode.toString();
+        return await server.add(
+            key: key!, type: type, data: data);
+      } else {
+        return await server.edit(
+            key: key!, type: type, data: data);
+      }
     }
   }
 }

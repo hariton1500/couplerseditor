@@ -8,11 +8,13 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/jsonbin_io.dart';
+import '../services/server.dart';
 import 'settings.dart';
 
 class Cable {
   CableEnd? end1, end2;
   List<LatLng> points = [];
+  String? key;
 
   Cable({required this.end1, required this.end2});
 
@@ -25,23 +27,24 @@ class Cable {
     } catch (e) {
       print(e);
     }
+    key = json['key'];
   }
 
   Map<String, dynamic> toJson() => {
         'end1': end1,
         'end2': end2,
-        'name': '${end1!.direction}<=>${end2!.direction}',
+        'key': key,
         'points': points
       };
 
   String signature() {
     //print('signature of cable with ends: $end1 and $end2');
-    return '${end1!.signature()}:${end2!.signature()}';
+    return key ?? '${end1!.signature()}:${end2!.signature()}';
   }
 
   @override
   String toString() {
-    return '${end1!.direction} <=> ${end2!.direction}';
+    return 'key: $key; ${end1!.direction} <=> ${end2!.direction}';
   }
 
   Future<bool> saveCable(bool isFromServer) async {
@@ -49,25 +52,41 @@ class Cable {
     if (isFromServer) {
       Settings settings = Settings();
       await settings.loadSettings();
-      JsonbinIO server = JsonbinIO(settings: settings);
-      await server.loadBins();
-      print('current bins = ${server.bins}');
-      String binId = signature().hashCode.toString();
-      print('binId = $binId');
-      if (!server.bins.containsKey(binId)) {
-        print('creating new bin');
-        return await server.createJsonRecord(
-            key: binId, jsonString: json.encode(toJson()), type: 'cable');
+      if (settings.altServer == '' ||
+          settings.login == '' ||
+          settings.password == '') {
+        JsonbinIO server = JsonbinIO(settings: settings);
+        await server.loadBins();
+        print('current bins = ${server.bins}');
+        String binId = signature().hashCode.toString();
+        print('binId = $binId');
+        if (!server.bins.containsKey(binId)) {
+          print('creating new bin');
+          return await server.createJsonRecord(
+              key: binId, jsonString: json.encode(toJson()), type: 'cable');
+        } else {
+          print('updating bin $binId');
+          return await server.updateJsonRecord(
+              type: 'cable',
+              binId: server.bins[binId]['id'],
+              jsonString: json.encode(toJson()));
+        }
       } else {
-        print('updating bin $binId');
-        return await server.updateJsonRecord(
-            type: 'cable',
-            binId: server.bins[binId]['id'],
-            jsonString: json.encode(toJson()));
+        Server server = Server(settings: settings);
+        String type = 'cable';
+        Map<String, dynamic> data = toJson();
+        if (key == null) {
+          key = signature().hashCode.toString();
+          return await server.add(
+              key: key!, type: type, data: data);
+        } else {
+          return await server.edit(
+              key: key!, type: type, data: data);
+        }
       }
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('cable: ${signature()}', jsonEncode(toJson()));
+      prefs.setString('cable: ${key ?? signature()}', jsonEncode(toJson()));
       return true;
     }
   }
@@ -77,7 +96,7 @@ class Cable {
     if (isFromServer) {
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.remove('cable: ${signature()}');
+      prefs.remove('cable: ${key ?? signature()}');
     }
   }
 

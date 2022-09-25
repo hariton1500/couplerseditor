@@ -126,14 +126,13 @@ class Mufta {
       Server server = Server(settings: settings);
       String type = 'fosc';
       Map<String, dynamic> data = toJson();
-      List<String> fields = ['cables', 'connections', 'location'];
       if (key == null) {
         key = signature().hashCode.toString();
         return await server.add(
-            key: key!, type: type, data: data, fields: fields);
+            key: key!, type: type, data: data);
       } else {
         return await server.edit(
-            key: key!, type: type, data: data, fields: fields);
+            key: key!, type: type, data: data);
       }
     }
   }
