@@ -69,8 +69,8 @@ class _CableScreenState extends State<CableScreen> {
                       getLocation().then((locationData) {
                         print(locationData);
                         _mapController.move(
-                            LatLng(locationData!.latitude!,
-                                locationData.longitude!),
+                            LatLng(
+                                locationData!.latitude, locationData.longitude),
                             16);
                       });
                     },
