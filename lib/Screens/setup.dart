@@ -1,3 +1,4 @@
+import 'package:coupolerseditor/Helpers/location.dart';
 import 'package:coupolerseditor/Models/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
@@ -134,7 +135,7 @@ class _SetupScreenState extends State<SetupScreen> {
                       onPressed: () => Navigator.of(context)
                               .push(MaterialPageRoute(
                                   builder: (context) => LocationPicker(
-                                        startLocation: LatLng(0, 0),
+                                        startLocation: zeroLocation,
                                       )))
                               .then((value) {
                             setState(() {

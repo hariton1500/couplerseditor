@@ -340,9 +340,9 @@ class _CableScreenState extends State<CableScreen> {
         for (var bin in nodeBinsList) {
           String data = await server.loadDataFromBin(binId: bin.value['id']);
           if (data != '') {
-            setState(() {
-              couplers.add(Mufta.fromJson(json.decode(data)));
-            });
+            //setState(() {
+            couplers.add(Mufta.fromJson(json.decode(data)));
+            //});
           }
         }
       });

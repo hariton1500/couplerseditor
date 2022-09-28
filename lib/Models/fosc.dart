@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:coupolerseditor/services/server.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart' as ll;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../Helpers/fibers.dart';
 import '../services/jsonbin_io.dart';
 import 'cableend.dart';
 import 'settings.dart';
@@ -35,7 +37,7 @@ class Mufta {
   String name = '';
   List<CableEnd> cableEnds = [];
   List<Connection> connections = [];
-  LatLng? location;
+  ll.LatLng? location;
   String? key;
 
   Mufta({
@@ -63,7 +65,7 @@ class Mufta {
         List<CableEnd>.from(json['cables'].map((x) => CableEnd.fromJson(x)));
     connections = List<Connection>.from(
         json['connections'].map((x) => Connection.fromJson(x)));
-    location = LatLng.fromJson(json['location']);
+    location = ll.LatLng.fromJson(json['location']);
     key = json['key'];
   }
 
@@ -128,12 +130,133 @@ class Mufta {
       Map<String, dynamic> data = toJson();
       if (key == null) {
         key = signature().hashCode.toString();
-        return await server.add(
-            key: key!, type: type, data: data);
+        return await server.add(key: key!, type: type, data: data);
       } else {
-        return await server.edit(
-            key: key!, type: type, data: data);
+        return await server.edit(key: key!, type: type, data: data);
       }
     }
   }
+
+  Widget show(
+      BuildContext context, int? isCableSelected, num longestSideHeight) {
+    return CustomPaint(
+      //size: 500,
+      painter: MuftaPainter(
+          this, MediaQuery.of(context).size.width, isCableSelected ?? -1),
+      //size: 500,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: longestSideHeight * 11 + 100,
+      ),
+    );
+  }
+}
+
+class MuftaPainter extends CustomPainter {
+  final Mufta mufta;
+  final double width;
+  final int selectedCableIndex;
+  MuftaPainter(this.mufta, this.width, this.selectedCableIndex);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint();
+    paint.strokeWidth = 2;
+    double wd = width - 60;
+    double st = 50;
+
+    double yPos0 = 20, yPos1 = 20;
+    for (var cable in mufta.cableEnds) {
+      var tpDirection = TextPainter(
+          text: TextSpan(
+              text: cable.direction,
+              style: mufta.cableEnds.indexOf(cable) != selectedCableIndex
+                  ? const TextStyle(fontSize: 10, color: Colors.black)
+                  : const TextStyle(
+                      fontSize: 11,
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold)),
+          textDirection: TextDirection.ltr);
+      tpDirection.layout();
+      if (cable.sideIndex == 0) {
+        tpDirection.paint(canvas, Offset(st - 30, yPos0 - 17));
+      } else {
+        tpDirection.paint(canvas, Offset(wd - 25, yPos1 - 17));
+      }
+
+      for (var i = 0; i < cable.fibersNumber; i++) {
+        TextStyle ts = const TextStyle(fontSize: 10);
+        if (mufta.cableEnds.indexOf(cable) == selectedCableIndex) {
+          ts = ts.copyWith(color: Colors.red);
+          ts = ts.copyWith(fontWeight: FontWeight.bold);
+          //print('printing bold');
+        } else {
+          ts = ts.copyWith(color: Colors.black);
+        }
+        var tp = TextPainter(
+            text: TextSpan(text: '${i + 1}', style: ts),
+            textDirection: TextDirection.ltr);
+        tp.layout();
+        if (cable.sideIndex == 0) {
+          tp.paint(canvas, Offset(st - 12, yPos0 - 7));
+        } else {
+          tp.paint(canvas, Offset(wd + 17, yPos1 - 7));
+        }
+        paint.color = fiberColors[cable.colorScheme]![i];
+        if (cable.sideIndex == 0) {
+          canvas.drawLine(Offset(st, yPos0), Offset(st + 10, yPos0), paint);
+          cable.fiberPosY[i] = yPos0;
+          yPos0 += 11;
+        } else {
+          canvas.drawLine(Offset(wd, yPos1), Offset(wd + 10, yPos1), paint);
+          cable.fiberPosY[i] = yPos1;
+          yPos1 += 11;
+        }
+      }
+
+      if (cable.sideIndex == 0) {
+        yPos0 += 22;
+      } else {
+        yPos1 += 22;
+      }
+    }
+
+    paint.strokeWidth = 1;
+    paint.style = PaintingStyle.stroke;
+
+    for (var connection in mufta.connections) {
+      //List<int> conList = connection.connectionData;
+
+      int cableIndex1 = connection.cableIndex1;
+      int cableIndex2 = connection.cableIndex2;
+      int fiberNumber1 = connection.fiberNumber1;
+      int fiberNumber2 = connection.fiberNumber2;
+
+      CableEnd cable1 = mufta.cableEnds[cableIndex1],
+          cable2 = mufta.cableEnds[cableIndex2];
+      if (cable1.sideIndex != cable2.sideIndex) {
+        canvas.drawLine(
+            Offset(cable1.sideIndex == 0 ? st + 10 : wd,
+                cable1.fiberPosY[fiberNumber1]!),
+            Offset(cable2.sideIndex == 0 ? st + 10 : wd,
+                cable2.fiberPosY[fiberNumber2]!),
+            paint);
+      } else {
+        Path path = Path();
+        path.moveTo(cable1.sideIndex == 0 ? st + 10 : wd,
+            cable1.fiberPosY[fiberNumber1]!);
+        path.arcToPoint(
+            Offset(cable2.sideIndex == 0 ? st + 10 : wd,
+                cable2.fiberPosY[fiberNumber2]!),
+            radius: const Radius.elliptical(20, 10),
+            clockwise: cable2.sideIndex == 0 &&
+                cable1.fiberPosY[fiberNumber1]! <
+                    cable2.fiberPosY[fiberNumber2]!);
+        canvas.drawPath(path, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

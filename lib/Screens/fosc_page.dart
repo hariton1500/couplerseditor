@@ -1,3 +1,4 @@
+import 'package:coupolerseditor/Helpers/location.dart';
 import 'package:coupolerseditor/Screens/fiberseditor.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -94,42 +95,33 @@ class MuftaScreenState extends State<MuftaScreen> {
                     //softWrap: true,
                     //maxLines: 2,
                   )),
+              //location picker
               TextButton(
-                  onPressed: () => showDialog<ll.LatLng>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: TranslateText(
-                            'Location Picker',
-                            language: widget.settings.language,
-                          ),
-                          content: LocationPicker(
-                            startLocation: widget.mufta.location ??
+                  onPressed: () => Navigator.of(context)
+                      .push<ll.LatLng?>(MaterialPageRoute(
+                          builder: (context) => LocationPicker(
+                              startLocation: widget.mufta.location ??
+                                  settings.baseLocation ??
+                                  zeroLocation)))
+                      .then((location) => setState(() {
+                            widget.mufta.location = location ??
                                 settings.baseLocation ??
-                                ll.LatLng(0, 0),
-                          ),
-                        );
-                      }).then((value) => setState(() {
-                        widget.mufta.location = value ??
-                            widget.mufta.location ??
-                            settings.baseLocation ??
-                            ll.LatLng(0, 0);
-                      })),
-                  child: Wrap(
-                    children: [
-                      TranslateText(
-                        'Location:',
-                        language: widget.settings.language,
-                      ),
-                      Text(
-                          (widget.mufta.location != null
-                              ? widget.mufta.location!
-                                  .toJson()['coordinates']
-                                  .toString()
-                              : ''),
-                          style: const TextStyle(fontSize: 10)),
-                    ],
-                  )),
+                                zeroLocation;
+                          })),
+                  child: Wrap(children: [
+                    TranslateText(
+                      'Location:',
+                      language: widget.settings.language,
+                    ),
+                    Text(
+                        (widget.mufta.location != null
+                            ? widget.mufta.location!
+                                .toJson()['coordinates']
+                                .toString()
+                            : ''),
+                        style: const TextStyle(fontSize: 10)),
+                  ])),
+              //end Lockation Picker
               GestureDetector(
                 onTapDown: (details) {
                   int index = widget.mufta.cableEnds.indexWhere((cable) {
@@ -152,21 +144,12 @@ class MuftaScreenState extends State<MuftaScreen> {
                     isCableSelected = index;
                   });
                 },
-                child: CustomPaint(
-                  //size: 500,
-                  painter: MuftaPainter(widget.mufta,
-                      MediaQuery.of(context).size.width, isCableSelected ?? -1),
-                  //size: 500,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: longestSideHeight * 11 + 100,
-                  ),
-                ),
+                child: widget.mufta
+                    .show(context, isCableSelected, longestSideHeight),
               ),
               Wrap(
                 alignment: WrapAlignment.start,
                 crossAxisAlignment: WrapCrossAlignment.start,
-                //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   (isCableSelected ?? -1) > -1 &&
                           widget.mufta.cableEnds[isCableSelected!].fiberComments
@@ -752,115 +735,6 @@ class MuftaScreenState extends State<MuftaScreen> {
       //print('add connection');
     };
   }
-}
-
-class MuftaPainter extends CustomPainter {
-  final Mufta mufta;
-  final double width;
-  final int selectedCableIndex;
-  MuftaPainter(this.mufta, this.width, this.selectedCableIndex);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint();
-    paint.strokeWidth = 2;
-    double wd = width - 60;
-    double st = 50;
-
-    double yPos0 = 20, yPos1 = 20;
-    for (var cable in mufta.cableEnds) {
-      var tpDirection = TextPainter(
-          text: TextSpan(
-              text: cable.direction,
-              style: mufta.cableEnds.indexOf(cable) != selectedCableIndex
-                  ? const TextStyle(fontSize: 10, color: Colors.black)
-                  : const TextStyle(
-                      fontSize: 11,
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold)),
-          textDirection: TextDirection.ltr);
-      tpDirection.layout();
-      if (cable.sideIndex == 0) {
-        tpDirection.paint(canvas, Offset(st - 30, yPos0 - 17));
-      } else {
-        tpDirection.paint(canvas, Offset(wd - 25, yPos1 - 17));
-      }
-
-      for (var i = 0; i < cable.fibersNumber; i++) {
-        TextStyle ts = const TextStyle(fontSize: 10);
-        if (mufta.cableEnds.indexOf(cable) == selectedCableIndex) {
-          ts = ts.copyWith(color: Colors.red);
-          ts = ts.copyWith(fontWeight: FontWeight.bold);
-          //print('printing bold');
-        } else {
-          ts = ts.copyWith(color: Colors.black);
-        }
-        var tp = TextPainter(
-            text: TextSpan(text: '${i + 1}', style: ts),
-            textDirection: TextDirection.ltr);
-        tp.layout();
-        if (cable.sideIndex == 0) {
-          tp.paint(canvas, Offset(st - 12, yPos0 - 7));
-        } else {
-          tp.paint(canvas, Offset(wd + 17, yPos1 - 7));
-        }
-        paint.color = fiberColors[cable.colorScheme]![i];
-        if (cable.sideIndex == 0) {
-          canvas.drawLine(Offset(st, yPos0), Offset(st + 10, yPos0), paint);
-          cable.fiberPosY[i] = yPos0;
-          yPos0 += 11;
-        } else {
-          canvas.drawLine(Offset(wd, yPos1), Offset(wd + 10, yPos1), paint);
-          cable.fiberPosY[i] = yPos1;
-          yPos1 += 11;
-        }
-      }
-
-      if (cable.sideIndex == 0) {
-        yPos0 += 22;
-      } else {
-        yPos1 += 22;
-      }
-    }
-
-    paint.strokeWidth = 1;
-    paint.style = PaintingStyle.stroke;
-
-    for (var connection in mufta.connections) {
-      //List<int> conList = connection.connectionData;
-
-      int cableIndex1 = connection.cableIndex1;
-      int cableIndex2 = connection.cableIndex2;
-      int fiberNumber1 = connection.fiberNumber1;
-      int fiberNumber2 = connection.fiberNumber2;
-
-      CableEnd cable1 = mufta.cableEnds[cableIndex1],
-          cable2 = mufta.cableEnds[cableIndex2];
-      if (cable1.sideIndex != cable2.sideIndex) {
-        canvas.drawLine(
-            Offset(cable1.sideIndex == 0 ? st + 10 : wd,
-                cable1.fiberPosY[fiberNumber1]!),
-            Offset(cable2.sideIndex == 0 ? st + 10 : wd,
-                cable2.fiberPosY[fiberNumber2]!),
-            paint);
-      } else {
-        Path path = Path();
-        path.moveTo(cable1.sideIndex == 0 ? st + 10 : wd,
-            cable1.fiberPosY[fiberNumber1]!);
-        path.arcToPoint(
-            Offset(cable2.sideIndex == 0 ? st + 10 : wd,
-                cable2.fiberPosY[fiberNumber2]!),
-            radius: const Radius.elliptical(20, 10),
-            clockwise: cable2.sideIndex == 0 &&
-                cable1.fiberPosY[fiberNumber1]! <
-                    cable2.fiberPosY[fiberNumber2]!);
-        canvas.drawPath(path, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
 Future<List<String>> loadNames() async {
