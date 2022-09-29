@@ -13,6 +13,7 @@ import '../Models/fosc.dart';
 import '../Models/node.dart';
 import '../Models/settings.dart';
 import '../services/jsonbin_io.dart';
+import '../services/server.dart';
 import 'cableeditor.dart';
 
 class CableScreen extends StatefulWidget {
@@ -437,27 +438,39 @@ class _CableScreenState extends State<CableScreen> {
       print('${cables.length} loaded');
     } else {
       //cables = [];
-      print(
-          'loading list of stored cables from server URL = ${widget.settings.baseUrl}');
-      JsonbinIO server = JsonbinIO(settings: widget.settings);
-      server.loadBins().then((_) async {
-        List<MapEntry<String, dynamic>> nodeBinsList =
-            server.bins.entries.where((element) {
-          Map<String, dynamic> data = (element.value is Map)
-              ? element.value
-              : {'id': element.value, 'type': 'unknown'};
-          return data['type'] == 'cable';
-        }).toList();
-        print('nodeBinsList = $nodeBinsList');
-        for (var bin in nodeBinsList) {
-          String data = await server.loadDataFromBin(binId: bin.value['id']);
-          if (data != '') {
-            setState(() {
-              cables.add(Cable.fromJson(json.decode(data)));
-            });
+      if (widget.settings.altServer == '' ||
+          widget.settings.login == '' ||
+          widget.settings.password == '') {
+        print(
+            'loading list of stored cables from server URL = ${widget.settings.baseUrl}');
+        JsonbinIO server = JsonbinIO(settings: widget.settings);
+        server.loadBins().then((_) async {
+          List<MapEntry<String, dynamic>> nodeBinsList =
+              server.bins.entries.where((element) {
+            Map<String, dynamic> data = (element.value is Map)
+                ? element.value
+                : {'id': element.value, 'type': 'unknown'};
+            return data['type'] == 'cable';
+          }).toList();
+          print('nodeBinsList = $nodeBinsList');
+          for (var bin in nodeBinsList) {
+            String data = await server.loadDataFromBin(binId: bin.value['id']);
+            if (data != '') {
+              setState(() {
+                cables.add(Cable.fromJson(json.decode(data)));
+              });
+            }
           }
-        }
-      });
+        });
+      } else {
+        Server server = Server(settings: widget.settings);
+        server.list(type: 'cable').then((value) => setState(() {
+              cables.addAll(value
+                  .split('\n')
+                  .map((e) => Cable.fromJson(json.decode(e)))
+                  .toList());
+            }));
+      }
     }
   }
 }

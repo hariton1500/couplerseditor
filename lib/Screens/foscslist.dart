@@ -3,6 +3,7 @@
 import 'dart:convert';
 //import 'package:coupolerseditor/Helpers/epsg3395.dart';
 import 'package:coupolerseditor/Models/settings.dart';
+import 'package:coupolerseditor/services/server.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
@@ -230,38 +231,36 @@ class _CouplersListState extends State<CouplersList> {
   }
 
   loadListFromBilling() async {
-    print('loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
-    JsonbinIO server = JsonbinIO(settings: widget.settings);
-    server.loadBins().then((_) async {
-      List<MapEntry<String, dynamic>> nodeBinsList =
-          server.bins.entries.where((element) {
-        Map<String, dynamic> data = (element.value is Map)
-            ? element.value
-            : {'id': element.value, 'type': 'unknown'};
-        return data['type'] == 'fosc';
-      }).toList();
-      print('nodeBinsList = $nodeBinsList');
-      for (var bin in nodeBinsList) {
-        String data = await server.loadDataFromBin(binId: bin.value['id']);
-        if (data != '') {
-          setState(() {
-            couplers.add(data);
-          });
+    if (widget.settings.altServer == '' ||
+        widget.settings.login == '' ||
+        widget.settings.password == '') {
+      print(
+          'loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
+      JsonbinIO server = JsonbinIO(settings: widget.settings);
+      server.loadBins().then((_) async {
+        List<MapEntry<String, dynamic>> nodeBinsList =
+            server.bins.entries.where((element) {
+          Map<String, dynamic> data = (element.value is Map)
+              ? element.value
+              : {'id': element.value, 'type': 'unknown'};
+          return data['type'] == 'fosc';
+        }).toList();
+        print('nodeBinsList = $nodeBinsList');
+        for (var bin in nodeBinsList) {
+          String data = await server.loadDataFromBin(binId: bin.value['id']);
+          if (data != '') {
+            setState(() {
+              couplers.add(data);
+            });
+          }
         }
-      }
-    });
-
-    /*
-    try {
-      var response = await get(Uri.parse('${widget.settings.baseUrl}/?getlist'));
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        setState(() {
-          couplers = json.decode(response.body).map((e) => json.encode(e));
-        });
-      }
-    } catch (e) {
-      throw Exception(e);
-    }*/
+      });
+    } else {
+      Server server = Server(settings: widget.settings);
+      server.list(type: 'fosc').then((value) => setState(() {
+            couplers.addAll(value.split('\n'));
+          }));
+    }
   }
 
   loadListFromDevice() async {

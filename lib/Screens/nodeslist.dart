@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Helpers/strings.dart';
 import '../Models/settings.dart';
+import '../services/server.dart';
 import 'node_page.dart';
 
 class NodesList extends StatefulWidget {
@@ -143,25 +144,34 @@ class _NodesListState extends State<NodesList> {
   }
 
   loadListFromBilling() {
-    JsonbinIO server = JsonbinIO(settings: widget.settings);
-    server.loadBins().then((_) async {
-      List<MapEntry<String, dynamic>> nodeBinsList =
-          server.bins.entries.where((element) {
-        Map<String, dynamic> data = (element.value is Map)
-            ? element.value
-            : {'id': element.value, 'type': 'unknown'};
-        return data['type'] == 'node';
-      }).toList();
-      print('nodeBinsList = $nodeBinsList');
-      for (var bin in nodeBinsList) {
-        String data = await server.loadDataFromBin(binId: bin.value['id']);
-        if (data != '') {
-          setState(() {
-            nodesJsonStrings.add(data);
-          });
+    if (widget.settings.altServer == '' ||
+        widget.settings.login == '' ||
+        widget.settings.password == '') {
+      JsonbinIO server = JsonbinIO(settings: widget.settings);
+      server.loadBins().then((_) async {
+        List<MapEntry<String, dynamic>> nodeBinsList =
+            server.bins.entries.where((element) {
+          Map<String, dynamic> data = (element.value is Map)
+              ? element.value
+              : {'id': element.value, 'type': 'unknown'};
+          return data['type'] == 'node';
+        }).toList();
+        print('nodeBinsList = $nodeBinsList');
+        for (var bin in nodeBinsList) {
+          String data = await server.loadDataFromBin(binId: bin.value['id']);
+          if (data != '') {
+            setState(() {
+              nodesJsonStrings.add(data);
+            });
+          }
         }
-      }
-    });
+      });
+    } else {
+      Server server = Server(settings: widget.settings);
+      server.list(type: 'node').then((value) => setState(() {
+            nodesJsonStrings.addAll(value.split('\n'));
+          }));
+    }
   }
 
   loadListFromDevice() async {

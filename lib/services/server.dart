@@ -17,10 +17,11 @@ class Server {
       {required String key,
       required String type,
       required Map<String, dynamic> data}) async {
-    print('server.add($url$type/add.php?key=$key)');
+    print(
+        'server.add($url$type/?add&key=$key) headers=$headers, data=${json.encode(data)}');
     data['key'] = key;
     try {
-      var response = await post(Uri.parse('$url$type/add.php?key=$key'),
+      var response = await post(Uri.parse('$url$type/?add&key=$key'),
           headers: headers, body: json.encode(data));
       if (response.statusCode == 200) {
         print(response.body);
@@ -39,9 +40,9 @@ class Server {
       {required String key,
       required String type,
       required Map<String, dynamic> data}) async {
-    print('server.edit($url$type/put.php?key=$key');
+    print('server.edit($url$type/?put&key=$key');
     try {
-      var response = await put(Uri.parse('$url$type/put.php?key=$key'),
+      var response = await put(Uri.parse('$url$type/?put&key=$key'),
           headers: headers, body: json.encode(data));
       if (response.statusCode == 200) {
         return true;
@@ -58,8 +59,7 @@ class Server {
       {required String type, Map<String, dynamic>? filter}) async {
     try {
       if (filter != null) headers['filter'] = json.encode(filter);
-      var response =
-          await get(Uri.parse('$url$type/get.php'), headers: headers);
+      var response = await get(Uri.parse('$url$type/?list'), headers: headers);
       if (response.statusCode == 200) {
         return response.body;
       }

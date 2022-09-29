@@ -8,7 +8,7 @@ import 'Models/node.dart';
 import 'Models/settings.dart';
 import 'Screens/cables.dart';
 import 'Screens/fosc_page.dart';
-import 'Screens/couplerslist.dart';
+import 'Screens/foscslist.dart';
 import 'Screens/node_page.dart';
 import 'Screens/nodeslist.dart';
 import 'Screens/setup.dart';
