@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:coupolerseditor/Helpers/location.dart';
+import 'package:coupolerseditor/services/location.dart';
 import 'package:coupolerseditor/Helpers/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';

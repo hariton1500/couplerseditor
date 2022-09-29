@@ -1,4 +1,4 @@
-import 'package:coupolerseditor/Helpers/location.dart';
+import 'package:coupolerseditor/services/location.dart';
 import 'package:coupolerseditor/Models/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';

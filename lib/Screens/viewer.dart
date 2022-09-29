@@ -7,7 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../Helpers/location.dart';
+import '../services/location.dart';
 import '../Helpers/strings.dart';
 import '../Models/cable.dart';
 import '../Models/fosc.dart';

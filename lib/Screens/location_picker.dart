@@ -4,7 +4,7 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../Helpers/epsg3395.dart';
-import '../Helpers/location.dart';
+import '../services/location.dart';
 //import '../Helpers/epsg3395.dart';
 
 //import 'package:latlong/latlong.dart';
