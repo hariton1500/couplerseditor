@@ -24,7 +24,7 @@ class Server {
       var response = await post(Uri.parse('$url$type/?add&key=$key'),
           headers: headers, body: json.encode(data));
       if (response.statusCode == 200) {
-        print(response.body);
+        print('Ok. Added.');
         return true;
       } else {
         print(response.statusCode);
@@ -45,6 +45,7 @@ class Server {
       var response = await put(Uri.parse('$url$type/?put&key=$key'),
           headers: headers, body: json.encode(data));
       if (response.statusCode == 200) {
+        print('ok. edited');
         return true;
       } else {
         return false;

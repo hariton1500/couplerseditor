@@ -256,10 +256,12 @@ class _CouplersListState extends State<CouplersList> {
         }
       });
     } else {
+      print('loading from altserver');
       Server server = Server(settings: widget.settings);
-      server.list(type: 'fosc').then((value) => setState(() {
-            couplers.addAll(value.split('\n'));
-          }));
+      server.list(type: 'fosc').then((value) {
+        print('|$value|');
+        if (value != '') setState(() {couplers.addAll(value.split('\n'));});
+      });
     }
   }
 
