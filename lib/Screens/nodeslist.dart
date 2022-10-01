@@ -138,7 +138,8 @@ class _NodesListState extends State<NodesList> {
                     ),
                   );
                 })
-            : TranslateText('Nodes are loading...', language: widget.lang),
+            : TranslateText('Nodes are loading... or Empty',
+                language: widget.lang),
       ),
     );
   }
@@ -168,9 +169,13 @@ class _NodesListState extends State<NodesList> {
       });
     } else {
       Server server = Server(settings: widget.settings);
-      server.list(type: 'node').then((value) => setState(() {
+      server.list(type: 'node').then((value) {
+        if (value != '') {
+          setState(() {
             nodesJsonStrings.addAll(value.split('\n'));
-          }));
+          });
+        }
+      });
     }
   }
 

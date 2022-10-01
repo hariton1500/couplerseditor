@@ -314,6 +314,7 @@ class _CableScreenState extends State<CableScreen> {
       nodes = [];
       return;
     }
+    //loading Couplers
     if (isSourceLocal) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Set<String> couplersJsonStrings = prefs
@@ -326,27 +327,43 @@ class _CableScreenState extends State<CableScreen> {
               Mufta.fromJson(jsonDecode(prefs.getString(element) ?? '')))
           .toList();
     } else {
-      print(
-          'loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
-      JsonbinIO server = JsonbinIO(settings: widget.settings);
-      server.loadBins().then((_) async {
-        List<MapEntry<String, dynamic>> nodeBinsList =
-            server.bins.entries.where((element) {
-          Map<String, dynamic> data = (element.value is Map)
-              ? element.value
-              : {'id': element.value, 'type': 'unknown'};
-          return data['type'] == 'fosc';
-        }).toList();
-        print('nodeBinsList = $nodeBinsList');
-        for (var bin in nodeBinsList) {
-          String data = await server.loadDataFromBin(binId: bin.value['id']);
-          if (data != '') {
-            //setState(() {
-            couplers.add(Mufta.fromJson(json.decode(data)));
-            //});
+      if (widget.settings.altServer == '' ||
+          widget.settings.login == '' ||
+          widget.settings.password == '') {
+        print(
+            'loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
+        JsonbinIO server = JsonbinIO(settings: widget.settings);
+        server.loadBins().then((_) async {
+          List<MapEntry<String, dynamic>> nodeBinsList =
+              server.bins.entries.where((element) {
+            Map<String, dynamic> data = (element.value is Map)
+                ? element.value
+                : {'id': element.value, 'type': 'unknown'};
+            return data['type'] == 'fosc';
+          }).toList();
+          print('nodeBinsList = $nodeBinsList');
+          for (var bin in nodeBinsList) {
+            String data = await server.loadDataFromBin(binId: bin.value['id']);
+            if (data != '') {
+              //setState(() {
+              couplers.add(Mufta.fromJson(json.decode(data)));
+              //});
+            }
           }
-        }
-      });
+        });
+      } else {
+        print('loading from altserver');
+        Server server = Server(settings: widget.settings);
+        server.list(type: 'fosc').then((value) {
+          print('|$value|');
+          if (value != '') {
+            setState(() {
+              couplers.addAll(
+                  value.split('\n').map((e) => Mufta.fromJson(json.decode(e))));
+            });
+          }
+        });
+      }
     }
     if (isSourceLocal) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -360,25 +377,39 @@ class _CableScreenState extends State<CableScreen> {
           .toList();
     } else {
       //nodes = [];
-      JsonbinIO server = JsonbinIO(settings: widget.settings);
-      server.loadBins().then((_) async {
-        List<MapEntry<String, dynamic>> nodeBinsList =
-            server.bins.entries.where((element) {
-          Map<String, dynamic> data = (element.value is Map)
-              ? element.value
-              : {'id': element.value, 'type': 'unknown'};
-          return data['type'] == 'node';
-        }).toList();
-        print('nodeBinsList = $nodeBinsList');
-        for (var bin in nodeBinsList) {
-          String data = await server.loadDataFromBin(binId: bin.value['id']);
-          if (data != '') {
+      if (widget.settings.altServer == '' ||
+          widget.settings.login == '' ||
+          widget.settings.password == '') {
+        JsonbinIO server = JsonbinIO(settings: widget.settings);
+        server.loadBins().then((_) async {
+          List<MapEntry<String, dynamic>> nodeBinsList =
+              server.bins.entries.where((element) {
+            Map<String, dynamic> data = (element.value is Map)
+                ? element.value
+                : {'id': element.value, 'type': 'unknown'};
+            return data['type'] == 'node';
+          }).toList();
+          print('nodeBinsList = $nodeBinsList');
+          for (var bin in nodeBinsList) {
+            String data = await server.loadDataFromBin(binId: bin.value['id']);
+            if (data != '') {
+              setState(() {
+                nodes.add(Node.fromJson(json.decode(data)));
+              });
+            }
+          }
+        });
+      } else {
+        Server server = Server(settings: widget.settings);
+        server.list(type: 'node').then((value) {
+          if (value != '') {
             setState(() {
-              nodes.add(Node.fromJson(json.decode(data)));
+              nodes.addAll(
+                  value.split('\n').map((e) => Node.fromJson(json.decode(e))));
             });
           }
-        }
-      });
+        });
+      }
     }
     if (enableFilter) {
       print('filter couplers and nodes');
@@ -464,12 +495,16 @@ class _CableScreenState extends State<CableScreen> {
         });
       } else {
         Server server = Server(settings: widget.settings);
-        server.list(type: 'cable').then((value) => setState(() {
+        server.list(type: 'cable').then((value) {
+          if (value != '') {
+            setState(() {
               cables.addAll(value
                   .split('\n')
                   .map((e) => Cable.fromJson(json.decode(e)))
                   .toList());
-            }));
+            });
+          }
+        });
       }
     }
   }
