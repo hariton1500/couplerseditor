@@ -89,6 +89,29 @@ class _CableScreenState extends State<CableScreen> {
             ),
           ],
         ),
+        bottomNavigationBar: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            DragTarget<CableEnd>(onAccept: (ce) {
+              print('$ce to 1');
+            }, builder: ((context, candidateData, rejectedData) {
+              return Container(
+                width: MediaQuery.of(context).size.width / 2,
+                color: Colors.green,
+                child: const Text('1'),
+              );
+            })),
+            DragTarget<CableEnd>(onAccept: (ce) {
+              print('$ce to 2');
+            }, builder: ((context, candidateData, rejectedData) {
+              return Container(
+                width: MediaQuery.of(context).size.width / 2,
+                color: Colors.red,
+                child: const Text('2'),
+              );
+            })),
+          ],
+        ),
         body: !isViewOnMap
             ? SingleChildScrollView(
                 child: Column(
@@ -284,6 +307,7 @@ class _CableScreenState extends State<CableScreen> {
   }
 
   Widget _buildMap() {
+    print('building map for creating cables from cableends');
     print(widget.settings.baseLocation.toString());
     return FlutterMap(
       options: MapOptions(
@@ -303,6 +327,39 @@ class _CableScreenState extends State<CableScreen> {
                       cable.end2!.location ?? LatLng(0, 0)
                     ]))
                 .toList()),
+        MarkerLayerOptions(
+            markers: couplers
+                .map((e) => Marker(
+                    width: 400,
+                    height: 100,
+                    point: e.location!,
+                    builder: (context) => Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  print('dfsdf');
+                                },
+                                icon: const Icon(Icons.blinds_rounded)),
+                            Column(
+                              children: e.cableEnds
+                                  .map((ce) => Draggable<CableEnd>(
+                                        data: ce,
+                                        feedback: const Icon(Icons.cable),
+                                        child: TextButton.icon(
+                                            onPressed: () {
+                                              print(ce.toString());
+                                            },
+                                            icon:
+                                                const Icon(Icons.cable_rounded),
+                                            label: Text(ce.toString())),
+                                      ))
+                                  .toList(),
+                            )
+                          ],
+                        )))
+                .toList())
       ],
     );
   }
