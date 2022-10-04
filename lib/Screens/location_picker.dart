@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../Helpers/enums.dart';
 import '../Helpers/epsg3395.dart';
 import '../services/location.dart';
 //import '../Helpers/epsg3395.dart';
@@ -17,8 +18,6 @@ class LocationPicker extends StatefulWidget {
   @override
   State<LocationPicker> createState() => _LocationPickerState();
 }
-
-enum MapSource { openstreet, google, yandex }
 
 class _LocationPickerState extends State<LocationPicker> {
   final MapController _mapController = MapController();
@@ -125,18 +124,11 @@ class _LocationPickerState extends State<LocationPicker> {
           }),
       layers: [
         layerMap(),
+        MarkerLayerOptions(markers: _markers),
         //TileLayerOptions(urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", userAgentPackageName: 'com.example.app',),
         //TileLayerOptions(urlTemplate: 'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU'),
-
         //TileLayerOptions(urlTemplate: 'https://tiles.api-maps.yandex.ru/v1/tiles/?l=map&scale=1.0&x={x}&y={y}&z={z}&lang=ru_RU&apikey='),
-        /*
-            TileLayerOptions(
-                urlTemplate:
-                    'http://vec{s}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=1.0&lang=ru_RU',
-                subdomains: ['01', '02', '03', '04'],
-                backgroundColor: Colors.transparent),*/
-        //CircleLayerOptions(circles: _circles),
-        MarkerLayerOptions(markers: _markers),
+        //TileLayerOptions(urlTemplate: 'http://vec{s}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=1.0&lang=ru_RU', subdomains: ['01', '02', '03', '04'], backgroundColor: Colors.transparent),
       ],
       mapController: _mapController,
     );
