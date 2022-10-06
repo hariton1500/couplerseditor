@@ -309,6 +309,7 @@ class MuftaScreenState extends State<MuftaScreen> {
                               });
                             }).then((value) => setState(() {
                               if (value != null) {
+                                value.location = widget.mufta.location;
                                 widget.mufta.cableEnds.add(value);
                               }
                             }));

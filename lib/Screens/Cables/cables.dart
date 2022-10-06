@@ -40,6 +40,8 @@ class _CableScreenState extends State<CableScreen> {
   List<Mufta> couplers = [];
   List<Cable> cables = [];
 
+  Mufta? selectedFosc;
+
   final MapController _mapController = MapController();
 
   LatLng? _currentPos;
@@ -64,6 +66,25 @@ class _CableScreenState extends State<CableScreen> {
             size: 16,
           ),
           actions: <Widget>[
+            if (ends.length == 2) ...[
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      cables.add(Cable(end1: ends.first, end2: ends.last));
+                      cables.last.saveCable(widget.isFromServer);
+                      ends.clear();
+                      selectedFosc = null;
+                    });
+                  },
+                  icon: const Icon(Icons.save_rounded))
+            ],
+            if (selectedFosc != null) ...[
+              IconButton(
+                  onPressed: () => setState(() {
+                        selectedFosc = null;
+                      }),
+                  icon: const Icon(Icons.deselect_outlined))
+            ],
             isViewOnMap
                 ? IconButton(
                     onPressed: () {
@@ -94,20 +115,48 @@ class _CableScreenState extends State<CableScreen> {
           children: [
             DragTarget<CableEnd>(onAccept: (ce) {
               print('$ce to 1');
+              setState(() {
+                if (ends.isNotEmpty) {
+                  ends[0] = ce;
+                } else {
+                  ends.add(ce);
+                }
+              });
             }, builder: ((context, candidateData, rejectedData) {
               return Container(
                 width: MediaQuery.of(context).size.width / 2,
                 color: Colors.green,
-                child: const Text('1'),
+                child: TextButton(
+                    onPressed: () => setState(() {
+                          if (ends.isNotEmpty) ends.removeAt(0);
+                        }),
+                    child: Text(
+                      '1: ${ends.isNotEmpty ? ends[0].direction : ''}',
+                      style: const TextStyle(color: Colors.black),
+                    )),
               );
             })),
             DragTarget<CableEnd>(onAccept: (ce) {
               print('$ce to 2');
+              setState(() {
+                if (ends.length == 2) {
+                  ends[1] = ce;
+                } else {
+                  ends.add(ce);
+                }
+              });
             }, builder: ((context, candidateData, rejectedData) {
               return Container(
                 width: MediaQuery.of(context).size.width / 2,
                 color: Colors.red,
-                child: const Text('2'),
+                child: TextButton(
+                    onPressed: () => setState(() {
+                          if (ends.length == 2) ends.removeAt(1);
+                        }),
+                    child: Text(
+                      '2: ${ends.length == 2 ? ends[1].direction : ''}',
+                      style: const TextStyle(color: Colors.black),
+                    )),
               );
             })),
           ],
@@ -338,25 +387,33 @@ class _CableScreenState extends State<CableScreen> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             IconButton(
+                                color: selectedFosc == e
+                                    ? Colors.red
+                                    : Colors.green,
                                 onPressed: () {
-                                  print('dfsdf');
+                                  print('${e.name} selected');
+                                  setState(() {
+                                    selectedFosc = e;
+                                  });
                                 },
                                 icon: const Icon(Icons.blinds_rounded)),
-                            Column(
-                              children: e.cableEnds
-                                  .map((ce) => Draggable<CableEnd>(
-                                        data: ce,
-                                        feedback: const Icon(Icons.cable),
-                                        child: TextButton.icon(
-                                            onPressed: () {
-                                              print(ce.toString());
-                                            },
-                                            icon:
-                                                const Icon(Icons.cable_rounded),
-                                            label: Text(ce.toString())),
-                                      ))
-                                  .toList(),
-                            )
+                            selectedFosc == e
+                                ? Column(
+                                    children: e.cableEnds
+                                        .map((ce) => Draggable<CableEnd>(
+                                              data: ce,
+                                              feedback: const Icon(Icons.cable),
+                                              child: TextButton.icon(
+                                                  onPressed: () {
+                                                    print(ce.toString());
+                                                  },
+                                                  icon: const Icon(
+                                                      Icons.cable_rounded),
+                                                  label: Text(ce.toString())),
+                                            ))
+                                        .toList(),
+                                  )
+                                : Container()
                           ],
                         )))
                 .toList())

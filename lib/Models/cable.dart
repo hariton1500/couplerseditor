@@ -30,12 +30,8 @@ class Cable {
     key = json['key'];
   }
 
-  Map<String, dynamic> toJson() => {
-        'end1': end1,
-        'end2': end2,
-        'key': key,
-        'points': points
-      };
+  Map<String, dynamic> toJson() =>
+      {'end1': end1, 'end2': end2, 'key': key, 'points': points};
 
   String signature() {
     //print('signature of cable with ends: $end1 and $end2');
@@ -77,11 +73,9 @@ class Cable {
         Map<String, dynamic> data = toJson();
         if (key == null) {
           key = signature().hashCode.toString();
-          return await server.add(
-              key: key!, type: type, data: data);
+          return await server.add(key: key!, type: type, data: data);
         } else {
-          return await server.edit(
-              key: key!, type: type, data: data);
+          return await server.edit(key: key!, type: type, data: data);
         }
       }
     } else {
@@ -94,6 +88,10 @@ class Cable {
   Future<void> remove(bool isFromServer) async {
     print('removing cable from ${isFromServer ? 'server' : 'local device'}');
     if (isFromServer) {
+      Settings settings = Settings();
+      await settings.loadSettings();
+      Server server = Server(settings: settings);
+      server.remove(type: 'cable', key: key!);
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.remove('cable: ${key ?? signature()}');

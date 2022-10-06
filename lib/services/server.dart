@@ -69,4 +69,19 @@ class Server {
     }
     return '';
   }
+
+  Future<bool> remove({required String type, required String key}) async {
+    try {
+      var response = await delete(Uri.parse('$url$type/?remove&key=$key'),
+          headers: headers);
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
 }
