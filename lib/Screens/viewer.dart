@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:coupolerseditor/Screens/fosc_page.dart';
+import 'package:coupolerseditor/Screens/Foscs/fosc_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -14,7 +14,7 @@ import '../Models/fosc.dart';
 import '../Models/node.dart';
 import '../Models/settings.dart';
 import '../services/jsonbin_io.dart';
-import 'node_page.dart';
+import 'Nodes/node_page.dart';
 
 class ViewerScreen extends StatefulWidget {
   final bool isFromServer;

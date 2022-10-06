@@ -1,8 +1,8 @@
 import 'package:coupolerseditor/Models/activedevice.dart';
 import 'package:flutter/material.dart';
 
-import '../Helpers/spliters.dart';
-import '../Helpers/strings.dart';
+import '../../Helpers/spliters.dart';
+import '../../Helpers/strings.dart';
 
 class AvtiveDevicePortsEditor extends StatefulWidget {
   final String lang;

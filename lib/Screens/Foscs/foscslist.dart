@@ -9,12 +9,12 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../Helpers/enums.dart';
-import '../Helpers/epsg3395.dart';
-import '../Helpers/strings.dart';
-import '../Models/fosc.dart';
-import '../services/jsonbin_io.dart';
-import 'fosc_page.dart';
+import '../../Helpers/enums.dart';
+import '../../Helpers/epsg3395.dart';
+import '../../Helpers/strings.dart';
+import '../../Models/fosc.dart';
+import '../../services/jsonbin_io.dart';
+import '../Foscs/fosc_page.dart';
 
 class CouplersList extends StatefulWidget {
   final String lang;
@@ -40,7 +40,7 @@ class _CouplersListState extends State<CouplersList> {
   final MapController _mapController = MapController();
 
   int? selectedCouplerIndex;
-  
+
   MapSource mapSource = MapSource.openstreet;
 
   @override
@@ -100,9 +100,11 @@ class _CouplersListState extends State<CouplersList> {
                 : Container(),
           ],
         ),
-        bottomSheet: showAsMap ? Wrap(
-          children: listActions(),
-        ) : const Text(''),
+        bottomSheet: showAsMap
+            ? Wrap(
+                children: listActions(),
+              )
+            : const Text(''),
         body: Center(
           child: couplers.isEmpty
               ? TranslateText('List of couplers is Loading or Empty',
@@ -178,7 +180,7 @@ class _CouplersListState extends State<CouplersList> {
                         );
                       },
                     )
-                  : map()/*FlutterMap(
+                  : map() /*FlutterMap(
                       options: MapOptions(
                           //crs: const Epsg3395(),
                           controller: _mapController,
@@ -233,7 +235,8 @@ class _CouplersListState extends State<CouplersList> {
                           }).toList(),
                         ),
                       ],
-                    )*/,
+                    )*/
+          ,
         ));
   }
 
@@ -282,13 +285,23 @@ class _CouplersListState extends State<CouplersList> {
           zoom: 16.0,
           maxZoom: 18.0,
           onTap: (tapPos, latlng) {
-            setState(() {selectedCouplerIndex = null;});
+            setState(() {
+              selectedCouplerIndex = null;
+            });
             Navigator.of(context).pop(latlng);
             //markLocation(latlng);
           }),
       layers: [
         layerMap(),
-        MarkerLayerOptions(markers: couplers.map((foscEncoded) => json.decode(foscEncoded)).toList().map((e) => Marker(point: LatLng.fromJson(e['location']!), builder: (ctx) => const Icon(Icons.blinds_rounded))).toList(),)
+        MarkerLayerOptions(
+          markers: couplers
+              .map((foscEncoded) => json.decode(foscEncoded))
+              .toList()
+              .map((e) => Marker(
+                  point: LatLng.fromJson(e['location']!),
+                  builder: (ctx) => const Icon(Icons.blinds_rounded)))
+              .toList(),
+        )
         //TileLayerOptions(urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", userAgentPackageName: 'com.example.app',),
         //TileLayerOptions(urlTemplate: 'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU'),
         //TileLayerOptions(urlTemplate: 'https://tiles.api-maps.yandex.ru/v1/tiles/?l=map&scale=1.0&x={x}&y={y}&z={z}&lang=ru_RU&apikey='),
@@ -297,7 +310,6 @@ class _CouplersListState extends State<CouplersList> {
       mapController: _mapController,
     );
   }
-
 
   loadListFromBilling() async {
     if (widget.settings.altServer == '' ||
@@ -329,7 +341,10 @@ class _CouplersListState extends State<CouplersList> {
       Server server = Server(settings: widget.settings);
       server.list(type: 'fosc').then((value) {
         print('|$value|');
-        if (value != '') setState(() {couplers.addAll(value.split('\n'));});
+        if (value != '')
+          setState(() {
+            couplers.addAll(value.split('\n'));
+          });
       });
     }
   }

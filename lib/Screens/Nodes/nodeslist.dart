@@ -5,9 +5,9 @@ import 'package:coupolerseditor/services/jsonbin_io.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../Helpers/strings.dart';
-import '../Models/settings.dart';
-import '../services/server.dart';
+import '../../Helpers/strings.dart';
+import '../../Models/settings.dart';
+import '../../services/server.dart';
 import 'node_page.dart';
 
 class NodesList extends StatefulWidget {

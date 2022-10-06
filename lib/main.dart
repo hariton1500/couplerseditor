@@ -6,11 +6,11 @@ import 'Helpers/strings.dart';
 import 'Models/fosc.dart';
 import 'Models/node.dart';
 import 'Models/settings.dart';
-import 'Screens/cables.dart';
-import 'Screens/fosc_page.dart';
-import 'Screens/foscslist.dart';
-import 'Screens/node_page.dart';
-import 'Screens/nodeslist.dart';
+import 'Screens/Cables/cables.dart';
+import 'Screens/Foscs/fosc_page.dart';
+import 'Screens/Foscs/foscslist.dart';
+import 'Screens/Nodes/node_page.dart';
+import 'Screens/Nodes/nodeslist.dart';
 import 'Screens/setup.dart';
 import 'Screens/viewer.dart';
 

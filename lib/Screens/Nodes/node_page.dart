@@ -2,14 +2,14 @@ import 'package:coupolerseditor/Models/activedevice.dart';
 import 'package:coupolerseditor/Models/cableend.dart';
 import 'package:coupolerseditor/Models/settings.dart';
 import 'package:flutter/material.dart';
-import '../Helpers/fibers.dart';
-import '../Helpers/strings.dart';
-import '../Models/node.dart';
+import '../../Helpers/fibers.dart';
+import '../../Helpers/strings.dart';
+import '../../Models/node.dart';
 import 'activedeviceportseditor.dart';
 import 'package:latlong2/latlong.dart' as ll;
 
-import 'fiberseditor.dart';
-import 'location_picker.dart';
+import '../fiberseditor.dart';
+import '../location_picker.dart';
 
 class NodesScreen extends StatefulWidget {
   //final String lang;

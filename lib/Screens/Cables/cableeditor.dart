@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../Models/cable.dart';
-import '../Models/settings.dart';
+import '../../Models/cable.dart';
+import '../../Models/settings.dart';
 
 class CableEditor extends StatefulWidget {
   const CableEditor(
