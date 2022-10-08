@@ -107,11 +107,7 @@ class _NodesListState extends State<NodesList> {
                                   setState(() {
                                     widget.isFromBilling
                                         ? removeFromServer(
-                                            name: Node.fromJson(jsonDecode(
-                                                    nodesJsonStrings[index]))
-                                                .signature()
-                                                .hashCode
-                                                .toString())
+                                            name: (json.decode(nodesJsonStrings[index]) as Map<String, dynamic>)['key'] ?? (json.decode(nodesJsonStrings[index]) as Map<String, dynamic>)['address'])
                                         : removeNodeFromStore(
                                             nodesJsonStrings[index]);
                                     nodesJsonStrings.removeAt(index);
@@ -200,13 +196,14 @@ class _NodesListState extends State<NodesList> {
     print('removing: $nodesJsonString');
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String key =
-        'node: ${(json.decode(nodesJsonString) as Map<String, dynamic>)['address']}';
+        'node: ${(json.decode(nodesJsonString) as Map<String, dynamic>)['key'] ?? (json.decode(nodesJsonString) as Map<String, dynamic>)['address']}';
     sharedPreferences.remove(key);
   }
 
   void removeFromServer({required String name}) async {
     print('removing: node with hash = $name');
-    // server = JsonbinIO(settings: widget.settings);
+    Server server = Server(settings: widget.settings);
+    server.remove(type: 'node', key: name);
     //server.saveBin(id: '', hash: name, type: 'deleted by at ${DateTime.now()}');
   }
 }
