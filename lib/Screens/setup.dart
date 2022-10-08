@@ -1,7 +1,7 @@
 import 'package:coupolerseditor/services/location.dart';
 import 'package:coupolerseditor/Models/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
+//import 'package:latlong2/latlong.dart';
 
 import '../Helpers/strings.dart';
 import 'location_picker.dart';
@@ -77,6 +77,7 @@ class _SetupScreenState extends State<SetupScreen> {
                 ],
               ),
               const Divider(),
+              /*
               TranslateText('Server REST URL:',
                   language: widget.settings.language),
               TextFormField(
@@ -111,6 +112,7 @@ class _SetupScreenState extends State<SetupScreen> {
                 height: 10,
                 color: Colors.black,
               ),
+              */
               TranslateText('Main server URL:',
                   language: widget.settings.language),
               TextFormField(

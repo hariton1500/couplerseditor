@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart' as ll;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Helpers/fibers.dart';
-import '../services/jsonbin_io.dart';
+//import '../services/jsonbin_io.dart';
 import 'cableend.dart';
 import 'settings.dart';
 
@@ -107,6 +107,7 @@ class Mufta {
     if (settings.altServer == '' ||
         settings.login == '' ||
         settings.password == '') {
+      /*
       JsonbinIO server = JsonbinIO(settings: settings);
       await server.loadBins();
       print('current bins = ${server.bins}');
@@ -123,7 +124,8 @@ class Mufta {
             type: 'fosc',
             binId: server.bins[binId]['id'],
             jsonString: json.encode(toJson()));
-      }
+      }*/
+      return false;
     } else {
       Server server = Server(settings: settings);
       String type = 'fosc';

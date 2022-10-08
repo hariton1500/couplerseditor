@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:coupolerseditor/Models/node.dart';
-import 'package:coupolerseditor/services/jsonbin_io.dart';
+//import 'package:coupolerseditor/services/jsonbin_io.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -148,6 +148,7 @@ class _NodesListState extends State<NodesList> {
     if (widget.settings.altServer == '' ||
         widget.settings.login == '' ||
         widget.settings.password == '') {
+      /*
       JsonbinIO server = JsonbinIO(settings: widget.settings);
       server.loadBins().then((_) async {
         List<MapEntry<String, dynamic>> nodeBinsList =
@@ -166,7 +167,7 @@ class _NodesListState extends State<NodesList> {
             });
           }
         }
-      });
+      });*/
     } else {
       Server server = Server(settings: widget.settings);
       server.list(type: 'node').then((value) {
@@ -205,7 +206,7 @@ class _NodesListState extends State<NodesList> {
 
   void removeFromServer({required String name}) async {
     print('removing: node with hash = $name');
-    JsonbinIO server = JsonbinIO(settings: widget.settings);
-    server.saveBin(id: '', hash: name, type: 'deleted by at ${DateTime.now()}');
+    // server = JsonbinIO(settings: widget.settings);
+    //server.saveBin(id: '', hash: name, type: 'deleted by at ${DateTime.now()}');
   }
 }

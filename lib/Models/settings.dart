@@ -7,10 +7,12 @@ class Settings {
   String baseUrl = '';
   String language = 'en';
   LatLng? baseLocation;
+  /*
   String binsMapId = '';
   String xMasterKey = '';
   String collectionId = '';
   String xAccessKey = '';
+  */
   String altServer = '';
   String login = '';
   String password = '';
@@ -21,10 +23,12 @@ class Settings {
     language = shared.getString('language') ?? 'en';
     baseLocation = LatLng.fromJson(json.decode(
         shared.getString('baseLocation') ?? '{"coordinates":[0.0,0.0]}'));
+    /*
     binsMapId = shared.getString('binsMapId') ?? '';
     xMasterKey = shared.getString('xMasterKey') ?? '';
     xAccessKey = shared.getString('xAccessKey') ?? '';
     collectionId = shared.getString('collectionId') ?? '';
+    */
     altServer = shared.getString('altServer') ?? '';
     login = shared.getString('login') ?? '';
     password = shared.getString('password') ?? '';
@@ -35,10 +39,12 @@ class Settings {
     shared.setString('baseUrl', baseUrl);
     shared.setString('language', language);
     shared.setString('baseLocation', json.encode(baseLocation?.toJson()));
+    /*
     shared.setString('binsMapId', binsMapId);
     shared.setString('xMasterKey', xMasterKey);
     shared.setString('xAccessKey', xAccessKey);
     shared.setString('collectionId', collectionId);
+    */
     shared.setString('altServer', altServer);
     shared.setString('login', login);
     shared.setString('password', password);

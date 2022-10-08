@@ -7,7 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../services/jsonbin_io.dart';
+//import '../services/jsonbin_io.dart';
 import '../services/server.dart';
 import 'settings.dart';
 
@@ -51,6 +51,7 @@ class Cable {
       if (settings.altServer == '' ||
           settings.login == '' ||
           settings.password == '') {
+        /*
         JsonbinIO server = JsonbinIO(settings: settings);
         await server.loadBins();
         print('current bins = ${server.bins}');
@@ -67,6 +68,8 @@ class Cable {
               binId: server.bins[binId]['id'],
               jsonString: json.encode(toJson()));
         }
+      */
+      return false;
       } else {
         Server server = Server(settings: settings);
         String type = 'cable';

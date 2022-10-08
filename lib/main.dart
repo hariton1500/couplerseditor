@@ -131,7 +131,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           .push(MaterialPageRoute<String>(
                         builder: (context) => CouplersList(
                           isFromBilling: true,
-                          lang: settings.language,
                           settings: settings,
                         ),
                       ))
@@ -157,7 +156,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           .push(MaterialPageRoute<String>(
                         builder: (context) => CouplersList(
                           isFromBilling: false,
-                          lang: settings.language,
                           settings: settings,
                         ),
                       ))

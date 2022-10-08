@@ -13,7 +13,7 @@ import '../Models/cable.dart';
 import '../Models/fosc.dart';
 import '../Models/node.dart';
 import '../Models/settings.dart';
-import '../services/jsonbin_io.dart';
+//import '../services/jsonbin_io.dart';
 import 'Nodes/node_page.dart';
 
 class ViewerScreen extends StatefulWidget {
@@ -281,6 +281,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
           .toList();
     } else {
       //couplers = [];
+      /*
       print(
           'loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
       JsonbinIO server = JsonbinIO(settings: widget.settings);
@@ -316,7 +317,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
             nodes.add(Node.fromJson(json.decode(data)));
           });
         }
-      }
+      }*/
     }
   }
 
@@ -351,6 +352,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
       }
     } else {
       //cables = [];
+      /*
       print(
           'loading list of stored cables from server URL = ${widget.settings.baseUrl}');
       JsonbinIO server = JsonbinIO(settings: widget.settings);
@@ -371,7 +373,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
             });
           }
         }
-      });
+      });*/
     }
   }
 }

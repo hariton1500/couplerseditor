@@ -13,17 +13,15 @@ import '../../Helpers/enums.dart';
 import '../../Helpers/epsg3395.dart';
 import '../../Helpers/strings.dart';
 import '../../Models/fosc.dart';
-import '../../services/jsonbin_io.dart';
+//import '../../services/jsonbin_io.dart';
 import '../Foscs/fosc_page.dart';
 
 class CouplersList extends StatefulWidget {
-  final String lang;
   final Settings settings;
   final bool isFromBilling;
 
   const CouplersList(
       {Key? key,
-      required this.lang,
       required this.settings,
       required this.isFromBilling})
       : super(key: key);
@@ -60,7 +58,7 @@ class _CouplersListState extends State<CouplersList> {
                 widget.isFromBilling
                     ? 'List of couplers from billing'
                     : 'List of couplers from device',
-                language: widget.lang,
+                language: widget.settings.language,
               ),
             ],
           ),
@@ -108,7 +106,7 @@ class _CouplersListState extends State<CouplersList> {
         body: Center(
           child: couplers.isEmpty
               ? TranslateText('List of couplers is Loading or Empty',
-                  language: widget.lang)
+                  language: widget.settings.language)
               : !showAsMap
                   ? ListView.builder(
                       itemCount: couplers.length,
@@ -124,17 +122,17 @@ class _CouplersListState extends State<CouplersList> {
                                 builder: (context) => AlertDialog(
                                   title: TranslateText(
                                     'Delete coupler',
-                                    language: widget.lang,
+                                    language: widget.settings.language,
                                   ),
                                   content: TranslateText(
                                     'Are you sure you want to delete coupler?',
-                                    language: widget.lang,
+                                    language: widget.settings.language,
                                   ),
                                   actions: [
                                     TextButton(
                                       child: TranslateText(
                                         'Cancel',
-                                        language: widget.lang,
+                                        language: widget.settings.language,
                                       ),
                                       onPressed: () {
                                         Navigator.of(context).pop();
@@ -143,7 +141,7 @@ class _CouplersListState extends State<CouplersList> {
                                     TextButton(
                                       child: TranslateText(
                                         'Delete',
-                                        language: widget.lang,
+                                        language: widget.settings.language,
                                       ),
                                       onPressed: () {
                                         Navigator.of(context).pop();
@@ -172,71 +170,31 @@ class _CouplersListState extends State<CouplersList> {
                               ),
                             ),
                             onPressed: () {
+                              //check
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(
+                                      builder: (context) => MuftaScreen(
+                                          mufta: Mufta.fromJson(jsonDecode(
+                                              couplers[index])),
+                                          callback: () {
+                                            setState(() {
+                                              couplers.clear();
+                                              widget.isFromBilling
+                                                  ? loadListFromBilling()
+                                                  : loadListFromDevice();
+                                            });
+                                          },
+                                          settings: widget.settings)));
+                              /*
                               setState(() {
                                 selectedCouplerIndex = index;
-                              });
+                              });*/
                             },
                           ),
                         );
                       },
                     )
-                  : map() /*FlutterMap(
-                      options: MapOptions(
-                          //crs: const Epsg3395(),
-                          controller: _mapController,
-                          center: LatLng(45.200834, 33.351089),
-                          zoom: 16.0,
-                          maxZoom: 18.0,
-                          onTap: (tapPos, latlng) {
-                            print(tapPos.relative.toString());
-                            setState(() {
-                              selectedCouplerIndex = null;
-                            });
-                          }),
-                      layers: [
-                        TileLayerOptions(
-                            urlTemplate:
-                                'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=ru-RU&scale=1&xss=1&yss=1&s=G5zdHJ1c3Q%3D&client=gme-google&style=api%3A1.0.0&key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'),
-                        /*
-                        TileLayerOptions(
-                          urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          subdomains: ['a', 'b', 'c'],
-                        ),
-                        */
-                        //TileLayerOptions(urlTemplate: 'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU'),
-                        MarkerLayerOptions(
-                          markers: couplers.map((e) {
-                            Map<String, dynamic> coupler = jsonDecode(e);
-                            return Marker(
-                              width: 80.0,
-                              height: 80.0,
-                              point: LatLng(
-                                  coupler['location']['coordinates'][1],
-                                  coupler['location']['coordinates'][0]),
-                              builder: (ctx) =>
-                                  selectedCouplerIndex != couplers.indexOf(e)
-                                      ? IconButton(
-                                          autofocus: true,
-                                          icon: const Icon(
-                                            Icons.location_on,
-                                            color: Colors.red,
-                                          ),
-                                          onPressed: () {
-                                            print(
-                                                'clicked on marker ${coupler['name']}');
-                                            setState(() {
-                                              selectedCouplerIndex =
-                                                  couplers.indexOf(e);
-                                            });
-                                          },
-                                        )
-                                      : Text(coupler['name']),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    )*/
-          ,
+                  : map(),
         ));
   }
 
@@ -284,13 +242,15 @@ class _CouplersListState extends State<CouplersList> {
           center: widget.settings.baseLocation,
           zoom: 16.0,
           maxZoom: 18.0,
+          /*
           onTap: (tapPos, latlng) {
             setState(() {
               selectedCouplerIndex = null;
             });
-            Navigator.of(context).pop(latlng);
+            //Navigator.of(context).pop(latlng);
             //markLocation(latlng);
-          }),
+          }*/
+      ),
       layers: [
         layerMap(),
         MarkerLayerOptions(
@@ -299,7 +259,21 @@ class _CouplersListState extends State<CouplersList> {
               .toList()
               .map((e) => Marker(
                   point: LatLng.fromJson(e['location']!),
-                  builder: (ctx) => const Icon(Icons.blinds_rounded)))
+                  builder: (ctx) => IconButton(onPressed: () {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(
+                            builder: (context) => MuftaScreen(
+                                mufta: Mufta.fromJson(e),
+                                callback: () {
+                                  setState(() {
+                                    couplers.clear();
+                                    widget.isFromBilling
+                                        ? loadListFromBilling()
+                                        : loadListFromDevice();
+                                  });
+                                },
+                                settings: widget.settings)));
+                  }, icon: const Icon(Icons.blinds_rounded))))
               .toList(),
         )
         //TileLayerOptions(urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", userAgentPackageName: 'com.example.app',),
@@ -317,6 +291,7 @@ class _CouplersListState extends State<CouplersList> {
         widget.settings.password == '') {
       print(
           'loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
+      /*
       JsonbinIO server = JsonbinIO(settings: widget.settings);
       server.loadBins().then((_) async {
         List<MapEntry<String, dynamic>> nodeBinsList =
@@ -335,16 +310,17 @@ class _CouplersListState extends State<CouplersList> {
             });
           }
         }
-      });
+      });*/
     } else {
       print('loading from altserver');
       Server server = Server(settings: widget.settings);
       server.list(type: 'fosc').then((value) {
         print('|$value|');
-        if (value != '')
+        if (value != '') {
           setState(() {
             couplers.addAll(value.split('\n'));
           });
+        }
       });
     }
   }
@@ -372,7 +348,7 @@ class _CouplersListState extends State<CouplersList> {
 
   void removeFromServer({required String name}) async {
     print('removing: node with hash = $name');
-    JsonbinIO server = JsonbinIO(settings: widget.settings);
-    server.saveBin(id: '', hash: name, type: 'deleted by at ${DateTime.now()}');
+    //JsonbinIO server = JsonbinIO(settings: widget.settings);
+    //server.saveBin(id: '', hash: name, type: 'deleted by at ${DateTime.now()}');
   }
 }

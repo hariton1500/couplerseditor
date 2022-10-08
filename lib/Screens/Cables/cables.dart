@@ -12,7 +12,7 @@ import '../../Models/cableend.dart';
 import '../../Models/fosc.dart';
 import '../../Models/node.dart';
 import '../../Models/settings.dart';
-import '../../services/jsonbin_io.dart';
+//import '../../services/jsonbin_io.dart';
 import '../../services/server.dart';
 import 'cableeditor.dart';
 
@@ -44,7 +44,7 @@ class _CableScreenState extends State<CableScreen> {
 
   final MapController _mapController = MapController();
 
-  LatLng? _currentPos;
+  //LatLng? _currentPos;
 
   @override
   void initState() {
@@ -444,6 +444,7 @@ class _CableScreenState extends State<CableScreen> {
       if (widget.settings.altServer == '' ||
           widget.settings.login == '' ||
           widget.settings.password == '') {
+        /*
         print(
             'loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
         JsonbinIO server = JsonbinIO(settings: widget.settings);
@@ -465,6 +466,7 @@ class _CableScreenState extends State<CableScreen> {
             }
           }
         });
+        */
       } else {
         print('loading from altserver');
         Server server = Server(settings: widget.settings);
@@ -494,6 +496,7 @@ class _CableScreenState extends State<CableScreen> {
       if (widget.settings.altServer == '' ||
           widget.settings.login == '' ||
           widget.settings.password == '') {
+        /*
         JsonbinIO server = JsonbinIO(settings: widget.settings);
         server.loadBins().then((_) async {
           List<MapEntry<String, dynamic>> nodeBinsList =
@@ -513,6 +516,7 @@ class _CableScreenState extends State<CableScreen> {
             }
           }
         });
+        */
       } else {
         Server server = Server(settings: widget.settings);
         server.list(type: 'node').then((value) {
@@ -588,6 +592,7 @@ class _CableScreenState extends State<CableScreen> {
           widget.settings.password == '') {
         print(
             'loading list of stored cables from server URL = ${widget.settings.baseUrl}');
+        /*
         JsonbinIO server = JsonbinIO(settings: widget.settings);
         server.loadBins().then((_) async {
           List<MapEntry<String, dynamic>> nodeBinsList =
@@ -606,7 +611,7 @@ class _CableScreenState extends State<CableScreen> {
               });
             }
           }
-        });
+        });*/
       } else {
         Server server = Server(settings: widget.settings);
         server.list(type: 'cable').then((value) {

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:coupolerseditor/Models/activedevice.dart';
 import 'package:coupolerseditor/Models/cableend.dart';
 import 'package:coupolerseditor/Models/settings.dart';
-import 'package:coupolerseditor/services/jsonbin_io.dart';
+//import 'package:coupolerseditor/services/jsonbin_io.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -84,6 +84,7 @@ class Node {
     if (settings.altServer == '' ||
         settings.login == '' ||
         settings.password == '') {
+      /*
       JsonbinIO server = JsonbinIO(settings: settings);
       await server.loadBins();
       print('current bins = ${server.bins}');
@@ -99,7 +100,8 @@ class Node {
             type: 'node',
             binId: server.bins[binId]['id'],
             jsonString: json.encode(toJson()));
-      }
+      }*/
+      return false;
     } else {
       Server server = Server(settings: settings);
       String type = 'node';
