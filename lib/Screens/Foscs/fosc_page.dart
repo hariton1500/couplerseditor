@@ -15,11 +15,11 @@ class MuftaScreen extends StatefulWidget {
   const MuftaScreen(
       {Key? key,
       required this.mufta,
-      required this.callback,
+      //required this.callback,
       required this.settings})
       : super(key: key);
   final Mufta mufta;
-  final Function callback;
+  //final Function callback;
   final Settings settings;
 
   @override
@@ -689,7 +689,7 @@ class MuftaScreenState extends State<MuftaScreen> {
                 children: [
                   TextButton.icon(
                       onPressed: () {
-                        widget.callback();
+                        //widget.callback();
                         Navigator.of(context).pop();
                       },
                       icon: const Icon(Icons.arrow_back_outlined),

@@ -82,6 +82,7 @@ class _CouplersListState extends State<CouplersList> {
                               builder: (context) => MuftaScreen(
                                   mufta: Mufta.fromJson(jsonDecode(
                                       couplers[selectedCouplerIndex!])),
+                                  /*
                                   callback: () {
                                     setState(() {
                                       couplers.clear();
@@ -89,7 +90,7 @@ class _CouplersListState extends State<CouplersList> {
                                           ? loadListFromBilling()
                                           : loadListFromDevice();
                                     });
-                                  },
+                                  },*/
                                   settings: widget.settings)))
                           .then((value) {});
                       //Navigator.of(context).pop(couplers[selectedCouplerIndex!]);
@@ -176,6 +177,7 @@ class _CouplersListState extends State<CouplersList> {
                                       builder: (context) => MuftaScreen(
                                           mufta: Mufta.fromJson(jsonDecode(
                                               couplers[index])),
+                                          /*
                                           callback: () {
                                             setState(() {
                                               couplers.clear();
@@ -183,7 +185,7 @@ class _CouplersListState extends State<CouplersList> {
                                                   ? loadListFromBilling()
                                                   : loadListFromDevice();
                                             });
-                                          },
+                                          },*/
                                           settings: widget.settings)));
                               /*
                               setState(() {
@@ -264,6 +266,7 @@ class _CouplersListState extends State<CouplersList> {
                         .push(MaterialPageRoute(
                             builder: (context) => MuftaScreen(
                                 mufta: Mufta.fromJson(e),
+                                /*
                                 callback: () {
                                   setState(() {
                                     couplers.clear();
@@ -271,7 +274,7 @@ class _CouplersListState extends State<CouplersList> {
                                         ? loadListFromBilling()
                                         : loadListFromDevice();
                                   });
-                                },
+                                },*/
                                 settings: widget.settings)));
                   }, icon: const Icon(Icons.blinds_rounded))))
               .toList(),

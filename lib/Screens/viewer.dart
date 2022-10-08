@@ -68,7 +68,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
                   onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => MuftaScreen(
                           mufta: couplers[selectedCouplerIndex],
-                          callback: () {},
+                          //callback: () {},
                           settings: widget.settings))),
                   icon: const Icon(Icons.task_alt_outlined))
               : Container(),

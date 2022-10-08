@@ -110,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => MuftaScreen(
                         mufta: mufta,
-                        callback: () => setState(() {}),
+                        //callback: () => setState(() {}),
                         settings: settings)));
                 /*
                       setState(() {
@@ -141,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => MuftaScreen(
                                     mufta: mufta,
-                                    callback: () => setState(() {}),
+                                    //callback: () => setState(() {}),
                                     settings: settings)));
                           }
                         });
