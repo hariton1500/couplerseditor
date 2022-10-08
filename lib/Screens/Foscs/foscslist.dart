@@ -149,11 +149,8 @@ class _CouplersListState extends State<CouplersList> {
                                         setState(() {
                                           widget.isFromBilling
                                               ? removeFromServer(
-                                                  name: Mufta.fromJson(coupler)
-                                                      .signature()
-                                                      .hashCode
-                                                      .toString())
-                                              : removeCoupler(coupler['name']);
+                                                  name: coupler['key'])
+                                              : removeCoupler(coupler['key']);
                                           couplers.removeAt(index);
                                         });
                                       },
@@ -351,7 +348,8 @@ class _CouplersListState extends State<CouplersList> {
 
   void removeFromServer({required String name}) async {
     print('removing: node with hash = $name');
-    //JsonbinIO server = JsonbinIO(settings: widget.settings);
+    Server server = Server(settings: widget.settings);
+    server.remove(type: 'fosc', key: name);
     //server.saveBin(id: '', hash: name, type: 'deleted by at ${DateTime.now()}');
   }
 }
