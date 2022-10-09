@@ -86,7 +86,7 @@ class _CableEditorState extends State<CableEditor> {
               subdomains: ['a', 'b', 'c'],
             ),
             PolylineLayerOptions(
-              polylines: widget.cable.polylines(),
+              polylines: widget.cable.polylines(color: Colors.green),
             ),
             MarkerLayerOptions(
                 markers:

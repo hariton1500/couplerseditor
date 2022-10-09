@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:coupolerseditor/Helpers/enums.dart';
+import 'package:coupolerseditor/Helpers/epsg3395.dart';
+import 'package:coupolerseditor/Helpers/map.dart';
 import 'package:coupolerseditor/Screens/Foscs/fosc_page.dart';
 import 'package:coupolerseditor/services/server.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +41,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
   int selectedCouplerIndex = -1;
   int selectedNodeIndex = -1;
   final MapController _mapController = MapController();
+  MapSource mapSource = MapSource.openstreet;
 
   @override
   void initState() {
@@ -101,105 +105,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
         ],
       ),
       body: isViewOnMap
-          ? FlutterMap(
-              options: MapOptions(
-                  //crs: const Epsg3395(),
-                  controller: _mapController,
-                  center: LatLng(45.200834, 33.351089),
-                  zoom: 16.0,
-                  maxZoom: 18.0,
-                  onTap: (tapPos, latlng) {
-                    print(latlng);
-                    setState(() {
-                      selectedCouplerIndex = selectedFOSC(latlng);
-                      selectedNodeIndex = selectedNode(latlng);
-                    });
-                  }),
-              layers: [
-                /*
-                TileLayerOptions(
-                    urlTemplate:
-                        'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=ru-RU&scale=1&xss=1&yss=1&s=G5zdHJ1c3Q%3D&client=gme-google&style=api%3A1.0.0&key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'),
-                */
-                TileLayerOptions(
-                  urlTemplate:
-                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  subdomains: ['a', 'b', 'c'],
-                ),
-                //TileLayerOptions(urlTemplate: 'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU'),
-                MarkerLayerOptions(
-                  markers: couplers.map((coupler) {
-                    return Marker(
-                      width: MediaQuery.of(context).size.width,
-                      height: 80.0,
-                      point: coupler.location!,
-                      builder: (ctx) => Stack(
-                        alignment: AlignmentDirectional.center,
-                        children: [
-                          const Icon(
-                            Icons.blinds_rounded,
-                            color: Colors.red,
-                          ),
-                          Positioned(
-                              bottom: 10,
-                              child: Text(coupler.name,
-                                  softWrap: true,
-                                  maxLines: 2,
-                                  textScaleFactor: 0.7,
-                                  style: TextStyle(
-                                      color: couplers.indexOf(coupler) ==
-                                              selectedCouplerIndex
-                                          ? Colors.red
-                                          : Colors.black)))
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-                MarkerLayerOptions(
-                  markers: nodes.map((node) {
-                    return Marker(
-                      width: MediaQuery.of(context).size.width,
-                      height: 80.0,
-                      point: node.location!,
-                      builder: (ctx) => Stack(
-                          alignment: AlignmentDirectional.center,
-                          children: [
-                            const Icon(
-                              Icons.api_outlined,
-                              color: Colors.red,
-                            ),
-                            Positioned(
-                                bottom: 10,
-                                child: Text(
-                                  node.address,
-                                  softWrap: true,
-                                  maxLines: 2,
-                                  textScaleFactor: 0.7,
-                                  style: TextStyle(
-                                      color: nodes.indexOf(node) ==
-                                              selectedNodeIndex
-                                          ? Colors.red
-                                          : Colors.black),
-                                ))
-                          ]),
-                    );
-                  }).toList(),
-                ),
-                PolylineLayerOptions(
-                  polylines: cables.map((cable) {
-                    return Polyline(
-                      points: [
-                        cable.end1!.location ?? LatLng(0, 0),
-                        cable.end2!.location ?? LatLng(0, 0)
-                      ],
-                      strokeWidth: 3.0,
-                      color: Colors.green,
-                    );
-                  }).toList(),
-                ),
-              ],
-            )
+          ? map()
           : SingleChildScrollView(
               child: Column(
                 children: [
@@ -258,6 +164,97 @@ class _ViewerScreenState extends State<ViewerScreen> {
     );
   }
 
+  Widget map() {
+    return FlutterMap(
+      nonRotatedChildren: [
+        Container(
+          color: Colors.white,
+          child: Row(
+            children: MapSource.values.map((source) => TextButton(onPressed: () => setState(() {mapSource = source;}), child: Text(source.name))).toList(),
+          ),
+        )
+      ],
+      options: MapOptions(
+          crs: mapSource == MapSource.yandex ? const Epsg3395() : const Epsg3857(),
+          controller: _mapController,
+          center: LatLng(45.200834, 33.351089),
+          zoom: 16.0,
+          maxZoom: 18.0,
+          onTap: (tapPos, latlng) {
+            print(latlng);
+            setState(() {
+              selectedCouplerIndex = selectedFOSC(latlng);
+              selectedNodeIndex = selectedNode(latlng);
+            });
+          }),
+      layers: [
+        layerMap(mapSource),
+        MarkerLayerOptions(
+          markers: couplers.map((coupler) {
+            return Marker(
+              width: MediaQuery.of(context).size.width,
+              height: 80.0,
+              point: coupler.location!,
+              builder: (ctx) => Stack(
+                alignment: AlignmentDirectional.center,
+                children: [
+                  const Icon(
+                    Icons.blinds_rounded,
+                    color: Colors.red,
+                  ),
+                  Positioned(
+                      bottom: 10,
+                      child: Text(coupler.name,
+                          softWrap: true,
+                          maxLines: 2,
+                          textScaleFactor: 0.7,
+                          style: TextStyle(
+                              color: couplers.indexOf(coupler) ==
+                                      selectedCouplerIndex
+                                  ? Colors.red
+                                  : Colors.black)))
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+        MarkerLayerOptions(
+          markers: nodes.map((node) {
+            return Marker(
+              width: MediaQuery.of(context).size.width,
+              height: 80.0,
+              point: node.location!,
+              builder: (ctx) => Stack(
+                  alignment: AlignmentDirectional.center,
+                  children: [
+                    const Icon(
+                      Icons.api_outlined,
+                      color: Colors.red,
+                    ),
+                    Positioned(
+                        bottom: 10,
+                        child: Text(
+                          node.address,
+                          softWrap: true,
+                          maxLines: 2,
+                          textScaleFactor: 0.7,
+                          style: TextStyle(
+                              color: nodes.indexOf(node) ==
+                                      selectedNodeIndex
+                                  ? Colors.red
+                                  : Colors.black),
+                        ))
+                  ]),
+            );
+          }).toList(),
+        ),
+        ...cables.map((cable) => PolylineLayerOptions(
+          polylines: cable.polylines(color: Colors.green, strokeWidth: log(cable.end1!.fibersNumber.toDouble()))
+        )).toList(),
+      ],
+    );
+  }
+
   Future<void> _loadCouplersAndNodes({required bool isSourceLocal}) async {
     if (isSourceLocal) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -296,20 +293,6 @@ class _ViewerScreenState extends State<ViewerScreen> {
     }
   }
 
-  bool isTapedOnIt(LatLng a, b) {
-    return pow(a.latitude - b.latitude, 2) +
-            pow(a.longitude - b.longitude, 2) <=
-        0.00000001;
-  }
-
-  int selectedFOSC(LatLng latLng) {
-    return couplers.indexWhere((fosc) => isTapedOnIt(fosc.location!, latLng));
-  }
-
-  int selectedNode(LatLng latLng) {
-    return nodes.indexWhere((node) => isTapedOnIt(node.location!, latLng));
-  }
-
   Future<void> _loadCables({required bool isSourceLocal}) async {
     if (isSourceLocal) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -326,29 +309,29 @@ class _ViewerScreenState extends State<ViewerScreen> {
         print(e);
       }
     } else {
-      //cables = [];
-      /*
-      print(
-          'loading list of stored cables from server URL = ${widget.settings.baseUrl}');
-      JsonbinIO server = JsonbinIO(settings: widget.settings);
-      server.loadBins().then((_) async {
-        List<MapEntry<String, dynamic>> nodeBinsList =
-            server.bins.entries.where((element) {
-          Map<String, dynamic> data = (element.value is Map)
-              ? element.value
-              : {'id': element.value, 'type': 'unknown'};
-          return data['type'] == 'cable';
-        }).toList();
-        print('nodeBinsList = $nodeBinsList');
-        for (var bin in nodeBinsList) {
-          String data = await server.loadDataFromBin(binId: bin.value['id']);
-          if (data != '') {
-            setState(() {
-              cables.add(Cable.fromJson(json.decode(data)));
-            });
-          }
+      Server server = Server(settings: widget.settings);
+      server.list(type: 'cable').then((value) {
+        if (value != '') {
+          setState(() {
+            cables.addAll(value.split('\n').map((e) => Cable.fromJson(json.decode(e))));
+          });
         }
-      });*/
+      });
     }
   }
+
+  bool isTapedOnIt(LatLng a, b) {
+    return pow(a.latitude - b.latitude, 2) +
+            pow(a.longitude - b.longitude, 2) <=
+        0.00000001;
+  }
+
+  int selectedFOSC(LatLng latLng) {
+    return couplers.indexWhere((fosc) => isTapedOnIt(fosc.location!, latLng));
+  }
+
+  int selectedNode(LatLng latLng) {
+    return nodes.indexWhere((node) => isTapedOnIt(node.location!, latLng));
+  }
 }
+

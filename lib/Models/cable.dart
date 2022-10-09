@@ -101,7 +101,7 @@ class Cable {
     }
   }
 
-  List<Polyline> polylines() {
+  List<Polyline> polylines({required MaterialColor color, double? strokeWidth}) {
     /*
     List<LatLng> list = [];
     list.add(end1!.location!);
@@ -111,8 +111,8 @@ class Cable {
     return [
       Polyline(
           points: [end1!.location!, ...points, end2!.location!],
-          strokeWidth: 2,
-          color: Colors.red)
+          strokeWidth: strokeWidth ?? 2,
+          color: color)
     ];
   }
 }
