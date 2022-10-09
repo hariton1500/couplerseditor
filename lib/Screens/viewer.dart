@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:coupolerseditor/Screens/Foscs/fosc_page.dart';
+import 'package:coupolerseditor/services/server.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -57,8 +58,6 @@ class _ViewerScreenState extends State<ViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(selectedCouplerIndex);
-    print(selectedNodeIndex);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Viewer'),
@@ -84,7 +83,6 @@ class _ViewerScreenState extends State<ViewerScreen> {
               ? IconButton(
                   onPressed: () {
                     getLocation().then((location) {
-                      //print(location);
                       _mapController.move(location!, 16);
                     });
                   },
@@ -280,44 +278,21 @@ class _ViewerScreenState extends State<ViewerScreen> {
               Node.fromJson(jsonDecode(prefs.getString(element) ?? '')))
           .toList();
     } else {
-      //couplers = [];
-      /*
-      print(
-          'loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
-      JsonbinIO server = JsonbinIO(settings: widget.settings);
-      await server.loadBins();
-      List<MapEntry<String, dynamic>> foscBinsList =
-          server.bins.entries.where((element) {
-        Map<String, dynamic> data = (element.value is Map)
-            ? element.value
-            : {'id': element.value, 'type': 'unknown'};
-        return data['type'] == 'fosc';
-      }).toList();
-      print('foscBinsList = $foscBinsList');
-      for (var bin in foscBinsList) {
-        String data = await server.loadDataFromBin(binId: bin.value['id']);
-        if (data != '') {
+      Server server = Server(settings: widget.settings);
+      server.list(type: 'node').then((value) {
+        if (value != '') {
           setState(() {
-            couplers.add(Mufta.fromJson(json.decode(data)));
+            nodes.addAll(value.split('\n').map((e) => Node.fromJson(json.decode(e))));
           });
         }
-      }
-      List<MapEntry<String, dynamic>> nodeBinsList =
-          server.bins.entries.where((element) {
-        Map<String, dynamic> data = (element.value is Map)
-            ? element.value
-            : {'id': element.value, 'type': 'unknown'};
-        return data['type'] == 'node';
-      }).toList();
-      print('nodeBinsList = $nodeBinsList');
-      for (var bin in nodeBinsList) {
-        String data = await server.loadDataFromBin(binId: bin.value['id']);
-        if (data != '') {
+      });
+      server.list(type: 'fosc').then((value) {
+        if (value != '') {
           setState(() {
-            nodes.add(Node.fromJson(json.decode(data)));
+            couplers.addAll(value.split('\n').map((e) => Mufta.fromJson(json.decode(e))));
           });
         }
-      }*/
+      });
     }
   }
 

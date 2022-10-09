@@ -5,10 +5,8 @@ import 'package:latlong2/latlong.dart';
 
 import '../Helpers/enums.dart';
 import '../Helpers/epsg3395.dart';
+import '../Helpers/map.dart';
 import '../services/location.dart';
-//import '../Helpers/epsg3395.dart';
-
-//import 'package:latlong/latlong.dart';
 
 class LocationPicker extends StatefulWidget {
   const LocationPicker({Key? key, required this.startLocation})
@@ -72,29 +70,6 @@ class _LocationPickerState extends State<LocationPicker> {
         .toList();
   }
 
-  LayerOptions layerMap() {
-    switch (mapSource) {
-      case MapSource.google:
-        return TileLayerOptions(
-            urlTemplate:
-                'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=ru-RU&scale=1&xss=1&yss=1&s=G5zdHJ1c3Q%3D&client=gme-google&style=api%3A1.0.0&key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY');
-      case MapSource.openstreet:
-        return TileLayerOptions(
-          urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-          userAgentPackageName: 'com.example.app',
-        );
-      case MapSource.yandex:
-        return TileLayerOptions(
-            urlTemplate:
-                'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU');
-      default:
-        return TileLayerOptions(
-          urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-          userAgentPackageName: 'com.example.app',
-        );
-    }
-  }
-
   Widget map() {
     return FlutterMap(
       options: MapOptions(
@@ -109,8 +84,6 @@ class _LocationPickerState extends State<LocationPicker> {
             setState(() {
               _markers.clear();
               _markers.add(Marker(
-                //width: 80.0,
-                //height: 80.0,
                 point: latlng,
                 builder: (ctx) => const Icon(
                   Icons.control_point_outlined,
@@ -123,7 +96,7 @@ class _LocationPickerState extends State<LocationPicker> {
             //markLocation(latlng);
           }),
       layers: [
-        layerMap(),
+        layerMap(mapSource),
         MarkerLayerOptions(markers: _markers),
         //TileLayerOptions(urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", userAgentPackageName: 'com.example.app',),
         //TileLayerOptions(urlTemplate: 'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU'),
