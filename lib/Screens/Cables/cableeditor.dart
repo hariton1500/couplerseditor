@@ -37,7 +37,13 @@ class _CableEditorState extends State<CableEditor> {
                 language: widget.settings.language,
                 size: 16,
               ),
-              Text(widget.cable.distance().toString(), style: const TextStyle(color: Colors.black),),
+              Text((){
+                if (widget.cable.distance() < 1) {
+                  return '${(widget.cable.distance() * 1000).round()} m';
+                } else {
+                  return '${widget.cable.distance().toStringAsFixed(3)} km';
+                }
+              }(), style: const TextStyle(color: Colors.black),),
             ],
           ),
           actions: [

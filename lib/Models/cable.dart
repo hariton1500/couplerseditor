@@ -49,7 +49,7 @@ class Cable {
     //LatLng p1 = end1!.location!;
     List<LatLng> cable = [end1!.location!,...points,end2!.location!];
     for (var i = 1; i < cable.length; i++) {
-      d += calculateDistance(points[i - 1], points[i]);
+      d += calculateDistance(cable[i - 1], cable[i]);
       //p1 = points[i];
     }
     return d;
