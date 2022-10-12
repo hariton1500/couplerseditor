@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
+import 'package:coupolerseditor/Helpers/map.dart';
 import 'package:coupolerseditor/Models/cableend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -41,6 +42,17 @@ class Cable {
   @override
   String toString() {
     return 'key: $key; ${end1!.direction} <=> ${end2!.direction}';
+  }
+
+  double distance() {
+    double d = 0;
+    //LatLng p1 = end1!.location!;
+    List<LatLng> cable = [end1!.location!,...points,end2!.location!];
+    for (var i = 1; i < cable.length; i++) {
+      d += calculateDistance(points[i - 1], points[i]);
+      //p1 = points[i];
+    }
+    return d;
   }
 
   Future<bool> saveCable(bool isFromServer) async {

@@ -37,7 +37,7 @@ class _CableEditorState extends State<CableEditor> {
                 language: widget.settings.language,
                 size: 16,
               ),
-              Text(widget.cable.toString()),
+              Text(widget.cable.distance().toString(), style: const TextStyle(color: Colors.black),),
             ],
           ),
           actions: [
