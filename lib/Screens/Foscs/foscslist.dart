@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Helpers/enums.dart';
 import '../../Helpers/epsg3395.dart';
+import '../../Helpers/map.dart';
 import '../../Helpers/strings.dart';
 import '../../Models/fosc.dart';
 //import '../../services/jsonbin_io.dart';
@@ -197,29 +198,6 @@ class _CouplersListState extends State<CouplersList> {
         ));
   }
 
-  LayerOptions layerMap() {
-    switch (mapSource) {
-      case MapSource.google:
-        return TileLayerOptions(
-            urlTemplate:
-                'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=ru-RU&scale=1&xss=1&yss=1&s=G5zdHJ1c3Q%3D&client=gme-google&style=api%3A1.0.0&key=AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY');
-      case MapSource.openstreet:
-        return TileLayerOptions(
-          urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-          userAgentPackageName: 'com.example.app',
-        );
-      case MapSource.yandex:
-        return TileLayerOptions(
-            urlTemplate:
-                'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU');
-      default:
-        return TileLayerOptions(
-          urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-          userAgentPackageName: 'com.example.app',
-        );
-    }
-  }
-
   List<Widget> listActions() {
     return MapSource.values
         .map((e) => TextButton(
@@ -234,7 +212,7 @@ class _CouplersListState extends State<CouplersList> {
   Widget map() {
     return FlutterMap(
       options: MapOptions(
-          crs: mapSource == MapSource.yandex
+          crs: mapSource == MapSource.yandexsat
               ? const Epsg3395()
               : const Epsg3857(),
           controller: _mapController,
@@ -251,7 +229,7 @@ class _CouplersListState extends State<CouplersList> {
           }*/
       ),
       layers: [
-        layerMap(),
+        layerMap(mapSource),
         MarkerLayerOptions(
           markers: couplers
               .map((foscEncoded) => json.decode(foscEncoded))

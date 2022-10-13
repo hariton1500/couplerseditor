@@ -73,9 +73,7 @@ class _LocationPickerState extends State<LocationPicker> {
   Widget map() {
     return FlutterMap(
       options: MapOptions(
-          crs: mapSource == MapSource.yandex
-              ? const Epsg3395()
-              : const Epsg3857(),
+          //crs: mapSource == MapSource.yandexsat ? const Epsg3395() : const Epsg3857(),
           controller: _mapController,
           center: widget.startLocation,
           zoom: 16.0,

@@ -1,1 +1,1 @@
-enum MapSource { openstreet, google, yandex }
+enum MapSource { openstreet, google, yandexsat, yandexmap }

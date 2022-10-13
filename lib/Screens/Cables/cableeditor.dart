@@ -149,8 +149,7 @@ class _CableEditorState extends State<CableEditor> {
       nonRotatedChildren: [Row(children: listActions())],
       options: MapOptions(
         //controller: _mapController,
-        crs:
-            mapSource == MapSource.yandex ? const Epsg3395() : const Epsg3857(),
+        crs: mapSource == MapSource.yandexsat ? const Epsg3395() : const Epsg3857(),
         center: widget.cable.end1?.location,
         zoom: 16,
         maxZoom: 18,
