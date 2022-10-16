@@ -5,6 +5,14 @@ Map<String, Map<String, String>> strings = {
     'en': 'Empty',
     'ru': 'Пусто'
   },
+  'Empty or loading...': {
+    'en': 'Empty or loading...',
+    'ru': 'Список пуст или загружается...',
+  },
+  'Nodes are loading... or Empty': {
+    'en': 'Nodes are loading... or Empty',
+    'ru': 'Список узлов загружается... Либо пуст'
+  },
   'Node name:': {
     'en': 'Node name:',
     'ru': 'Название узла:'
@@ -121,6 +129,22 @@ Map<String, Map<String, String>> strings = {
     'en': 'Language:',
     'ru': 'Язык:',
   },
+  'Main server URL:': {
+    'en': 'Main server URL:',
+    'ru': 'URL основного сервера:',
+  },
+  'Login:': {
+    'en': 'Login:',
+    'ru': 'Логин:',
+  },
+  'Password:': {
+    'en': 'Password:',
+    'ru': 'Пароль:'
+  },
+  'Set base location': {
+    'en': 'Set base location',
+    'ru': 'Установить начальную геопозицию',
+  },
   'Load list of couplers URL:': {
     'en': 'Load list of couplers URL:',
     'ru': 'URL для загрузки списка муфт:',
@@ -193,6 +217,46 @@ Map<String, Map<String, String>> strings = {
     'ru': 'Создать/редактировать узел'
   },
   'Nodes:': {'en': 'Nodes:', 'ru': 'Узлы:'},
+  'Add cable ending': {
+    'en': 'Add cable ending',
+    'ru': 'Добавить окончание кабеля',
+  },
+  'Add equipment': {
+    'en': 'Add equipment',
+    'ru': 'Добавить оборудование',
+  },
+  'Delete equipment': {
+    'en': 'Delete equipment',
+    'ru': 'Удалить оборудование',
+  },
+  'Edit/View comments': {
+    'en': 'Edit/View comments',
+    'ru': 'Редактировать/просмотреть примечания',
+  },
+  'Model': {
+    'en': 'Model',
+    'ru': 'Модель',
+  },
+  'IP address': {
+    'en': 'IP address',
+    'ru': 'IP адрес',
+  },
+  'Ports': {
+    'en': 'Ports',
+    'ru': 'Портов',
+  },
+  'Cables': {
+    'en': 'Cables',
+    'ru': 'Кабеля',
+  },
+  'New cable:': {
+    'en': 'New cables:',
+    'ru': 'Новые кабеля:',
+  },
+  'Stored cables:': {
+    'en': 'Stored cables:',
+    'ru': 'Сохраненные кабеля:',
+  },
   'Create/edit cable from Server': {
     'en': 'Create/edit cable from Server',
     'ru': 'Создать/редактировать кабель на Сервер'
@@ -200,6 +264,10 @@ Map<String, Map<String, String>> strings = {
   'Create/edit cable from Local device': {
     'en': 'Create/edit cable from Local device',
     'ru': 'Создать/редактировать кабель на устройстве'
+  },
+  'Create/edit cable on billing (json)': {
+    'en': 'Create/edit cable on billing (json)',
+    'ru': 'Создать/редактировать в биллинге (json)'
   },
   'FOSCs:': {'en': 'FOSCs:', 'ru': 'Муфты:'},
   'Cables:': {'en': 'Cables:', 'ru': 'Кабеля:'},
