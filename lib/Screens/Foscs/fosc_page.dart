@@ -32,6 +32,7 @@ class MuftaScreenState extends State<MuftaScreen> {
   bool isShowAddConnections = false;
   Settings settings = Settings();
   bool isNetworkProcess = false;
+  bool isEditingAddress = false;
 
   @override
   void initState() {
@@ -57,71 +58,75 @@ class MuftaScreenState extends State<MuftaScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: TranslateText('Coupler name:',
-                    language: widget.settings.language),
-              ),
-              TextButton(
-                  onPressed: () {
-                    showDialog<String>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          String name = widget.mufta.name;
-                          return AlertDialog(
-                            title: TranslateText('Name editing',
-                                language: widget.settings.language),
-                            content: TextField(
-                              controller: TextEditingController(text: name),
-                              onChanged: (text) => name = text,
-                            ),
-                            actions: [
-                              OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context, name);
-                                  },
-                                  child: TranslateText('Ok',
-                                      language: widget.settings.language))
-                            ],
-                          );
-                        }).then((value) {
-                      setState(() {
-                        widget.mufta.name = value ?? '';
-                      });
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 5,
+                children: [
+                  TextButton.icon(onPressed: () {
+                    setState(() {
+                      isEditingAddress = true;
                     });
-                  },
-                  child: Text(
-                    widget.mufta.name == '' ? 'NoName' : widget.mufta.name,
-                    //softWrap: true,
-                    //maxLines: 2,
-                  )),
-              //location picker
-              TextButton(
-                  onPressed: () => Navigator.of(context)
-                      .push<ll.LatLng?>(MaterialPageRoute(
-                          builder: (context) => LocationPicker(
-                              startLocation: widget.mufta.location ??
-                                  settings.baseLocation ??
-                                  zeroLocation)))
-                      .then((location) => setState(() {
-                            widget.mufta.location = location ??
-                                settings.baseLocation ??
-                                zeroLocation;
-                          })),
-                  child: Wrap(children: [
-                    TranslateText(
-                      'Location:',
+                  }, icon: const Icon(Icons.edit), label: TranslateText('Coupler name:', language: widget.settings.language)),
+                  Text(widget.mufta.name, style: const TextStyle(fontSize: 10),)
+                ],
+              ),
+              isEditingAddress
+                  ? Wrap(
+                    children: [
+                      TextField(
+                        autofocus: true,
+                        controller: TextEditingController(text: widget.mufta.name),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          widget.mufta.name = value;
+                          //isEdititingAddress = false;
+                        },
+                        onSubmitted: (value) => setState(() {
+                          widget.mufta.name = value;
+                          isEditingAddress = false;
+                        }),
+                        onEditingComplete: () => setState(() {
+                          isEditingAddress = false;
+                        }),
+                      ),
+                      IconButton(onPressed: () {
+                        setState(() {
+                          isEditingAddress = false;
+                        });
+                      }, icon: const Icon(Icons.done))
+                    ],
+                  )
+                  : Container(),
+              TextButton.icon(
+                icon: const Icon(Icons.edit),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LocationPicker(
+                  startLocation: widget.mufta.location ??
+                      widget.settings.baseLocation ??
+                      ll.LatLng(0, 0),
+                ))).then((value) => setState(() {
+                  widget.mufta.location = value ??
+                      widget.mufta.location ??
+                      widget.settings.baseLocation ??
+                      ll.LatLng(0, 0);
+                })),
+                label: Wrap(
+                children: [
+                  TranslateText(
+                    'Location:',
                       language: widget.settings.language,
                     ),
                     Text(
                         (widget.mufta.location != null
                             ? widget.mufta.location!
-                                .toJson()['coordinates']
-                                .toString()
+                            .toJson()['coordinates']
+                            .toString()
                             : ''),
                         style: const TextStyle(fontSize: 10)),
-                  ])),
-              //end Lockation Picker
+                ],
+              )),
+              const Divider(),
               GestureDetector(
                 onTapDown: (details) {
                   int index = widget.mufta.cableEnds.indexWhere((cable) {
