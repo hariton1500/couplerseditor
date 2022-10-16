@@ -457,7 +457,7 @@ class _NodesScreenState extends State<NodesScreen> {
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.arrow_back_outlined),
-            label: TranslateText('back', language: widget.settings.language),
+            label: TranslateText('Back', language: widget.settings.language),
           ),
         ])),
       ),

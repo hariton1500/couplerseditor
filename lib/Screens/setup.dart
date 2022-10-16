@@ -29,7 +29,7 @@ class _SetupScreenState extends State<SetupScreen> {
       appBar: AppBar(
         title: TranslateText(
           'Settings',
-          language: lang,
+          language: widget.settings.language,
           size: 16,
         ),
         actions: [
@@ -145,7 +145,7 @@ class _SetupScreenState extends State<SetupScreen> {
                             });
                           }),
                       icon: const Icon(Icons.location_on_outlined),
-                      label: TranslateText('Set base location')),
+                      label: TranslateText('Set base location', language: widget.settings.language)),
                   widget.settings.baseLocation != null
                       ? Text(
                           '[${widget.settings.baseLocation?.latitude}, ${widget.settings.baseLocation?.longitude}]')
