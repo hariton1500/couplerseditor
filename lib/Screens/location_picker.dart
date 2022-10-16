@@ -21,16 +21,21 @@ class _LocationPickerState extends State<LocationPicker> {
   final MapController _mapController = MapController();
   final List<Marker> _markers = [];
 
-  MapSource mapSource = MapSource.openstreet;
+  MapSource mapSource = MapSource.yandexmap;
 
   LatLng? location;
 
   @override
+  void initState() {
+    location = widget.startLocation;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print('run Location Picker with start location: ${widget.startLocation}');
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.startLocation.toString()),
+        title: Text('${location?.longitude.toStringAsFixed(6)}, ${location?.latitude.toStringAsFixed(6)}', style: const TextStyle(color: Colors.black, fontSize: 12),),
         actions: [
           IconButton(
               onPressed: () => Navigator.of(context).pop(location),
@@ -72,9 +77,12 @@ class _LocationPickerState extends State<LocationPicker> {
 
   Widget map() {
     return FlutterMap(
+      mapController: _mapController,
       options: MapOptions(
-          //crs: mapSource == MapSource.yandexsat ? const Epsg3395() : const Epsg3857(),
-          controller: _mapController,
+          onPositionChanged: ((position, hasGesture) {
+            if (hasGesture) setState(() {location = position.center;});
+          }),
+          crs: mapSource == MapSource.yandexsat ? const Epsg3395() : const Epsg3857(),
           center: widget.startLocation,
           zoom: 16.0,
           maxZoom: 18.0,
@@ -96,12 +104,12 @@ class _LocationPickerState extends State<LocationPicker> {
       layers: [
         layerMap(mapSource),
         MarkerLayerOptions(markers: _markers),
+        MarkerLayerOptions(markers: [Marker(point: location ?? widget.startLocation, builder: (context) => const Icon(Icons.center_focus_weak))])
         //TileLayerOptions(urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", userAgentPackageName: 'com.example.app',),
         //TileLayerOptions(urlTemplate: 'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU'),
         //TileLayerOptions(urlTemplate: 'https://tiles.api-maps.yandex.ru/v1/tiles/?l=map&scale=1.0&x={x}&y={y}&z={z}&lang=ru_RU&apikey='),
         //TileLayerOptions(urlTemplate: 'http://vec{s}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=1.0&lang=ru_RU', subdomains: ['01', '02', '03', '04'], backgroundColor: Colors.transparent),
       ],
-      mapController: _mapController,
     );
   }
 }

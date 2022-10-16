@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 
 Map<String, Map<String, String>> strings = {
+  'Empty': {
+    'en': 'Empty',
+    'ru': 'Пусто'
+  },
+  'Node name:': {
+    'en': 'Node name:',
+    'ru': 'Название узла:'
+  },
   'Adding of cable': {
     'en': 'Adding of cable',
     'ru': 'Добавление кабеля',

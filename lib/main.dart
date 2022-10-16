@@ -56,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> localStored = [];
   String selectedName = '';
 
-  Node node = Node(address: 'no address');
+  Node node = Node(address: '');
 
   //Cable cable = Cable(ends: []);
 
@@ -184,7 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => NodesScreen(
-                          node: Node(address: 'no Address'),
+                          node: Node(address: (strings['Empty'] ?? {})[settings.language] ?? ''),
                           //callback: () => setState(() {}),
                           //lang: settings.language, node: node,
                           settings: settings,

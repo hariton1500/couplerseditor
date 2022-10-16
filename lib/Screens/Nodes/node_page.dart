@@ -29,7 +29,7 @@ class NodesScreen extends StatefulWidget {
 
 class _NodesScreenState extends State<NodesScreen> {
   int selectedAquipmentIndex = -1;
-  bool isEdititingAddress = false;
+  bool isEditingAddress = false;
   CableEnd? selectedCableEnd;
   bool isNetworkProcess = false;
 
@@ -43,37 +43,61 @@ class _NodesScreenState extends State<NodesScreen> {
         child: SingleChildScrollView(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TranslateText(
-              'node address:',
-              language: widget.settings.language,
-            ),
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 5,
+            children: [
+              TextButton.icon(onPressed: () {
+                setState(() {
+                  isEditingAddress = true;
+                });
+              }, icon: const Icon(Icons.edit), label: TranslateText('Node name:', language: widget.settings.language)),
+              Text(widget.node.address, style: const TextStyle(fontSize: 10),)
+            ],
           ),
-          isEdititingAddress
-              ? TextField(
-                  autofocus: true,
-                  controller: TextEditingController(text: widget.node.address),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (value) {
-                    widget.node.address = value;
-                    //isEdititingAddress = false;
-                  },
-                  onEditingComplete: () => setState(() {
-                    isEdititingAddress = false;
-                  }),
-                )
-              : TextButton(
-                  onPressed: () {
+          isEditingAddress
+              ? Wrap(
+                children: [
+                  TextField(
+                      autofocus: true,
+                      controller: TextEditingController(text: widget.node.address),
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (value) {
+                        widget.node.address = value;
+                        //isEdititingAddress = false;
+                      },
+                      onSubmitted: (value) => setState(() {
+                        widget.node.address = value;
+                        isEditingAddress = false;
+                      }),
+                      onEditingComplete: () => setState(() {
+                        isEditingAddress = false;
+                      }),
+                    ),
+                  IconButton(onPressed: () {
                     setState(() {
-                      isEdititingAddress = true;
+                      isEditingAddress = false;
                     });
-                  },
-                  child: Text(widget.node.address)),
-          TextButton(
-              onPressed: () => showDialog<ll.LatLng>(
+                  }, icon: const Icon(Icons.done))
+                ],
+              )
+              : Container(),
+          TextButton.icon(
+              icon: const Icon(Icons.edit),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LocationPicker(
+                        startLocation: widget.node.location ??
+                            widget.settings.baseLocation ??
+                            ll.LatLng(0, 0),
+                      ))).then((value) => setState(() {
+                    widget.node.location = value ??
+                        widget.node.location ??
+                        widget.settings.baseLocation ??
+                        ll.LatLng(0, 0);
+                  }))
+              
+                /*showDialog<ll.LatLng>(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
@@ -92,8 +116,8 @@ class _NodesScreenState extends State<NodesScreen> {
                         widget.node.location ??
                         widget.settings.baseLocation ??
                         ll.LatLng(0, 0);
-                  })),
-              child: Wrap(
+                  }))*/,
+              label: Wrap(
                 children: [
                   TranslateText(
                     'Location:',
