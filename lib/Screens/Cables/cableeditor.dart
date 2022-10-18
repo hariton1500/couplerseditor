@@ -88,6 +88,8 @@ class _CableEditorState extends State<CableEditor> {
                 setState(() {
                   _point = null;
                   widget.cable.points.clear();
+                  widget.cable.points.add(widget.cable.end1!.location!);
+                  widget.cable.points.add(widget.cable.end2!.location!);
                 });
               },
               icon: const Icon(Icons.delete_forever_outlined),
@@ -149,14 +151,32 @@ class _CableEditorState extends State<CableEditor> {
       nonRotatedChildren: [Row(children: listActions())],
       options: MapOptions(
         //controller: _mapController,
-        crs: mapSource == MapSource.yandexsat ? const Epsg3395() : const Epsg3857(),
+        crs: mapSource == MapSource.yandexsat
+            ? const Epsg3395()
+            : const Epsg3857(),
         center: widget.cable.end1?.location,
         zoom: 16,
         maxZoom: 18,
         onTap: (tapPosition, point) {
           setState(() {
             _point = point;
-            widget.cable.points.add(point);
+            bool found = false;
+            for (var i = 0; i < widget.cable.points.length - 1; i++) {
+              print(
+                  [widget.cable.points[i], point, widget.cable.points[i + 1]]);
+              if (point.latitude < widget.cable.points[i].latitude &&
+                  point.latitude > widget.cable.points[i + 1].latitude &&
+                  point.longitude > widget.cable.points[i].longitude &&
+                  point.longitude < widget.cable.points[i + 1].longitude) {
+                print('between $i and ${i + 1}');
+                widget.cable.points.insert(i, point);
+                found = true;
+                break;
+              }
+            }
+            if (!found) {
+              widget.cable.points.insert(widget.cable.points.length - 1, point);
+            }
           });
         },
       ),

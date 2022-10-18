@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:coupolerseditor/Helpers/map.dart';
 import 'package:coupolerseditor/Models/cableend.dart';
+import 'package:coupolerseditor/Services/location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -17,7 +18,10 @@ class Cable {
   List<LatLng> points = [];
   String? key;
 
-  Cable({required this.end1, required this.end2});
+  Cable({required this.end1, required this.end2}) {
+    points.add(end1!.location ?? zeroLocation);
+    points.add(end2!.location ?? zeroLocation);
+  }
 
   Cable.fromJson(Map<String, dynamic> json) {
     end1 = CableEnd.fromJson(json['end1']);
@@ -47,7 +51,7 @@ class Cable {
   double distance() {
     double d = 0;
     //LatLng p1 = end1!.location!;
-    List<LatLng> cable = [end1!.location!,...points,end2!.location!];
+    List<LatLng> cable = [end1!.location!, ...points, end2!.location!];
     for (var i = 1; i < cable.length; i++) {
       d += calculateDistance(cable[i - 1], cable[i]);
       //p1 = points[i];
@@ -63,25 +67,7 @@ class Cable {
       if (settings.altServer == '' ||
           settings.login == '' ||
           settings.password == '') {
-        /*
-        JsonbinIO server = JsonbinIO(settings: settings);
-        await server.loadBins();
-        print('current bins = ${server.bins}');
-        String binId = signature().hashCode.toString();
-        print('binId = $binId');
-        if (!server.bins.containsKey(binId)) {
-          print('creating new bin');
-          return await server.createJsonRecord(
-              key: binId, jsonString: json.encode(toJson()), type: 'cable');
-        } else {
-          print('updating bin $binId');
-          return await server.updateJsonRecord(
-              type: 'cable',
-              binId: server.bins[binId]['id'],
-              jsonString: json.encode(toJson()));
-        }
-      */
-      return false;
+        return false;
       } else {
         Server server = Server(settings: settings);
         String type = 'cable';
@@ -113,7 +99,8 @@ class Cable {
     }
   }
 
-  List<Polyline> polylines({required MaterialColor color, double? strokeWidth}) {
+  List<Polyline> polylines(
+      {required MaterialColor color, double? strokeWidth}) {
     /*
     List<LatLng> list = [];
     list.add(end1!.location!);
