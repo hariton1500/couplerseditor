@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:coupolerseditor/Services/server.dart';
 import 'package:coupolerseditor/services/location.dart';
 import 'package:coupolerseditor/Models/settings.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +19,8 @@ class SetupScreen extends StatefulWidget {
 
 class _SetupScreenState extends State<SetupScreen> {
   String lang = '';
+  bool isAllAuthFieldsPresent = false;
+  DateTime blockTime = DateTime.now();
 
   @override
   void initState() {
@@ -33,6 +38,25 @@ class _SetupScreenState extends State<SetupScreen> {
           size: 16,
         ),
         actions: [
+          if (isAllAuthFieldsPresent && DateTime.now().isAfter(blockTime)) ...[
+            TextButton.icon(
+                onPressed: () {
+                  Timer(const Duration(seconds: 4), () => setState(() {}));
+                  Server server = Server(settings: widget.settings);
+                  server.list(type: 'node').then((value) {
+                    setState(() {
+                      blockTime =
+                          DateTime.now().add(const Duration(seconds: 3));
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: TranslateText(value == '' ? 'Error' : 'Ok',
+                            language: widget.settings.language,
+                            color: value == '' ? Colors.red : Colors.green)));
+                  });
+                },
+                icon: const Icon(Icons.network_check_outlined),
+                label: TranslateText('Check Server'))
+          ],
           TextButton.icon(
               onPressed: () {
                 if (!widget.settings.altServer.endsWith('/')) {
@@ -77,58 +101,31 @@ class _SetupScreenState extends State<SetupScreen> {
                 ],
               ),
               const Divider(),
-              /*
-              TranslateText('Server REST URL:',
-                  language: widget.settings.language),
-              TextFormField(
-                initialValue: widget.settings.baseUrl,
-                onChanged: (value) => widget.settings.baseUrl = value,
-              ),
-              TranslateText('Master key:', language: widget.settings.language),
-              TextFormField(
-                initialValue: widget.settings.xMasterKey,
-                onChanged: (value) => widget.settings.xMasterKey = value,
-              ),
-              /*
-              TranslateText('Access key:', language: widget.settings.language),
-              TextFormField(
-                initialValue: widget.settings.xAccessKey,
-                onChanged: (value) => widget.settings.xAccessKey = value,
-              ),
-              */
-              TranslateText('Collection ID:',
-                  language: widget.settings.language),
-              TextFormField(
-                initialValue: widget.settings.collectionId,
-                onChanged: (value) => widget.settings.collectionId = value,
-              ),
-              TranslateText('Map bin ID:', language: widget.settings.language),
-              TextFormField(
-                initialValue: widget.settings.binsMapId,
-                onChanged: (value) => widget.settings.binsMapId = value,
-              ),
-              const Divider(
-                thickness: 5,
-                height: 10,
-                color: Colors.black,
-              ),
-              */
               TranslateText('Main server URL:',
                   language: widget.settings.language),
               TextFormField(
                 initialValue: widget.settings.altServer,
-                onChanged: (value) => widget.settings.altServer = value,
+                onChanged: (value) {
+                  widget.settings.altServer = value;
+                  checkAllAuthFieldsPresent();
+                },
               ),
               TranslateText('Login:', language: widget.settings.language),
               TextFormField(
                 initialValue: widget.settings.login,
-                onChanged: (value) => widget.settings.login = value,
+                onChanged: (value) {
+                  widget.settings.login = value;
+                  checkAllAuthFieldsPresent();
+                },
               ),
               TranslateText('Password:', language: widget.settings.language),
               TextFormField(
                 initialValue: widget.settings.password,
                 obscureText: true,
-                onChanged: (value) => widget.settings.password = value,
+                onChanged: (value) {
+                  widget.settings.password = value;
+                  checkAllAuthFieldsPresent();
+                },
               ),
               const Divider(),
               Column(
@@ -145,7 +142,8 @@ class _SetupScreenState extends State<SetupScreen> {
                             });
                           }),
                       icon: const Icon(Icons.location_on_outlined),
-                      label: TranslateText('Set base location', language: widget.settings.language)),
+                      label: TranslateText('Set base location',
+                          language: widget.settings.language)),
                   widget.settings.baseLocation != null
                       ? Text(
                           '[${widget.settings.baseLocation?.latitude}, ${widget.settings.baseLocation?.longitude}]')
@@ -160,5 +158,19 @@ class _SetupScreenState extends State<SetupScreen> {
         ),
       ),
     );
+  }
+
+  void checkAllAuthFieldsPresent() {
+    if (widget.settings.altServer != '' &&
+        widget.settings.login != '' &&
+        widget.settings.password != '') {
+      setState(() {
+        isAllAuthFieldsPresent = true;
+      });
+    } else {
+      setState(() {
+        isAllAuthFieldsPresent = false;
+      });
+    }
   }
 }

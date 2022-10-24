@@ -1,12 +1,16 @@
 import 'dart:convert';
 
-import 'package:coupolerseditor/services/location.dart';
+import 'package:coupolerseditor/Services/location.dart';
+//import 'package:coupolerseditor/services/location.dart';
 import 'package:coupolerseditor/Helpers/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../Helpers/enums.dart';
+import '../../Helpers/epsg3395.dart';
+import '../../Helpers/map.dart';
 import '../../Models/cable.dart';
 import '../../Models/cableend.dart';
 import '../../Models/fosc.dart';
@@ -43,6 +47,9 @@ class _CableScreenState extends State<CableScreen> {
   Mufta? selectedFosc;
 
   final MapController _mapController = MapController();
+  MapSource mapSource = MapSource.yandexmap;
+
+  List<Mufta> selectedFoscList = [];
 
   //LatLng? _currentPos;
 
@@ -74,6 +81,7 @@ class _CableScreenState extends State<CableScreen> {
                       cables.last.saveCable(widget.isFromServer);
                       ends.clear();
                       selectedFosc = null;
+                      selectedFoscList.clear();
                     });
                   },
                   icon: const Icon(Icons.save_rounded))
@@ -108,57 +116,6 @@ class _CableScreenState extends State<CableScreen> {
                 });
               },
             ),
-          ],
-        ),
-        bottomNavigationBar: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            DragTarget<CableEnd>(onAccept: (ce) {
-              print('$ce to 1');
-              setState(() {
-                if (ends.isNotEmpty) {
-                  ends[0] = ce;
-                } else {
-                  ends.add(ce);
-                }
-              });
-            }, builder: ((context, candidateData, rejectedData) {
-              return Container(
-                width: MediaQuery.of(context).size.width / 2,
-                color: Colors.green,
-                child: TextButton(
-                    onPressed: () => setState(() {
-                          if (ends.isNotEmpty) ends.removeAt(0);
-                        }),
-                    child: Text(
-                      '1: ${ends.isNotEmpty ? ends[0].direction : ''}',
-                      style: const TextStyle(color: Colors.black),
-                    )),
-              );
-            })),
-            DragTarget<CableEnd>(onAccept: (ce) {
-              print('$ce to 2');
-              setState(() {
-                if (ends.length == 2) {
-                  ends[1] = ce;
-                } else {
-                  ends.add(ce);
-                }
-              });
-            }, builder: ((context, candidateData, rejectedData) {
-              return Container(
-                width: MediaQuery.of(context).size.width / 2,
-                color: Colors.red,
-                child: TextButton(
-                    onPressed: () => setState(() {
-                          if (ends.length == 2) ends.removeAt(1);
-                        }),
-                    child: Text(
-                      '2: ${ends.length == 2 ? ends[1].direction : ''}',
-                      style: const TextStyle(color: Colors.black),
-                    )),
-              );
-            })),
           ],
         ),
         body: !isViewOnMap
@@ -359,16 +316,79 @@ class _CableScreenState extends State<CableScreen> {
     print('building map for creating cables from cableends');
     print(widget.settings.baseLocation.toString());
     return FlutterMap(
+      nonRotatedChildren: [
+        Column(
+          children: [
+            Wrap(
+              children: MapSource.values
+                  .map((e) => TextButton(
+                      onPressed: () {
+                        setState(() {
+                          mapSource = e;
+                        });
+                      },
+                      child: Text(e.name)))
+                  .toList(),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Wrap(
+                spacing: 10,
+                children: selectedFoscList
+                    .map((fosc) => Container(
+                          color: Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('[${fosc.name}]'),
+                              ...fosc.cableEnds
+                                  .skipWhile((value) => isAlreadyUsed(value))
+                                  .map((cableEnd) => Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Draggable<CableEnd>(
+                                          data: cableEnd,
+                                          feedback: Material(
+                                              child: Text(cableEnd.direction)),
+                                          child: DragTarget<CableEnd>(
+                                              onAccept: (data) {
+                                                print(
+                                                    'cableEnd=${cableEnd.direction}; data=${data.direction}');
+                                                setState(() {
+                                                  ends = [cableEnd, data];
+                                                });
+                                              },
+                                              builder: (context, candidateData,
+                                                      rejectedData) =>
+                                                  Text(cableEnd.direction)),
+                                        ),
+                                      ))
+                                  .toList()
+                            ],
+                          ),
+                        ))
+                    .toList(),
+              ),
+            )
+          ],
+        )
+      ],
+      mapController: _mapController,
       options: MapOptions(
           zoom: 16.0,
           maxZoom: 18.0,
-          controller: _mapController,
+          crs: mapSource == MapSource.yandexsat
+              ? const Epsg3395()
+              : const Epsg3857(),
           center: widget.settings.baseLocation ?? LatLng(0, 0)),
       layers: [
-        TileLayerOptions(
-          urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          subdomains: ['a', 'b', 'c'],
-        ),
+        layerMap(mapSource),
+        if (ends.length == 2)
+          PolylineLayerOptions(polylines: [
+            Polyline(
+                points: ends.map((e) => e.location!).toList(),
+                color: Colors.black,
+                strokeWidth: 3)
+          ]),
         PolylineLayerOptions(
             polylines: cables
                 .map((cable) => Polyline(strokeWidth: 3, points: [
@@ -376,47 +396,7 @@ class _CableScreenState extends State<CableScreen> {
                       cable.end2!.location ?? LatLng(0, 0)
                     ]))
                 .toList()),
-        MarkerLayerOptions(
-            markers: couplers
-                .map((e) => Marker(
-                    width: 400,
-                    height: 100,
-                    point: e.location!,
-                    builder: (context) => Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            IconButton(
-                                color: selectedFosc == e
-                                    ? Colors.red
-                                    : Colors.green,
-                                onPressed: () {
-                                  print('${e.name} selected');
-                                  setState(() {
-                                    selectedFosc = e;
-                                  });
-                                },
-                                icon: const Icon(Icons.blinds_rounded)),
-                            selectedFosc == e
-                                ? Column(
-                                    children: e.cableEnds
-                                        .map((ce) => Draggable<CableEnd>(
-                                              data: ce,
-                                              feedback: const Icon(Icons.cable),
-                                              child: TextButton.icon(
-                                                  onPressed: () {
-                                                    print(ce.toString());
-                                                  },
-                                                  icon: const Icon(
-                                                      Icons.cable_rounded),
-                                                  label: Text(ce.toString())),
-                                            ))
-                                        .toList(),
-                                  )
-                                : Container()
-                          ],
-                        )))
-                .toList())
+        MarkerLayerOptions(markers: getFOSCS())
       ],
     );
   }
@@ -444,29 +424,6 @@ class _CableScreenState extends State<CableScreen> {
       if (widget.settings.altServer == '' ||
           widget.settings.login == '' ||
           widget.settings.password == '') {
-        /*
-        print(
-            'loading list of FOSCs from server URL = ${widget.settings.baseUrl}');
-        JsonbinIO server = JsonbinIO(settings: widget.settings);
-        server.loadBins().then((_) async {
-          List<MapEntry<String, dynamic>> nodeBinsList =
-              server.bins.entries.where((element) {
-            Map<String, dynamic> data = (element.value is Map)
-                ? element.value
-                : {'id': element.value, 'type': 'unknown'};
-            return data['type'] == 'fosc';
-          }).toList();
-          print('nodeBinsList = $nodeBinsList');
-          for (var bin in nodeBinsList) {
-            String data = await server.loadDataFromBin(binId: bin.value['id']);
-            if (data != '') {
-              //setState(() {
-              couplers.add(Mufta.fromJson(json.decode(data)));
-              //});
-            }
-          }
-        });
-        */
       } else {
         print('loading from altserver');
         Server server = Server(settings: widget.settings);
@@ -496,27 +453,6 @@ class _CableScreenState extends State<CableScreen> {
       if (widget.settings.altServer == '' ||
           widget.settings.login == '' ||
           widget.settings.password == '') {
-        /*
-        JsonbinIO server = JsonbinIO(settings: widget.settings);
-        server.loadBins().then((_) async {
-          List<MapEntry<String, dynamic>> nodeBinsList =
-              server.bins.entries.where((element) {
-            Map<String, dynamic> data = (element.value is Map)
-                ? element.value
-                : {'id': element.value, 'type': 'unknown'};
-            return data['type'] == 'node';
-          }).toList();
-          print('nodeBinsList = $nodeBinsList');
-          for (var bin in nodeBinsList) {
-            String data = await server.loadDataFromBin(binId: bin.value['id']);
-            if (data != '') {
-              setState(() {
-                nodes.add(Node.fromJson(json.decode(data)));
-              });
-            }
-          }
-        });
-        */
       } else {
         Server server = Server(settings: widget.settings);
         server.list(type: 'node').then((value) {
@@ -592,26 +528,6 @@ class _CableScreenState extends State<CableScreen> {
           widget.settings.password == '') {
         print(
             'loading list of stored cables from server URL = ${widget.settings.baseUrl}');
-        /*
-        JsonbinIO server = JsonbinIO(settings: widget.settings);
-        server.loadBins().then((_) async {
-          List<MapEntry<String, dynamic>> nodeBinsList =
-              server.bins.entries.where((element) {
-            Map<String, dynamic> data = (element.value is Map)
-                ? element.value
-                : {'id': element.value, 'type': 'unknown'};
-            return data['type'] == 'cable';
-          }).toList();
-          print('nodeBinsList = $nodeBinsList');
-          for (var bin in nodeBinsList) {
-            String data = await server.loadDataFromBin(binId: bin.value['id']);
-            if (data != '') {
-              setState(() {
-                cables.add(Cable.fromJson(json.decode(data)));
-              });
-            }
-          }
-        });*/
       } else {
         Server server = Server(settings: widget.settings);
         server.list(type: 'cable').then((value) {
@@ -626,5 +542,61 @@ class _CableScreenState extends State<CableScreen> {
         });
       }
     }
+  }
+
+  List<Marker> getFOSCS() {
+    return couplers
+        .map((fosc) => Marker(
+            width: 30,
+            //height: fosc.cableEnds.length * 20,
+            point: fosc.location!,
+            builder: (context) {
+              return Material(
+                color: Colors.transparent,
+                child: GestureDetector(
+                    onTap: () {
+                      addFOSCToSelected(fosc);
+                    },
+                    child: Icon(
+                      Icons.blinds_rounded,
+                      color: selectedFoscList.contains(fosc)
+                          ? Colors.red
+                          : Colors.black,
+                    )),
+              );
+            }))
+        .toList();
+  }
+
+  void addFOSCToSelected(Mufta fosc) {
+    setState(() {
+      if (selectedFoscList.contains(fosc)) {
+        selectedFoscList.remove(fosc);
+      } else {
+        if (selectedFoscList.length < 2) {
+          selectedFoscList.add(fosc);
+        }
+      }
+    });
+  }
+
+  bool isAlreadyUsed(CableEnd value) {
+    print('isAlreadyUsed ${value.signature()}');
+    int count = 0;
+    cables.forEach((element) {
+      //print(element.end1?.location.toString());
+      //print(element.end2?.location.toString());
+      if (element.end1!.toString() == value.toString()) {
+        print('found at cable ${element.toString()}');
+        count++;
+      }
+      if (element.end2!.toString() == value.toString()) {
+        print('found at cable ${element.toString()}');
+        count++;
+      }
+      //print('---------------');
+    });
+    print(count);
+    return count > 0;
   }
 }

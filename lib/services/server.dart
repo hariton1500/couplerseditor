@@ -13,6 +13,8 @@ class Server {
     url = settings.altServer;
   }
 
+  //Future<int> checkServer()
+
   Future<bool> add(
       {required String key,
       required String type,
