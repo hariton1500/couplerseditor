@@ -1,4 +1,3 @@
-import 'package:coupolerseditor/services/location.dart';
 import 'package:coupolerseditor/Screens/fiberseditor.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,6 +32,7 @@ class MuftaScreenState extends State<MuftaScreen> {
   Settings settings = Settings();
   bool isNetworkProcess = false;
   bool isEditingAddress = false;
+  bool isEditCableName = false;
 
   @override
   void initState() {
@@ -110,6 +110,9 @@ class MuftaScreenState extends State<MuftaScreen> {
                       widget.mufta.location ??
                       widget.settings.baseLocation ??
                       ll.LatLng(0, 0);
+                  for (var cableEnd in widget.mufta.cableEnds) {
+                    cableEnd.location = widget.mufta.location;
+                  }
                 })),
                 label: Wrap(
                 children: [
@@ -359,22 +362,56 @@ class MuftaScreenState extends State<MuftaScreen> {
                         )
                       : Container(),
                   isCableSelected != null && isCableSelected! >= 0
-                      ? TextButton.icon(
-                          onPressed: () {
+                      ? Wrap(
+                        children: [
+                          TextButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  widget.mufta.connections
+                                      .removeWhere((connection) {
+                                    return (connection.cableIndex1 ==
+                                            isCableSelected ||
+                                        connection.cableIndex2 == isCableSelected);
+                                  });
+                                  widget.mufta.cableEnds.removeAt(isCableSelected!);
+                                  isCableSelected = -1;
+                                });
+                              },
+                              icon: const Icon(Icons.remove_outlined),
+                              label: TranslateText('Delete cable',
+                                  language: widget.settings.language)),
+                          TextButton.icon(onPressed: () {
                             setState(() {
-                              widget.mufta.connections
-                                  .removeWhere((connection) {
-                                return (connection.cableIndex1 ==
-                                        isCableSelected ||
-                                    connection.cableIndex2 == isCableSelected);
-                              });
-                              widget.mufta.cableEnds.removeAt(isCableSelected!);
-                              isCableSelected = -1;
+                              isEditCableName = true;
                             });
-                          },
-                          icon: const Icon(Icons.remove_outlined),
-                          label: TranslateText('Delete cable',
-                              language: widget.settings.language))
+                          }, icon: const Icon(Icons.edit_outlined), label: TranslateText('Edit cable name', language: widget.settings.language)),
+                          if (isEditCableName) ... [
+                            TextField(
+                              autofocus: true,
+                              controller: TextEditingController(text: widget.mufta.cableEnds[isCableSelected!].direction),
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                              ),
+                              onChanged: (value) {
+                                widget.mufta.cableEnds[isCableSelected!].direction = value;
+                                //isEdititingAddress = false;
+                              },
+                              onSubmitted: (value) => setState(() {
+                                widget.mufta.cableEnds[isCableSelected!].direction = value;
+                                isEditCableName = false;
+                              }),
+                              onEditingComplete: () => setState(() {
+                                isEditCableName = false;
+                              }),
+                            ),
+                            IconButton(onPressed: () {
+                              setState(() {
+                                isEditCableName = false;
+                              });
+                            }, icon: const Icon(Icons.done))
+                          ]
+                        ],
+                      )
                       : Container(),
                 ],
               ),

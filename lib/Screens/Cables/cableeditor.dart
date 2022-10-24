@@ -169,7 +169,7 @@ class _CableEditorState extends State<CableEditor> {
                   point.longitude > widget.cable.points[i].longitude &&
                   point.longitude < widget.cable.points[i + 1].longitude) {
                 print('between $i and ${i + 1}');
-                widget.cable.points.insert(i, point);
+                widget.cable.points.insert(i + 1, point);
                 found = true;
                 break;
               }
