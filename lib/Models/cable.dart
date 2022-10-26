@@ -16,16 +16,19 @@ import 'settings.dart';
 class Cable {
   CableEnd? end1, end2;
   List<LatLng> points = [];
-  String? key;
+  String? key, key1, key2;
 
-  Cable({required this.end1, required this.end2}) {
+  Cable({required this.end1, required this.end2, this.key1, this.key2}) {
     points.add(end1!.location ?? zeroLocation);
     points.add(end2!.location ?? zeroLocation);
   }
 
   Cable.fromJson(Map<String, dynamic> json) {
-    end1 = CableEnd.fromJson(json['end1']);
-    end2 = CableEnd.fromJson(json['end2']);
+    //end1 = json.containsKey('end1') ? CableEnd.fromJson(json['end1']) : null;
+    //end2 = json.containsKey('end2') ? CableEnd.fromJson(json['end2']) : null;
+    key1 = json[key1];
+    key2 = json[key2];
+
     try {
       points =
           List.from(json['points']).map((x) => LatLng.fromJson(x)).toList();
@@ -35,17 +38,24 @@ class Cable {
     key = json['key'];
   }
 
-  Map<String, dynamic> toJson() =>
-      {'end1': end1, 'end2': end2, 'key': key, 'points': points};
+  Map<String, dynamic> toJson() => {
+        'end1': key1,
+        'end2': key2,
+        'key': key,
+        'points': points,
+        //'key1': key1,
+        //'key2': key2
+      };
 
   String signature() {
     //print('signature of cable with ends: $end1 and $end2');
-    return key ?? '${end1!.signature()}:${end2!.signature()}';
+    //return key ?? '${end1!.signature()}:${end2!.signature()}';
+    return key ?? '$key1:$key2';
   }
 
   @override
   String toString() {
-    return 'key: $key; ${end1!.direction} <=> ${end2!.direction}';
+    return 'key: $key; ${end1?.direction} <=> ${end2?.direction}';
   }
 
   double distance() {

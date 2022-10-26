@@ -45,6 +45,7 @@ class _CableScreenState extends State<CableScreen> {
   List<Cable> cables = [];
 
   Mufta? selectedFosc;
+  String key1 = '', key2 = '';
 
   final MapController _mapController = MapController();
   MapSource mapSource = MapSource.yandexmap;
@@ -77,7 +78,11 @@ class _CableScreenState extends State<CableScreen> {
               IconButton(
                   onPressed: () {
                     setState(() {
-                      cables.add(Cable(end1: ends.first, end2: ends.last));
+                      cables.add(Cable(
+                          end1: ends.first,
+                          end2: ends.last,
+                          key1: key1,
+                          key2: key2));
                       cables.last.saveCable(widget.isFromServer);
                       ends.clear();
                       selectedFosc = null;
@@ -318,6 +323,7 @@ class _CableScreenState extends State<CableScreen> {
     return FlutterMap(
       nonRotatedChildren: [
         Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Wrap(
               children: MapSource.values
@@ -331,39 +337,58 @@ class _CableScreenState extends State<CableScreen> {
                   .toList(),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                spacing: 10,
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: selectedFoscList
-                    .map((fosc) => Container(
-                          color: Colors.white,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('[${fosc.name}]'),
-                              ...fosc.cableEnds
-                                  .skipWhile((value) => isAlreadyUsed(value))
-                                  .map((cableEnd) => Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Draggable<CableEnd>(
-                                          data: cableEnd,
-                                          feedback: Material(
-                                              child: Text(cableEnd.direction)),
-                                          child: DragTarget<CableEnd>(
-                                              onAccept: (data) {
-                                                print(
-                                                    'cableEnd=${cableEnd.direction}; data=${data.direction}');
-                                                setState(() {
-                                                  ends = [cableEnd, data];
-                                                });
-                                              },
-                                              builder: (context, candidateData,
-                                                      rejectedData) =>
-                                                  Text(cableEnd.direction)),
-                                        ),
-                                      ))
-                                  .toList()
-                            ],
+                    .map((fosc) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Container(
+                            color: selectedFoscList.indexOf(fosc) == 0
+                                ? Colors.blue
+                                : Colors.red,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '[${fosc.name}]',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                ...fosc.cableEnds
+                                    .skipWhile((value) => isAlreadyUsed(value))
+                                    .map((cableEnd) => Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Draggable<CableEnd>(
+                                            data: cableEnd,
+                                            feedback: Material(
+                                                child:
+                                                    Text(cableEnd.direction)),
+                                            child: DragTarget<CableEnd>(
+                                                onAccept: (data) {
+                                                  key1 =
+                                                      'fosc:${selectedFoscList.where((element) => element.cableEnds.contains(cableEnd)).first.key!}';
+                                                  key2 =
+                                                      'fosc:${selectedFoscList.where((element) => element.cableEnds.contains(data)).first.key!}';
+                                                  print(
+                                                      'cableEnd=${cableEnd.direction}($key1); data=${data.direction}($key2)');
+                                                  setState(() {
+                                                    ends = [cableEnd, data];
+                                                  });
+                                                },
+                                                builder: (context,
+                                                        candidateData,
+                                                        rejectedData) =>
+                                                    Container(
+                                                        //width: double.infinity,
+                                                        color: Colors.white,
+                                                        child: Text(cableEnd
+                                                            .direction))),
+                                          ),
+                                        ))
+                                    .toList()
+                              ],
+                            ),
                           ),
                         ))
                     .toList(),
@@ -533,10 +558,43 @@ class _CableScreenState extends State<CableScreen> {
         server.list(type: 'cable').then((value) {
           if (value != '') {
             setState(() {
-              cables.addAll(value
-                  .split('\n')
-                  .map((e) => Cable.fromJson(json.decode(e)))
-                  .toList());
+              cables.addAll(value.split('\n').map((e) {
+                Cable cable = Cable.fromJson(json.decode(e));
+                //
+                //setting end1 and end2 cableEnds from couplers or nodes
+                //
+                if (cable.key1 != null && cable.key1!.startsWith('fosc:')) {
+                  int index = int.tryParse(cable.key1!.split(':')[2]) ?? 0;
+                  cable.end1 = couplers
+                      .where(
+                          (element) => element.key == cable.key1!.split(':')[1])
+                      .first
+                      .cableEnds[index];
+                } else {
+                  int index = int.tryParse(cable.key1!.split(':')[2]) ?? 0;
+                  cable.end1 = nodes
+                      .where(
+                          (element) => element.key == cable.key1!.split(':')[1])
+                      .first
+                      .cableEnds[index];
+                }
+                if (cable.key2 != null && cable.key2!.startsWith('fosc:')) {
+                  int index = int.tryParse(cable.key2!.split(':')[2]) ?? 0;
+                  cable.end2 = couplers
+                      .where(
+                          (element) => element.key == cable.key2!.split(':')[1])
+                      .first
+                      .cableEnds[index];
+                } else {
+                  int index = int.tryParse(cable.key2!.split(':')[2]) ?? 0;
+                  cable.end2 = nodes
+                      .where(
+                          (element) => element.key == cable.key2!.split(':')[1])
+                      .first
+                      .cableEnds[index];
+                }
+                return cable;
+              }).toList());
             });
           }
         });
@@ -560,7 +618,9 @@ class _CableScreenState extends State<CableScreen> {
                     child: Icon(
                       Icons.blinds_rounded,
                       color: selectedFoscList.contains(fosc)
-                          ? Colors.red
+                          ? selectedFoscList.indexOf(fosc) == 0
+                              ? Colors.blue
+                              : Colors.red
                           : Colors.black,
                     )),
               );
