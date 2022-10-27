@@ -34,13 +34,13 @@ class CouplersList extends StatefulWidget {
 class _CouplersListState extends State<CouplersList> {
   List<String> couplers = [];
 
-  bool showAsMap = false;
+  bool showAsMap = true;
 
   final MapController _mapController = MapController();
 
   int? selectedCouplerIndex;
 
-  MapSource mapSource = MapSource.openstreet;
+  MapSource mapSource = MapSource.yandexmap;
 
   @override
   void initState() {

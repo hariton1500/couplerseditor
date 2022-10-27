@@ -38,7 +38,7 @@ class CableScreen extends StatefulWidget {
 }
 
 class _CableScreenState extends State<CableScreen> {
-  bool isViewOnMap = false;
+  bool isViewOnMap = true;
   List<CableEnd> ends = [];
   List<Node> nodes = [];
   List<Mufta> couplers = [];
@@ -367,9 +367,9 @@ class _CableScreenState extends State<CableScreen> {
                                             child: DragTarget<CableEnd>(
                                                 onAccept: (data) {
                                                   key1 =
-                                                      'fosc:${selectedFoscList.where((element) => element.cableEnds.contains(cableEnd)).first.key!}';
+                                                      'fosc<|>${selectedFoscList.first.key}<|>${selectedFoscList.first.location?.toJson()}<|>${cableEnd.signature()}';
                                                   key2 =
-                                                      'fosc:${selectedFoscList.where((element) => element.cableEnds.contains(data)).first.key!}';
+                                                      'fosc<|>${selectedFoscList.last.key}<|>${selectedFoscList.last.location?.toJson()}<|>${data.signature()}';
                                                   print(
                                                       'cableEnd=${cableEnd.direction}($key1); data=${data.direction}($key2)');
                                                   setState(() {

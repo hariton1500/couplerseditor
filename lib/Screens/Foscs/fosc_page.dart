@@ -307,7 +307,7 @@ class MuftaScreenState extends State<MuftaScreen> {
                                             fibersNumber: fibersNumber,
                                             sideIndex: 0,
                                             colorScheme: colorScheme,
-                                            id: -1,
+                                            id: DateTime.now().microsecondsSinceEpoch.hashCode,
                                           ));
                                         },
                                         child: TranslateText('Add',

@@ -70,6 +70,11 @@ class Mufta {
   }
 
   Map<String, dynamic> toJson() {
+    for (var element in cableEnds) {
+      if (element.id <= 0) {
+        element.id = element.signature().hashCode;
+      }
+    }
     return {
       'name': name,
       'cables': cableEnds,
@@ -107,24 +112,6 @@ class Mufta {
     if (settings.altServer == '' ||
         settings.login == '' ||
         settings.password == '') {
-      /*
-      JsonbinIO server = JsonbinIO(settings: settings);
-      await server.loadBins();
-      print('current bins = ${server.bins}');
-      String binId = key ?? signature().hashCode.toString();
-      print('binId = $binId');
-      if (!server.bins.containsKey(binId)) {
-        print('creating new bin');
-        key = binId;
-        return await server.createJsonRecord(
-            key: binId, jsonString: json.encode(toJson()), type: 'fosc');
-      } else {
-        print('updating bin $binId');
-        return await server.updateJsonRecord(
-            type: 'fosc',
-            binId: server.bins[binId]['id'],
-            jsonString: json.encode(toJson()));
-      }*/
       return false;
     } else {
       Server server = Server(settings: settings);
