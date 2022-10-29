@@ -24,10 +24,12 @@ class Cable {
   }
 
   Cable.fromJson(Map<String, dynamic> json) {
+    print('load cable from json');
+    print(json);
     //end1 = json.containsKey('end1') ? CableEnd.fromJson(json['end1']) : null;
     //end2 = json.containsKey('end2') ? CableEnd.fromJson(json['end2']) : null;
-    key1 = json[key1];
-    key2 = json[key2];
+    key1 = json['end1'];
+    key2 = json['end2'];
 
     try {
       points =

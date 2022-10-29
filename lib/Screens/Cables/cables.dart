@@ -554,42 +554,45 @@ class _CableScreenState extends State<CableScreen> {
         print(
             'loading list of stored cables from server URL = ${widget.settings.baseUrl}');
       } else {
+        print('loading list of stored cables from server URL = ${widget.settings.altServer}');
         Server server = Server(settings: widget.settings);
         server.list(type: 'cable').then((value) {
           if (value != '') {
+            print(value);
             setState(() {
               cables.addAll(value.split('\n').map((e) {
                 Cable cable = Cable.fromJson(json.decode(e));
                 //
                 //setting end1 and end2 cableEnds from couplers or nodes
                 //
-                if (cable.key1 != null && cable.key1!.startsWith('fosc:')) {
-                  int index = int.tryParse(cable.key1!.split(':')[2]) ?? 0;
+                if (cable.key1 != null && cable.key1!.startsWith('fosc<|>')) {
+                  int index = int.tryParse(cable.key1!.split('<|>')[2]) ?? 0;
                   cable.end1 = couplers
                       .where(
-                          (element) => element.key == cable.key1!.split(':')[1])
+                          (element) => element.key == cable.key1!.split('<|>')[1])
                       .first
                       .cableEnds[index];
                 } else {
-                  int index = int.tryParse(cable.key1!.split(':')[2]) ?? 0;
+                  print('key=${cable.key1}');
+                  int index = int.tryParse(cable.key1!.split('<|>')[2]) ?? 0;
                   cable.end1 = nodes
                       .where(
-                          (element) => element.key == cable.key1!.split(':')[1])
+                          (element) => element.key == cable.key1!.split('<|>')[1])
                       .first
                       .cableEnds[index];
                 }
-                if (cable.key2 != null && cable.key2!.startsWith('fosc:')) {
-                  int index = int.tryParse(cable.key2!.split(':')[2]) ?? 0;
+                if (cable.key2 != null && cable.key2!.startsWith('fosc<|>')) {
+                  int index = int.tryParse(cable.key2!.split('<|>')[2]) ?? 0;
                   cable.end2 = couplers
                       .where(
-                          (element) => element.key == cable.key2!.split(':')[1])
+                          (element) => element.key == cable.key2!.split('<|>')[1])
                       .first
                       .cableEnds[index];
                 } else {
-                  int index = int.tryParse(cable.key2!.split(':')[2]) ?? 0;
+                  int index = int.tryParse(cable.key2!.split('<|>')[2]) ?? 0;
                   cable.end2 = nodes
                       .where(
-                          (element) => element.key == cable.key2!.split(':')[1])
+                          (element) => element.key == cable.key2!.split('<|>')[1])
                       .first
                       .cableEnds[index];
                 }
