@@ -21,6 +21,7 @@ class _SetupScreenState extends State<SetupScreen> {
   String lang = '';
   bool isAllAuthFieldsPresent = false;
   DateTime blockTime = DateTime.now();
+  bool isShowPassword = false;
 
   @override
   void initState() {
@@ -119,13 +120,28 @@ class _SetupScreenState extends State<SetupScreen> {
                 },
               ),
               TranslateText('Password:', language: widget.settings.language),
-              TextFormField(
-                initialValue: widget.settings.password,
-                obscureText: true,
-                onChanged: (value) {
-                  widget.settings.password = value;
-                  checkAllAuthFieldsPresent();
-                },
+              Wrap(
+                children: [
+                  TextField(
+                    //initialValue: widget.settings.password,
+                    controller:
+                        TextEditingController(text: widget.settings.password),
+                    obscureText: !isShowPassword,
+                    onChanged: (value) {
+                      widget.settings.password = value;
+                      checkAllAuthFieldsPresent();
+                    },
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isShowPassword = !isShowPassword;
+                        });
+                      },
+                      icon: Icon(!isShowPassword
+                          ? Icons.visibility_rounded
+                          : Icons.visibility_off_rounded))
+                ],
               ),
               const Divider(),
               Column(
