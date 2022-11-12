@@ -85,10 +85,11 @@ class _ViewerScreenState extends State<ViewerScreen> {
               : Container(),
           isViewOnMap
               ? IconButton(
-                  onPressed: () {
-                    getLocation().then((location) {
-                      _mapController.move(location!, 16);
-                    });
+                  onPressed: () async {
+                    LatLng? ll = await getLocation();
+                    if (ll != null) {
+                      _mapController.move(ll, 16);
+                    }
                   },
                   icon: const Icon(Icons.location_on_outlined))
               : Container(),
@@ -166,6 +167,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
 
   Widget map() {
     return FlutterMap(
+      mapController: _mapController,
       nonRotatedChildren: [
         Container(
           color: Colors.white,
@@ -176,7 +178,6 @@ class _ViewerScreenState extends State<ViewerScreen> {
       ],
       options: MapOptions(
           crs: mapSource == MapSource.yandexsat ? const Epsg3395() : const Epsg3857(),
-          controller: _mapController,
           center: LatLng(45.200834, 33.351089),
           zoom: 16.0,
           maxZoom: 18.0,
