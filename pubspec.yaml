@@ -37,6 +37,8 @@ dependencies:
   location: ^4.4.0
   shared_preferences: ^2.0.15
   flutter_map: ^2.1.1
+  #  path: ../
+  #flutter_map_line_editor: ^4.0.2
   latlong2: ^0.8.1
   http: ^0.13.5
 
