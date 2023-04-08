@@ -25,17 +25,44 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-          primarySwatch: Colors.blue,
-          canvasColor: Colors.white,
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.white,
-            iconTheme: IconThemeData(color: Colors.blue),
-            actionsIconTheme: IconThemeData(color: Colors.blue),
-          )),
-      debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'FOSCs, Nodes & Cables keeper'),
+        title: 'Flutter Demo',
+        theme: ThemeData(
+            primarySwatch: Colors.blue,
+            canvasColor: Colors.white,
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.white,
+              iconTheme: IconThemeData(color: Colors.blue),
+              actionsIconTheme: IconThemeData(color: Colors.blue),
+            )),
+        debugShowCheckedModeBanner: false,
+        home: const StartScreen() //(title: 'FOSCs, Nodes & Cables keeper'),
+        );
+  }
+}
+
+class StartScreen extends StatelessWidget {
+  const StartScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      children: [
+        SizedBox(
+          width: 100,
+          height: 100,
+          child: Image.asset('assets/images/fosc.png'),
+        ),
+        SizedBox(
+          width: 100,
+          height: 100,
+          child: Image.asset(
+            'assets/images/node.png',
+            //width: 100,
+            //height: 100,
+            fit: BoxFit.fitWidth,
+          ),
+        )
+      ],
     );
   }
 }
@@ -184,7 +211,10 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => NodesScreen(
-                          node: Node(address: (strings['Empty'] ?? {})[settings.language] ?? ''),
+                          node: Node(
+                              address:
+                                  (strings['Empty'] ?? {})[settings.language] ??
+                                      ''),
                           //callback: () => setState(() {}),
                           //lang: settings.language, node: node,
                           settings: settings,
