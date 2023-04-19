@@ -25,18 +25,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-            primarySwatch: Colors.blue,
-            canvasColor: Colors.white,
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.white,
-              iconTheme: IconThemeData(color: Colors.blue),
-              actionsIconTheme: IconThemeData(color: Colors.blue),
-            )),
-        debugShowCheckedModeBanner: false,
-        home: const StartScreen() //(title: 'FOSCs, Nodes & Cables keeper'),
-        );
+      title: 'Flutter Demo',
+      theme: ThemeData(
+          primarySwatch: Colors.blue,
+          canvasColor: Colors.white,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.white,
+            iconTheme: IconThemeData(color: Colors.blue),
+            actionsIconTheme: IconThemeData(color: Colors.blue),
+          )),
+      debugShowCheckedModeBanner: false,
+      home: const MyHomePage(title: 'FOSCs, Nodes & Cables keeper'),
+    );
   }
 }
 
