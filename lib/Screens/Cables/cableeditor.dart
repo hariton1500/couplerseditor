@@ -1,6 +1,6 @@
 import 'package:coupolerseditor/Helpers/strings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../Helpers/enums.dart';
@@ -29,7 +29,7 @@ class _CableEditorState extends State<CableEditor> {
   bool isNetworkProcess = false;
   MapSource mapSource = MapSource.openstreet;
 
-  @override
+  @override 
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -146,84 +146,94 @@ class _CableEditorState extends State<CableEditor> {
   final MapController _mapController = MapController();
 
   Widget map() {
-    return FlutterMap(
-      mapController: _mapController,
-      nonRotatedChildren: [Row(children: listActions())],
-      options: MapOptions(
-        //controller: _mapController,
-        crs: mapSource == MapSource.yandexsat
-            ? const Epsg3395()
-            : const Epsg3857(),
-        center: widget.cable.end1?.location,
-        zoom: 16,
-        maxZoom: 18,
-        onTap: (tapPosition, point) {
-          setState(() {
-            _point = point;
-            bool found = false;
-            for (var i = 0; i < widget.cable.points.length - 1; i++) {
-              print(
-                  [widget.cable.points[i], point, widget.cable.points[i + 1]]);
-              if (point.latitude < widget.cable.points[i].latitude &&
-                  point.latitude > widget.cable.points[i + 1].latitude &&
-                  point.longitude > widget.cable.points[i].longitude &&
-                  point.longitude < widget.cable.points[i + 1].longitude) {
-                print('between $i and ${i + 1}');
-                widget.cable.points.insert(i + 1, point);
-                found = true;
-                break;
-              }
-            }
-            if (!found) {
-              widget.cable.points.insert(widget.cable.points.length - 1, point);
-            }
-          });
-        },
-      ),
-      layers: [
-        layerMap(mapSource),
-        PolylineLayerOptions(
-          polylines: widget.cable.polylines(color: Colors.green),
-        ),
-        MarkerLayerOptions(
-            markers: [widget.cable.end1!.location, widget.cable.end2!.location]
-                .map((e) => Marker(
-                    width: 5,
-                    height: 5,
-                    point: e!,
-                    builder: (context) => Container(
+    return Stack(
+      children: [
+        FlutterMap(
+          mapController: _mapController,
+          options: MapOptions(
+            //controller: _mapController,
+            crs: mapSource == MapSource.yandexsat
+                ? epsg3395()
+                : const Epsg3857(),
+            initialCenter: widget.cable.end1?.location ?? const LatLng(0, 0),
+            initialZoom: 16,
+            maxZoom: 18,
+            onTap: (tapPosition, point) {
+              setState(() {
+                _point = point;
+                bool found = false;
+                for (var i = 0; i < widget.cable.points.length - 1; i++) {
+                  print([
+                    widget.cable.points[i],
+                    point,
+                    widget.cable.points[i + 1]
+                  ]);
+                  if (point.latitude < widget.cable.points[i].latitude &&
+                      point.latitude > widget.cable.points[i + 1].latitude &&
+                      point.longitude > widget.cable.points[i].longitude &&
+                      point.longitude < widget.cable.points[i + 1].longitude) {
+                    print('between $i and ${i + 1}');
+                    widget.cable.points.insert(i + 1, point);
+                    found = true;
+                    break;
+                  }
+                }
+                if (!found) {
+                  widget.cable.points
+                      .insert(widget.cable.points.length - 1, point);
+                }
+              });
+            },
+          ),
+          children: [
+            layerMap(mapSource),
+            PolylineLayer(
+              polylines: widget.cable.polylines(color: Colors.green),
+            ),
+            MarkerLayer(
+                markers: [
+              widget.cable.end1!.location,
+              widget.cable.end2!.location
+            ]
+                    .map((e) => Marker(
+                        width: 5,
+                        height: 5,
+                        point: e!,
+                        child: Container(
                           color: Colors.red,
                         )))
-                .toList()),
-        MarkerLayerOptions(
-            markers: widget.cable.points
-                .map((e) => Marker(
-                    point: e,
-                    builder: (context) =>
-                        Text((widget.cable.points.indexOf(e) + 1).toString())))
-                .toList()),
-        MarkerLayerOptions(
-            markers: widget.cable.points
-                .map((e) => Marker(
-                    width: 10,
-                    height: 10,
-                    point: e,
-                    builder: (context) => Draggable(
+                    .toList()),
+            MarkerLayer(
+                markers: widget.cable.points
+                    .map((e) => Marker(
+                        point: e,
+                        child: Text(
+                            (widget.cable.points.indexOf(e) + 1).toString())))
+                    .toList()),
+            MarkerLayer(
+                markers: widget.cable.points
+                    .map((e) => Marker(
+                        width: 10,
+                        height: 10,
+                        point: e,
+                        child: Draggable(
                           onDragUpdate: (details) => setState(() {
-                            widget.cable.points
-                                    .firstWhere((element) => element == e)
-                                    .latitude -=
-                                details.delta.dy /
-                                    200000 /
-                                    18 *
-                                    _mapController.zoom;
-                            widget.cable.points
-                                    .firstWhere((element) => element == e)
-                                    .longitude +=
-                                details.delta.dx /
-                                    200000 /
-                                    18 *
-                                    _mapController.zoom;
+                            final index = widget.cable.points
+                                .indexWhere((element) => element == e);
+                            if (index < 0) return;
+                            final current = widget.cable.points[index];
+                            final latDelta = details.delta.dy /
+                                200000 /
+                                18 *
+                                _mapController.camera.zoom;
+                            final lonDelta = details.delta.dx /
+                                200000 /
+                                18 *
+                                _mapController.camera.zoom;
+                            widget.cable.points[index] = LatLng(
+                              current.latitude - latDelta,
+                              current.longitude + lonDelta,
+                            );
                           }),
                           feedback: Material(
                             child: Container(
@@ -234,7 +244,15 @@ class _CableEditorState extends State<CableEditor> {
                             color: Colors.green,
                           ),
                         )))
-                .toList())
+                    .toList())
+          ],
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: Row(children: listActions()),
+        )
       ],
     );
   }

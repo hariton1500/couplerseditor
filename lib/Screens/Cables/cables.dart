@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:coupolerseditor/Services/location.dart';
+import 'package:coupolerseditor/services/location.dart';
 //import 'package:coupolerseditor/services/location.dart';
 import 'package:coupolerseditor/Helpers/strings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -321,166 +321,184 @@ class _CableScreenState extends State<CableScreen> {
   Widget _buildMap() {
     print('building map for creating cables from cableends');
     print(widget.settings.baseLocation.toString());
-    return FlutterMap(
-      nonRotatedChildren: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
+      children: [
+        FlutterMap(
+          mapController: _mapController,
+          options: MapOptions(
+              initialZoom: 16.0,
+              maxZoom: 18.0,
+              crs: mapSource == MapSource.yandexsat
+                  ? epsg3395()
+                  : const Epsg3857(),
+              initialCenter:
+                  widget.settings.baseLocation ?? const LatLng(0, 0)),
           children: [
-            Wrap(
-              children: MapSource.values
-                  .map((e) => TextButton(
-                      onPressed: () {
-                        setState(() {
-                          mapSource = e;
-                        });
-                      },
-                      child: Text(e.name)))
-                  .toList(),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ...selectedFoscList
-                        .map((fosc) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Container(
-                                color: selectedFoscList.indexOf(fosc) == 0
-                                    ? Colors.blue
-                                    : Colors.red,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '[${fosc.name}]',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    ...fosc.cableEnds
-                                        .skipWhile(
-                                            (value) => isAlreadyUsed(value))
-                                        .map((cableEnd) => Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Draggable<CableEnd>(
-                                                data: cableEnd,
-                                                feedback: Material(
-                                                    child: Text(
-                                                        cableEnd.direction)),
-                                                child: DragTarget<CableEnd>(
-                                                    onAccept: (data) {
-                                                      key1 =
-                                                          'fosc<|>${selectedFoscList.first.key}<|>${selectedFoscList.first.location?.toJson()}<|>${cableEnd.signature()}';
-                                                      key2 =
-                                                          'fosc<|>${selectedFoscList.last.key}<|>${selectedFoscList.last.location?.toJson()}<|>${data.signature()}';
-                                                      print(
-                                                          'cableEnd=${cableEnd.direction}($key1); data=${data.direction}($key2)');
-                                                      setState(() {
-                                                        ends = [cableEnd, data];
-                                                      });
-                                                    },
-                                                    builder: (context,
-                                                            candidateData,
-                                                            rejectedData) =>
-                                                        Container(
-                                                            //width: double.infinity,
-                                                            color: Colors.white,
-                                                            child: Text(cableEnd
-                                                                .direction))),
-                                              ),
-                                            ))
-                                        .toList()
-                                  ],
-                                ),
-                              ),
-                            ))
-                        .toList(),
-                    ...selectedNodeList
-                        .map((node) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Container(
-                                color: selectedNodeList.indexOf(node) == 0
-                                    ? Colors.blue
-                                    : Colors.red,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '[${node.address}]',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    ...node.cableEnds
-                                        .skipWhile(
-                                            (value) => isAlreadyUsed(value))
-                                        .map((cableEnd) => Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Draggable<CableEnd>(
-                                                data: cableEnd,
-                                                feedback: Material(
-                                                    child: Text(
-                                                        cableEnd.direction)),
-                                                child: DragTarget<CableEnd>(
-                                                    onAccept: (data) {
-                                                      key1 =
-                                                          'node<|>${selectedNodeList.first.key}<|>${selectedNodeList.first.location?.toJson()}<|>${cableEnd.signature()}';
-                                                      key2 =
-                                                          'node<|>${selectedNodeList.last.key}<|>${selectedNodeList.last.location?.toJson()}<|>${data.signature()}';
-                                                      print(
-                                                          'cableEnd=${cableEnd.direction}($key1); data=${data.direction}($key2)');
-                                                      setState(() {
-                                                        ends = [cableEnd, data];
-                                                      });
-                                                    },
-                                                    builder: (context,
-                                                            candidateData,
-                                                            rejectedData) =>
-                                                        Container(
-                                                            //width: double.infinity,
-                                                            color: Colors.white,
-                                                            child: Text(cableEnd
-                                                                .direction))),
-                                              ),
-                                            ))
-                                        .toList()
-                                  ],
-                                ),
-                              ),
-                            ))
-                        .toList(),
-                  ]),
-            )
+            layerMap(mapSource),
+            if (ends.length == 2)
+              PolylineLayer(polylines: [
+                Polyline(
+                    points: ends.map((e) => e.location!).toList(),
+                    color: Colors.black,
+                    strokeWidth: 3)
+              ]),
+            PolylineLayer(
+                polylines: cables
+                    .map((cable) => Polyline(strokeWidth: 3, points: [
+                          cable.end1!.location ?? LatLng(0, 0),
+                          cable.end2!.location ?? LatLng(0, 0)
+                        ]))
+                    .toList()),
+            MarkerLayer(markers: getFOSCS()),
+            MarkerLayer(markers: getNodes())
           ],
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                children: MapSource.values
+                    .map((e) => TextButton(
+                        onPressed: () {
+                          setState(() {
+                            mapSource = e;
+                          });
+                        },
+                        child: Text(e.name)))
+                    .toList(),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ...selectedFoscList
+                          .map((fosc) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Container(
+                                  color: selectedFoscList.indexOf(fosc) == 0
+                                      ? Colors.blue
+                                      : Colors.red,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '[${fosc.name}]',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      ...fosc.cableEnds
+                                          .skipWhile(
+                                              (value) => isAlreadyUsed(value))
+                                          .map((cableEnd) => Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Draggable<CableEnd>(
+                                                  data: cableEnd,
+                                                  feedback: Material(
+                                                      child: Text(
+                                                          cableEnd.direction)),
+                                                  child: DragTarget<CableEnd>(
+                                                      onAccept: (data) {
+                                                        key1 =
+                                                            'fosc<|>${selectedFoscList.first.key}<|>${selectedFoscList.first.location?.toJson()}<|>${cableEnd.signature()}';
+                                                        key2 =
+                                                            'fosc<|>${selectedFoscList.last.key}<|>${selectedFoscList.last.location?.toJson()}<|>${data.signature()}';
+                                                        print(
+                                                            'cableEnd=${cableEnd.direction}($key1); data=${data.direction}($key2)');
+                                                        setState(() {
+                                                          ends = [
+                                                            cableEnd,
+                                                            data
+                                                          ];
+                                                        });
+                                                      },
+                                                      builder: (context,
+                                                              candidateData,
+                                                              rejectedData) =>
+                                                          Container(
+                                                              //width: double.infinity,
+                                                              color:
+                                                                  Colors.white,
+                                                              child: Text(cableEnd
+                                                                  .direction))),
+                                                ),
+                                              ))
+                                          .toList()
+                                    ],
+                                  ),
+                                ),
+                              ))
+                          .toList(),
+                      ...selectedNodeList
+                          .map((node) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Container(
+                                  color: selectedNodeList.indexOf(node) == 0
+                                      ? Colors.blue
+                                      : Colors.red,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '[${node.address}]',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      ...node.cableEnds
+                                          .skipWhile(
+                                              (value) => isAlreadyUsed(value))
+                                          .map((cableEnd) => Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Draggable<CableEnd>(
+                                                  data: cableEnd,
+                                                  feedback: Material(
+                                                      child: Text(
+                                                          cableEnd.direction)),
+                                                  child: DragTarget<CableEnd>(
+                                                      onAccept: (data) {
+                                                        key1 =
+                                                            'node<|>${selectedNodeList.first.key}<|>${selectedNodeList.first.location?.toJson()}<|>${cableEnd.signature()}';
+                                                        key2 =
+                                                            'node<|>${selectedNodeList.last.key}<|>${selectedNodeList.last.location?.toJson()}<|>${data.signature()}';
+                                                        print(
+                                                            'cableEnd=${cableEnd.direction}($key1); data=${data.direction}($key2)');
+                                                        setState(() {
+                                                          ends = [
+                                                            cableEnd,
+                                                            data
+                                                          ];
+                                                        });
+                                                      },
+                                                      builder: (context,
+                                                              candidateData,
+                                                              rejectedData) =>
+                                                          Container(
+                                                              //width: double.infinity,
+                                                              color:
+                                                                  Colors.white,
+                                                              child: Text(cableEnd
+                                                                  .direction))),
+                                                ),
+                                              ))
+                                          .toList()
+                                    ],
+                                  ),
+                                ),
+                              ))
+                          .toList(),
+                    ]),
+              )
+            ],
+          ),
         )
-      ],
-      mapController: _mapController,
-      options: MapOptions(
-          zoom: 16.0,
-          maxZoom: 18.0,
-          crs: mapSource == MapSource.yandexsat
-              ? const Epsg3395()
-              : const Epsg3857(),
-          center: widget.settings.baseLocation ?? LatLng(0, 0)),
-      layers: [
-        layerMap(mapSource),
-        if (ends.length == 2)
-          PolylineLayerOptions(polylines: [
-            Polyline(
-                points: ends.map((e) => e.location!).toList(),
-                color: Colors.black,
-                strokeWidth: 3)
-          ]),
-        PolylineLayerOptions(
-            polylines: cables
-                .map((cable) => Polyline(strokeWidth: 3, points: [
-                      cable.end1!.location ?? LatLng(0, 0),
-                      cable.end2!.location ?? LatLng(0, 0)
-                    ]))
-                .toList()),
-        MarkerLayerOptions(markers: getFOSCS()),
-        MarkerLayerOptions(markers: getNodes())
       ],
     );
   }
@@ -668,11 +686,10 @@ class _CableScreenState extends State<CableScreen> {
   List<Marker> getFOSCS() {
     return couplers
         .map((fosc) => Marker(
-            width: 40,
-            //height: fosc.cableEnds.length * 20,
-            point: fosc.location!,
-            builder: (context) {
-              return Material(
+              width: 40,
+              //height: fosc.cableEnds.length * 20,
+              point: fosc.location!,
+              child: Material(
                 color: Colors.transparent,
                 child: IconButton(
                     onPressed: () {
@@ -686,8 +703,8 @@ class _CableScreenState extends State<CableScreen> {
                               : Colors.red
                           : Colors.black,
                     )),
-              );
-            }))
+              ),
+            ))
         .toList();
   }
 
@@ -696,7 +713,7 @@ class _CableScreenState extends State<CableScreen> {
         .map((node) => Marker(
             width: 40,
             point: node.location!,
-            builder: ((context) => Material(
+            child: Material(
                 color: Colors.transparent,
                 child: IconButton(
                     onPressed: () {
@@ -709,7 +726,7 @@ class _CableScreenState extends State<CableScreen> {
                               ? Colors.blue
                               : Colors.red
                           : Colors.black,
-                    ))))))
+                    )))))
         .toList();
   }
 

@@ -10,7 +10,7 @@ import '../Helpers/strings.dart';
 import 'location_picker.dart';
 
 class SetupScreen extends StatefulWidget {
-  const SetupScreen({Key? key, required this.settings}) : super(key: key);
+  const SetupScreen({super.key, required this.settings});
   final Settings settings;
 
   @override

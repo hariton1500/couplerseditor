@@ -166,92 +166,109 @@ class _ViewerScreenState extends State<ViewerScreen> {
   }
 
   Widget map() {
-    return FlutterMap(
-      mapController: _mapController,
-      nonRotatedChildren: [
-        Container(
-          color: Colors.white,
-          child: Row(
-            children: MapSource.values.map((source) => TextButton(onPressed: () => setState(() {mapSource = source;}), child: Text(source.name))).toList(),
+    return Stack(
+      children: [
+        FlutterMap(
+          mapController: _mapController,
+          options: MapOptions(
+              crs:
+                  mapSource == MapSource.yandexsat ? epsg3395() : const Epsg3857(),
+              initialCenter: const LatLng(45.200834, 33.351089),
+              initialZoom: 16.0,
+              maxZoom: 18.0,
+              onTap: (tapPos, latlng) {
+                print(latlng);
+                setState(() {
+                  selectedCouplerIndex = selectedFOSC(latlng);
+                  selectedNodeIndex = selectedNode(latlng);
+                });
+              }),
+          children: [
+            layerMap(mapSource),
+            MarkerLayer(
+              markers: couplers.map((coupler) {
+                return Marker(
+                  width: MediaQuery.of(context).size.width,
+                  height: 80.0,
+                  point: coupler.location!,
+                  child: Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      const Icon(
+                        Icons.blinds_rounded,
+                        color: Colors.red,
+                      ),
+                      Positioned(
+                          bottom: 10,
+                          child: Text(coupler.name,
+                              softWrap: true,
+                              maxLines: 2,
+                              textScaleFactor: 0.7,
+                              style: TextStyle(
+                                  color: couplers.indexOf(coupler) ==
+                                          selectedCouplerIndex
+                                      ? Colors.red
+                                      : Colors.black)))
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+            MarkerLayer(
+              markers: nodes.map((node) {
+                return Marker(
+                  width: MediaQuery.of(context).size.width,
+                  height: 80.0,
+                  point: node.location!,
+                  child: Stack(
+                      alignment: AlignmentDirectional.center,
+                      children: [
+                        const Icon(
+                          Icons.api_outlined,
+                          color: Colors.red,
+                        ),
+                        Positioned(
+                            bottom: 10,
+                            child: Text(
+                              node.address,
+                              softWrap: true,
+                              maxLines: 2,
+                              textScaleFactor: 0.7,
+                              style: TextStyle(
+                                  color: nodes.indexOf(node) ==
+                                          selectedNodeIndex
+                                      ? Colors.red
+                                      : Colors.black),
+                            ))
+                      ]),
+                );
+              }).toList(),
+            ),
+            ...cables
+                .map((cable) => PolylineLayer(
+                    polylines: cable.polylines(
+                        color: Colors.green,
+                        strokeWidth: log(cable.end1!.fibersNumber.toDouble()))))
+                .toList(),
+          ],
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            color: Colors.white,
+            child: Row(
+              children: MapSource.values
+                  .map((source) => TextButton(
+                      onPressed: () => setState(() {
+                            mapSource = source;
+                          }),
+                      child: Text(source.name)))
+                  .toList(),
+            ),
           ),
         )
-      ],
-      options: MapOptions(
-          crs: mapSource == MapSource.yandexsat ? const Epsg3395() : const Epsg3857(),
-          center: LatLng(45.200834, 33.351089),
-          zoom: 16.0,
-          maxZoom: 18.0,
-          onTap: (tapPos, latlng) {
-            print(latlng);
-            setState(() {
-              selectedCouplerIndex = selectedFOSC(latlng);
-              selectedNodeIndex = selectedNode(latlng);
-            });
-          }),
-      layers: [
-        layerMap(mapSource),
-        MarkerLayerOptions(
-          markers: couplers.map((coupler) {
-            return Marker(
-              width: MediaQuery.of(context).size.width,
-              height: 80.0,
-              point: coupler.location!,
-              builder: (ctx) => Stack(
-                alignment: AlignmentDirectional.center,
-                children: [
-                  const Icon(
-                    Icons.blinds_rounded,
-                    color: Colors.red,
-                  ),
-                  Positioned(
-                      bottom: 10,
-                      child: Text(coupler.name,
-                          softWrap: true,
-                          maxLines: 2,
-                          textScaleFactor: 0.7,
-                          style: TextStyle(
-                              color: couplers.indexOf(coupler) ==
-                                      selectedCouplerIndex
-                                  ? Colors.red
-                                  : Colors.black)))
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-        MarkerLayerOptions(
-          markers: nodes.map((node) {
-            return Marker(
-              width: MediaQuery.of(context).size.width,
-              height: 80.0,
-              point: node.location!,
-              builder: (ctx) => Stack(
-                  alignment: AlignmentDirectional.center,
-                  children: [
-                    const Icon(
-                      Icons.api_outlined,
-                      color: Colors.red,
-                    ),
-                    Positioned(
-                        bottom: 10,
-                        child: Text(
-                          node.address,
-                          softWrap: true,
-                          maxLines: 2,
-                          textScaleFactor: 0.7,
-                          style: TextStyle(
-                              color: nodes.indexOf(node) ==
-                                      selectedNodeIndex
-                                  ? Colors.red
-                                  : Colors.black),
-                        ))
-                  ]),
-            );
-          }).toList(),
-        ),
-        ...cables.map((cable) => PolylineLayerOptions(
-          polylines: cable.polylines(color: Colors.green, strokeWidth: log(cable.end1!.fibersNumber.toDouble()))
-        )).toList(),
       ],
     );
   }

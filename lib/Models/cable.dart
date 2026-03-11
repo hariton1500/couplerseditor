@@ -3,7 +3,7 @@
 import 'dart:convert';
 import 'package:coupolerseditor/Helpers/map.dart';
 import 'package:coupolerseditor/Models/cableend.dart';
-import 'package:coupolerseditor/Services/location.dart';
+import 'package:coupolerseditor/services/location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';

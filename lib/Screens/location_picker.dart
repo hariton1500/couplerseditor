@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../Helpers/enums.dart';
@@ -82,16 +81,16 @@ class _LocationPickerState extends State<LocationPicker> {
           onPositionChanged: ((position, hasGesture) {
             if (hasGesture) setState(() {location = position.center;});
           }),
-          crs: mapSource == MapSource.yandexsat ? const Epsg3395() : const Epsg3857(),
-          center: widget.startLocation,
-          zoom: 16.0,
+          crs: mapSource == MapSource.yandexsat ? epsg3395() : const Epsg3857(),
+          initialCenter: widget.startLocation,
+          initialZoom: 16.0,
           maxZoom: 18.0,
           onTap: (tapPos, latlng) {
             setState(() {
               _markers.clear();
               _markers.add(Marker(
                 point: latlng,
-                builder: (ctx) => const Icon(
+                child: const Icon(
                   Icons.control_point_outlined,
                   size: 10.0,
                   color: Colors.red,
@@ -101,10 +100,10 @@ class _LocationPickerState extends State<LocationPicker> {
             Navigator.of(context).pop(latlng);
             //markLocation(latlng);
           }),
-      layers: [
+      children: [
         layerMap(mapSource),
-        MarkerLayerOptions(markers: _markers),
-        MarkerLayerOptions(markers: [Marker(point: location ?? widget.startLocation, builder: (context) => const Icon(Icons.center_focus_weak))])
+        MarkerLayer(markers: _markers),
+        MarkerLayer(markers: [Marker(point: location ?? widget.startLocation, child: const Icon(Icons.center_focus_weak))])
         //TileLayerOptions(urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", userAgentPackageName: 'com.example.app',),
         //TileLayerOptions(urlTemplate: 'https://core-sat.maps.yandex.net/tiles?l=map&v=3.569.0&x={x}&y={y}&z={z}&lang=ru_RU'),
         //TileLayerOptions(urlTemplate: 'https://tiles.api-maps.yandex.ru/v1/tiles/?l=map&scale=1.0&x={x}&y={y}&z={z}&lang=ru_RU&apikey='),

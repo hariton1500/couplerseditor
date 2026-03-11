@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:coupolerseditor/Models/settings.dart';
 import 'package:coupolerseditor/services/server.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -213,11 +213,10 @@ class _CouplersListState extends State<CouplersList> {
     return FlutterMap(
       options: MapOptions(
           crs: mapSource == MapSource.yandexsat
-              ? const Epsg3395()
+              ? epsg3395()
               : const Epsg3857(),
-          controller: _mapController,
-          center: widget.settings.baseLocation,
-          zoom: 16.0,
+          initialCenter: widget.settings.baseLocation ?? const LatLng(0, 0),
+          initialZoom: 16.0,
           maxZoom: 18.0,
           /*
           onTap: (tapPos, latlng) {
@@ -228,15 +227,15 @@ class _CouplersListState extends State<CouplersList> {
             //markLocation(latlng);
           }*/
       ),
-      layers: [
+      children: [
         layerMap(mapSource),
-        MarkerLayerOptions(
+        MarkerLayer(
           markers: couplers
               .map((foscEncoded) => json.decode(foscEncoded))
               .toList()
               .map((e) => Marker(
                   point: LatLng.fromJson(e['location']!),
-                  builder: (ctx) => IconButton(onPressed: () {
+                  child: IconButton(onPressed: () {
                     Navigator.of(context)
                         .push(MaterialPageRoute(
                             builder: (context) => MuftaScreen(

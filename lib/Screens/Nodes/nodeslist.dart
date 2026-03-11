@@ -218,13 +218,13 @@ class _NodesListState extends State<NodesList> {
     return FlutterMap(
       mapController: _mapController,
       options: MapOptions(
-          zoom: 16,
+          initialZoom: 16,
           maxZoom: 18,
           crs: mapSource == MapSource.yandexsat
-              ? const Epsg3395()
+              ? epsg3395()
               : const Epsg3857(),
-          center: widget.settings.baseLocation ?? LatLng(0, 0)),
-      layers: [layerMap(mapSource), MarkerLayerOptions(markers: getNodes())],
+          initialCenter: widget.settings.baseLocation ?? const LatLng(0, 0)),
+      children: [layerMap(mapSource), MarkerLayer(markers: getNodes())],
     );
   }
 
@@ -235,13 +235,13 @@ class _NodesListState extends State<NodesList> {
     for (var node in nodes) {
       nodesMarkers.add(Marker(
           point: node.location!,
-          builder: ((context) => IconButton(
+          child: IconButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: ((context) =>
                         NodesScreen(node: node, settings: widget.settings))));
               },
-              icon: const Icon(Icons.add_box_outlined)))));
+              icon: const Icon(Icons.add_box_outlined))));
     }
     return nodesMarkers;
   }
