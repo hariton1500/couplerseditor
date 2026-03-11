@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/location.dart';
 import '../Helpers/strings.dart';
 import '../Models/cable.dart';
+import '../Models/cableend.dart';
 import '../Models/fosc.dart';
 import '../Models/node.dart';
 import '../Models/settings.dart';
@@ -43,21 +44,74 @@ class _ViewerScreenState extends State<ViewerScreen> {
   final MapController _mapController = MapController();
   MapSource mapSource = MapSource.openstreet;
 
+  bool _isNonEmpty(String? value) =>
+      value != null && value.trim().isNotEmpty;
+
+  T? _decodeJson<T>(String? raw, T Function(Map<String, dynamic>) fromJson) {
+    if (!_isNonEmpty(raw)) return null;
+    try {
+      final decoded = jsonDecode(raw!);
+      if (decoded is Map<String, dynamic>) {
+        return fromJson(decoded);
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  CableEnd? _resolveCableEnd(
+      String? ref, List<Mufta> couplers, List<Node> nodes) {
+    if (ref == null || ref.trim().isEmpty) return null;
+    final parts = ref.split('<|>');
+    if (parts.length >= 3) {
+      final type = parts[0];
+      final ownerKey = parts[1];
+      final payload =
+          parts.length >= 4 ? parts.last : parts.sublist(2).join('<|>');
+      final owner = type == 'fosc'
+          ? couplers.firstWhere(
+              (c) => c.key == ownerKey,
+              orElse: () => Mufta(name: '', cableEnds: [], connections: []))
+          : nodes.firstWhere(
+              (n) => n.key == ownerKey,
+              orElse: () => Node(address: ''));
+      final list = owner is Mufta ? owner.cableEnds : (owner as Node).cableEnds;
+      if (list.isNotEmpty) {
+        final index = int.tryParse(payload);
+        if (index != null && index >= 0 && index < list.length) {
+          return list[index];
+        }
+        final bySignature =
+            list.where((e) => e.signature() == payload).toList();
+        if (bySignature.isNotEmpty) return bySignature.first;
+      }
+      return null;
+    }
+    // Fallback: treat ref as signature and search all ends.
+    for (final coupler in couplers) {
+      final match =
+          coupler.cableEnds.where((e) => e.signature() == ref).toList();
+      if (match.isNotEmpty) return match.first;
+    }
+    for (final node in nodes) {
+      final match =
+          node.cableEnds.where((e) => e.signature() == ref).toList();
+      if (match.isNotEmpty) return match.first;
+    }
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
-    _loadCouplersAndNodes(isSourceLocal: !widget.isFromServer)
-        .then((value) => setState(
-              () {
-                //print(nodes);
-                //print(couplers);
-              },
-            ));
-    _loadCables(isSourceLocal: !widget.isFromServer).then((value) => setState(
-          () {
-            //print(cables);
-          },
-        ));
+    if (widget.isFromServer) {
+      _loadCouplersAndNodes(isSourceLocal: false).then((_) {
+        _loadCables(isSourceLocal: false).then((_) => setState(() {}));
+      });
+    } else {
+      _loadCouplersAndNodes(isSourceLocal: true).then((_) {
+        _loadCables(isSourceLocal: true).then((_) => setState(() {}));
+      });
+    }
   }
 
   @override
@@ -186,7 +240,9 @@ class _ViewerScreenState extends State<ViewerScreen> {
           children: [
             layerMap(mapSource),
             MarkerLayer(
-              markers: couplers.map((coupler) {
+              markers: couplers
+                  .where((coupler) => coupler.location != null)
+                  .map((coupler) {
                 return Marker(
                   width: MediaQuery.of(context).size.width,
                   height: 80.0,
@@ -215,7 +271,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
               }).toList(),
             ),
             MarkerLayer(
-              markers: nodes.map((node) {
+              markers: nodes.where((node) => node.location != null).map((node) {
                 return Marker(
                   width: MediaQuery.of(context).size.width,
                   height: 80.0,
@@ -245,6 +301,9 @@ class _ViewerScreenState extends State<ViewerScreen> {
               }).toList(),
             ),
             ...cables
+                .where((cable) =>
+                    cable.end1?.location != null &&
+                    cable.end2?.location != null)
                 .map((cable) => PolylineLayer(
                     polylines: cable.polylines(
                         color: Colors.green,
@@ -278,19 +337,21 @@ class _ViewerScreenState extends State<ViewerScreen> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Set<String> couplersJsonStrings = prefs
           .getKeys()
-          .where((element) => element.startsWith('coupler:'))
+          .where((element) =>
+              element.startsWith('coupler:') || element.startsWith('coupler: '))
           .toSet();
       couplers = couplersJsonStrings
-          .map((element) =>
-              Mufta.fromJson(jsonDecode(prefs.getString(element) ?? '')))
+          .map((element) => _decodeJson(prefs.getString(element), Mufta.fromJson))
+          .whereType<Mufta>()
           .toList();
       Set<String> nodesJsonStrings = prefs
           .getKeys()
-          .where((element) => element.startsWith('node:'))
+          .where((element) =>
+              element.startsWith('node:') || element.startsWith('node: '))
           .toSet();
       nodes = nodesJsonStrings
-          .map((element) =>
-              Node.fromJson(jsonDecode(prefs.getString(element) ?? '')))
+          .map((element) => _decodeJson(prefs.getString(element), Node.fromJson))
+          .whereType<Node>()
           .toList();
     } else {
       Server server = Server(settings: widget.settings);
@@ -319,10 +380,21 @@ class _ViewerScreenState extends State<ViewerScreen> {
           .where((element) => element.startsWith('cable:'))
           .toSet();
       try {
-        cables = cablesJsonStrings
+        final decoded = cablesJsonStrings
             .map((element) =>
-                Cable.fromJson(jsonDecode(prefs.getString(element) ?? '')))
+                _decodeJson(prefs.getString(element), Cable.fromJson))
+            .whereType<Cable>()
             .toList();
+        final resolved = <Cable>[];
+        for (final cable in decoded) {
+          final end1 = _resolveCableEnd(cable.key1, couplers, nodes);
+          final end2 = _resolveCableEnd(cable.key2, couplers, nodes);
+          if (end1 == null || end2 == null) continue;
+          cable.end1 = end1;
+          cable.end2 = end2;
+          resolved.add(cable);
+        }
+        cables = resolved;
       } catch (e) {
         print(e);
       }
@@ -331,25 +403,40 @@ class _ViewerScreenState extends State<ViewerScreen> {
       server.list(type: 'cable').then((value) {
         if (value != '') {
           setState(() {
-            cables.addAll(value.split('\n').map((e) => Cable.fromJson(json.decode(e))));
+            final decoded = value
+                .split('\n')
+                .map((e) => Cable.fromJson(json.decode(e)))
+                .toList();
+            final resolved = <Cable>[];
+            for (final cable in decoded) {
+              final end1 = _resolveCableEnd(cable.key1, couplers, nodes);
+              final end2 = _resolveCableEnd(cable.key2, couplers, nodes);
+              if (end1 == null || end2 == null) continue;
+              cable.end1 = end1;
+              cable.end2 = end2;
+              resolved.add(cable);
+            }
+            cables.addAll(resolved);
           });
         }
       });
     }
   }
 
-  bool isTapedOnIt(LatLng a, b) {
+  bool isTapedOnIt(LatLng a, LatLng b) {
     return pow(a.latitude - b.latitude, 2) +
             pow(a.longitude - b.longitude, 2) <=
         0.00000001;
   }
 
   int selectedFOSC(LatLng latLng) {
-    return couplers.indexWhere((fosc) => isTapedOnIt(fosc.location!, latLng));
+    return couplers.indexWhere(
+        (fosc) => fosc.location != null && isTapedOnIt(fosc.location!, latLng));
   }
 
   int selectedNode(LatLng latLng) {
-    return nodes.indexWhere((node) => isTapedOnIt(node.location!, latLng));
+    return nodes.indexWhere(
+        (node) => node.location != null && isTapedOnIt(node.location!, latLng));
   }
 }
 

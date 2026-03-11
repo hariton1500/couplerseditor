@@ -73,7 +73,7 @@ class Node {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String jsonString = json.encode(toJson());
     print('saving to local: $jsonString');
-    sharedPreferences.setString('node: ${key ?? address}', jsonString);
+    sharedPreferences.setString('node:${key ?? address}', jsonString);
   }
 
   Future<bool> saveToServer() async {

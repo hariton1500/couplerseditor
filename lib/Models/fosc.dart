@@ -91,7 +91,7 @@ class Mufta {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String jsonString = json.encode(toJson());
     print('saving to local: $jsonString');
-    sharedPreferences.setString('coupler: ${key ?? name}', jsonString);
+    sharedPreferences.setString('coupler:${key ?? name}', jsonString);
   }
 
   Function addConnection() {

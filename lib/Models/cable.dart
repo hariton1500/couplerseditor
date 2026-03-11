@@ -19,6 +19,8 @@ class Cable {
   String? key, key1, key2;
 
   Cable({required this.end1, required this.end2, this.key1, this.key2}) {
+    key1 ??= end1?.signature();
+    key2 ??= end2?.signature();
     points.add(end1!.location ?? zeroLocation);
     points.add(end2!.location ?? zeroLocation);
   }
@@ -41,8 +43,8 @@ class Cable {
   }
 
   Map<String, dynamic> toJson() => {
-        'end1': key1,
-        'end2': key2,
+        'end1': key1 ?? end1?.signature(),
+        'end2': key2 ?? end2?.signature(),
         'key': key,
         'points': points,
         //'key1': key1,
@@ -52,7 +54,7 @@ class Cable {
   String signature() {
     //print('signature of cable with ends: $end1 and $end2');
     //return key ?? '${end1!.signature()}:${end2!.signature()}';
-    return key ?? '$key1:$key2';
+    return key ?? '${end1?.signature()}:${end2?.signature()}';
   }
 
   @override
@@ -63,7 +65,7 @@ class Cable {
   double distance() {
     double d = 0;
     //LatLng p1 = end1!.location!;
-    List<LatLng> cable = [end1!.location!, ...points, end2!.location!];
+    List<LatLng> cable = _buildPath();
     for (var i = 1; i < cable.length; i++) {
       d += calculateDistance(cable[i - 1], cable[i]);
       //p1 = points[i];
@@ -121,9 +123,25 @@ class Cable {
     */
     return [
       Polyline(
-          points: [end1!.location!, ...points, end2!.location!],
+          points: _buildPath(),
           strokeWidth: strokeWidth ?? 2,
           color: color)
     ];
+  }
+
+  List<LatLng> _buildPath() {
+    if (end1?.location == null || end2?.location == null) {
+      return points;
+    }
+    if (points.isNotEmpty &&
+        _samePoint(points.first, end1!.location!) &&
+        _samePoint(points.last, end2!.location!)) {
+      return points;
+    }
+    return [end1!.location!, ...points, end2!.location!];
+  }
+
+  bool _samePoint(LatLng a, LatLng b) {
+    return a.latitude == b.latitude && a.longitude == b.longitude;
   }
 }

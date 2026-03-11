@@ -53,14 +53,94 @@ class _CableScreenState extends State<CableScreen> {
   List<Mufta> selectedFoscList = [];
   List<Node> selectedNodeList = [];
 
+  bool _isNonEmpty(String? value) =>
+      value != null && value.trim().isNotEmpty;
+
+  T? _decodeJson<T>(String? raw, T Function(Map<String, dynamic>) fromJson) {
+    if (!_isNonEmpty(raw)) return null;
+    try {
+      final decoded = jsonDecode(raw!);
+      if (decoded is Map<String, dynamic>) {
+        return fromJson(decoded);
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  CableEnd? _resolveCableEnd(String? ref) {
+    if (ref == null || ref.trim().isEmpty) return null;
+    final parts = ref.split('<|>');
+    if (parts.length >= 3) {
+      final type = parts[0];
+      final ownerKey = parts[1];
+      final payload =
+          parts.length >= 4 ? parts.last : parts.sublist(2).join('<|>');
+      final owner = type == 'fosc'
+          ? couplers.firstWhere(
+              (c) => c.key == ownerKey,
+              orElse: () => Mufta(name: '', cableEnds: [], connections: []))
+          : nodes.firstWhere(
+              (n) => n.key == ownerKey,
+              orElse: () => Node(address: ''));
+      final list = owner is Mufta ? owner.cableEnds : (owner as Node).cableEnds;
+      if (list.isNotEmpty) {
+        final index = int.tryParse(payload);
+        if (index != null && index >= 0 && index < list.length) {
+          return list[index];
+        }
+        final bySignature =
+            list.where((e) => e.signature() == payload).toList();
+        if (bySignature.isNotEmpty) return bySignature.first;
+      }
+      return null;
+    }
+    // Fallback: treat ref as signature and search all ends.
+    for (final coupler in couplers) {
+      final match =
+          coupler.cableEnds.where((e) => e.signature() == ref).toList();
+      if (match.isNotEmpty) return match.first;
+    }
+    for (final node in nodes) {
+      final match =
+          node.cableEnds.where((e) => e.signature() == ref).toList();
+      if (match.isNotEmpty) return match.first;
+    }
+    return null;
+  }
+
+  String _buildEndRef(CableEnd end) {
+    for (final coupler in couplers) {
+      if (coupler.cableEnds.contains(end)) {
+        if (coupler.key != null && coupler.key!.isNotEmpty) {
+          return 'fosc<|>${coupler.key}<|>${end.signature()}';
+        }
+        return end.signature();
+      }
+    }
+    for (final node in nodes) {
+      if (node.cableEnds.contains(end)) {
+        if (node.key != null && node.key!.isNotEmpty) {
+          return 'node<|>${node.key}<|>${end.signature()}';
+        }
+        return end.signature();
+      }
+    }
+    return end.signature();
+  }
+
   //LatLng? _currentPos;
 
   @override
   void initState() {
     super.initState();
-    _loadCouplersAndNodes(isSourceLocal: !widget.isFromServer);
-    _loadCables(isSourceLocal: !widget.isFromServer)
-        .then((_) => setState(() {}));
+    if (widget.isFromServer) {
+      _loadCouplersAndNodes(isSourceLocal: false).then((_) {
+        _loadCables(isSourceLocal: false).then((_) => setState(() {}));
+      });
+    } else {
+      _loadCouplersAndNodes(isSourceLocal: true);
+      _loadCables(isSourceLocal: true).then((_) => setState(() {}));
+    }
   }
 
   @override
@@ -79,6 +159,12 @@ class _CableScreenState extends State<CableScreen> {
               IconButton(
                   onPressed: () {
                     setState(() {
+                      if (key1.isEmpty) {
+                        key1 = _buildEndRef(ends.first);
+                      }
+                      if (key2.isEmpty) {
+                        key2 = _buildEndRef(ends.last);
+                      }
                       cables.add(Cable(
                           end1: ends.first,
                           end2: ends.last,
@@ -86,6 +172,8 @@ class _CableScreenState extends State<CableScreen> {
                           key2: key2));
                       cables.last.saveCable(widget.isFromServer);
                       ends.clear();
+                      key1 = '';
+                      key2 = '';
                       selectedFosc = null;
                       selectedFoscList.clear();
                     });
@@ -104,9 +192,10 @@ class _CableScreenState extends State<CableScreen> {
                     onPressed: () {
                       getLocation().then((locationData) {
                         print(locationData);
+                        if (locationData == null) return;
                         _mapController.move(
                             LatLng(
-                                locationData!.latitude, locationData.longitude),
+                                locationData.latitude, locationData.longitude),
                             16);
                       });
                     },
@@ -174,11 +263,19 @@ class _CableScreenState extends State<CableScreen> {
                                 return;
                               }
                               print('creating cable from $ends');
-                              Cable cable = Cable(end1: ends[0], end2: ends[1]);
+                              final localKey1 = _buildEndRef(ends[0]);
+                              final localKey2 = _buildEndRef(ends[1]);
+                              Cable cable = Cable(
+                                  end1: ends[0],
+                                  end2: ends[1],
+                                  key1: localKey1,
+                                  key2: localKey2);
                               cable.saveCable(widget.isFromServer);
                               setState(() {
                                 cables.add(cable);
                                 ends.clear();
+                                key1 = '';
+                                key2 = '';
                                 _loadCouplersAndNodes(
                                     isSourceLocal: !widget.isFromServer);
                               });
@@ -197,6 +294,7 @@ class _CableScreenState extends State<CableScreen> {
                     ),
                     Column(
                       children: cables
+                          .where((cable) => cable.end1 != null && cable.end2 != null)
                           .map((cable) => ListTile(
                                 leading: IconButton(
                                     onPressed: () {
@@ -344,9 +442,12 @@ class _CableScreenState extends State<CableScreen> {
               ]),
             PolylineLayer(
                 polylines: cables
+                    .where((cable) =>
+                        cable.end1?.location != null &&
+                        cable.end2?.location != null)
                     .map((cable) => Polyline(strokeWidth: 3, points: [
-                          cable.end1!.location ?? LatLng(0, 0),
-                          cable.end2!.location ?? LatLng(0, 0)
+                          cable.end1!.location!,
+                          cable.end2!.location!
                         ]))
                     .toList()),
             MarkerLayer(markers: getFOSCS()),
@@ -405,12 +506,12 @@ class _CableScreenState extends State<CableScreen> {
                                                           cableEnd.direction)),
                                                   child: DragTarget<CableEnd>(
                                                       onAccept: (data) {
-                                                        key1 =
-                                                            'fosc<|>${selectedFoscList.first.key}<|>${selectedFoscList.first.location?.toJson()}<|>${cableEnd.signature()}';
-                                                        key2 =
-                                                            'fosc<|>${selectedFoscList.last.key}<|>${selectedFoscList.last.location?.toJson()}<|>${data.signature()}';
-                                                        print(
-                                                            'cableEnd=${cableEnd.direction}($key1); data=${data.direction}($key2)');
+                                                      key1 =
+                                                          'fosc<|>${selectedFoscList.first.key}<|>${cableEnd.signature()}';
+                                                      key2 =
+                                                          'fosc<|>${selectedFoscList.last.key}<|>${data.signature()}';
+                                                      print(
+                                                          'cableEnd=${cableEnd.direction}($key1); data=${data.direction}($key2)');
                                                         setState(() {
                                                           ends = [
                                                             cableEnd,
@@ -464,12 +565,12 @@ class _CableScreenState extends State<CableScreen> {
                                                           cableEnd.direction)),
                                                   child: DragTarget<CableEnd>(
                                                       onAccept: (data) {
-                                                        key1 =
-                                                            'node<|>${selectedNodeList.first.key}<|>${selectedNodeList.first.location?.toJson()}<|>${cableEnd.signature()}';
-                                                        key2 =
-                                                            'node<|>${selectedNodeList.last.key}<|>${selectedNodeList.last.location?.toJson()}<|>${data.signature()}';
-                                                        print(
-                                                            'cableEnd=${cableEnd.direction}($key1); data=${data.direction}($key2)');
+                                                      key1 =
+                                                          'node<|>${selectedNodeList.first.key}<|>${cableEnd.signature()}';
+                                                      key2 =
+                                                          'node<|>${selectedNodeList.last.key}<|>${data.signature()}';
+                                                      print(
+                                                          'cableEnd=${cableEnd.direction}($key1); data=${data.direction}($key2)');
                                                         setState(() {
                                                           ends = [
                                                             cableEnd,
@@ -515,12 +616,13 @@ class _CableScreenState extends State<CableScreen> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Set<String> couplersJsonStrings = prefs
           .getKeys()
-          .where((element) => element.startsWith('coupler:'))
+          .where((element) =>
+              element.startsWith('coupler:') || element.startsWith('coupler: '))
           .toSet();
       print(couplersJsonStrings);
       couplers = couplersJsonStrings
-          .map((element) =>
-              Mufta.fromJson(jsonDecode(prefs.getString(element) ?? '')))
+          .map((element) => _decodeJson(prefs.getString(element), Mufta.fromJson))
+          .whereType<Mufta>()
           .toList();
     } else {
       if (widget.settings.altServer == '' ||
@@ -544,11 +646,12 @@ class _CableScreenState extends State<CableScreen> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Set<String> nodesJsonStrings = prefs
           .getKeys()
-          .where((element) => element.startsWith('node:'))
+          .where((element) =>
+              element.startsWith('node:') || element.startsWith('node: '))
           .toSet();
       nodes = nodesJsonStrings
-          .map((element) =>
-              Node.fromJson(jsonDecode(prefs.getString(element) ?? '')))
+          .map((element) => _decodeJson(prefs.getString(element), Node.fromJson))
+          .whereType<Node>()
           .toList();
     } else {
       //nodes = [];
@@ -615,10 +718,21 @@ class _CableScreenState extends State<CableScreen> {
           .toSet();
       print('cables keys: $cablesJsonStrings');
       try {
-        cables = cablesJsonStrings
+        final decoded = cablesJsonStrings
             .map((element) =>
-                Cable.fromJson(jsonDecode(prefs.getString(element) ?? '')))
+                _decodeJson(prefs.getString(element), Cable.fromJson))
+            .whereType<Cable>()
             .toList();
+        final resolved = <Cable>[];
+        for (final cable in decoded) {
+          final end1 = _resolveCableEnd(cable.key1);
+          final end2 = _resolveCableEnd(cable.key2);
+          if (end1 == null || end2 == null) continue;
+          cable.end1 = end1;
+          cable.end2 = end2;
+          resolved.add(cable);
+        }
+        cables = resolved;
       } catch (e) {
         print(e);
       }
@@ -638,44 +752,20 @@ class _CableScreenState extends State<CableScreen> {
           if (value != '') {
             print(value);
             setState(() {
-              cables.addAll(value.split('\n').map((e) {
-                Cable cable = Cable.fromJson(json.decode(e));
-                //
-                //setting end1 and end2 cableEnds from couplers or nodes
-                //
-                if (cable.key1 != null && cable.key1!.startsWith('fosc<|>')) {
-                  int index = int.tryParse(cable.key1!.split('<|>')[2]) ?? 0;
-                  cable.end1 = couplers
-                      .where((element) =>
-                          element.key == cable.key1!.split('<|>')[1])
-                      .first
-                      .cableEnds[index];
-                } else {
-                  print('key=${cable.key1}');
-                  int index = int.tryParse(cable.key1!.split('<|>')[2]) ?? 0;
-                  cable.end1 = nodes
-                      .where((element) =>
-                          element.key == cable.key1!.split('<|>')[1])
-                      .first
-                      .cableEnds[index];
-                }
-                if (cable.key2 != null && cable.key2!.startsWith('fosc<|>')) {
-                  int index = int.tryParse(cable.key2!.split('<|>')[2]) ?? 0;
-                  cable.end2 = couplers
-                      .where((element) =>
-                          element.key == cable.key2!.split('<|>')[1])
-                      .first
-                      .cableEnds[index];
-                } else {
-                  int index = int.tryParse(cable.key2!.split('<|>')[2]) ?? 0;
-                  cable.end2 = nodes
-                      .where((element) =>
-                          element.key == cable.key2!.split('<|>')[1])
-                      .first
-                      .cableEnds[index];
-                }
-                return cable;
-              }).toList());
+              final decoded = value
+                  .split('\n')
+                  .map((e) => Cable.fromJson(json.decode(e)))
+                  .toList();
+              final resolved = <Cable>[];
+              for (final cable in decoded) {
+                final end1 = _resolveCableEnd(cable.key1);
+                final end2 = _resolveCableEnd(cable.key2);
+                if (end1 == null || end2 == null) continue;
+                cable.end1 = end1;
+                cable.end2 = end2;
+                resolved.add(cable);
+              }
+              cables.addAll(resolved);
             });
           }
         });
@@ -685,10 +775,11 @@ class _CableScreenState extends State<CableScreen> {
 
   List<Marker> getFOSCS() {
     return couplers
+        .where((fosc) => fosc.location != null)
         .map((fosc) => Marker(
-              width: 40,
-              //height: fosc.cableEnds.length * 20,
-              point: fosc.location!,
+            width: 40,
+            //height: fosc.cableEnds.length * 20,
+            point: fosc.location!,
               child: Material(
                 color: Colors.transparent,
                 child: IconButton(
@@ -710,6 +801,7 @@ class _CableScreenState extends State<CableScreen> {
 
   List<Marker> getNodes() {
     return nodes
+        .where((node) => node.location != null)
         .map((node) => Marker(
             width: 40,
             point: node.location!,

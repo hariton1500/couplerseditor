@@ -188,13 +188,15 @@ class _NodesListState extends State<NodesList> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     List<String> codedNodesListKeys = sharedPreferences
         .getKeys()
-        .where((element) => element.startsWith('node: '))
+        .where(
+            (element) => element.startsWith('node:') || element.startsWith('node: '))
         .toList();
     print('codedNodesListKeys: $codedNodesListKeys');
     setState(() {
       nodesJsonStrings = codedNodesListKeys
-          .map(
-              (codedNodeKey) => sharedPreferences.getString(codedNodeKey) ?? '')
+          .map((codedNodeKey) => sharedPreferences.getString(codedNodeKey))
+          .where((value) => value != null && value!.trim().isNotEmpty)
+          .cast<String>()
           .toList();
     });
   }
@@ -202,9 +204,11 @@ class _NodesListState extends State<NodesList> {
   void removeNodeFromStore(String nodesJsonString) async {
     print('removing: $nodesJsonString');
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String key =
-        'node: ${(json.decode(nodesJsonString) as Map<String, dynamic>)['key'] ?? (json.decode(nodesJsonString) as Map<String, dynamic>)['address']}';
-    sharedPreferences.remove(key);
+    final base =
+        (json.decode(nodesJsonString) as Map<String, dynamic>)['key'] ??
+            (json.decode(nodesJsonString) as Map<String, dynamic>)['address'];
+    sharedPreferences.remove('node:$base');
+    sharedPreferences.remove('node: $base');
   }
 
   void removeFromServer({required String name}) async {
@@ -233,6 +237,7 @@ class _NodesListState extends State<NodesList> {
     List<Node> nodes =
         nodesJsonStrings.map((e) => Node.fromJson(json.decode(e))).toList();
     for (var node in nodes) {
+      if (node.location == null) continue;
       nodesMarkers.add(Marker(
           point: node.location!,
           child: IconButton(

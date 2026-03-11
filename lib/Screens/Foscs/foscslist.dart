@@ -233,24 +233,28 @@ class _CouplersListState extends State<CouplersList> {
           markers: couplers
               .map((foscEncoded) => json.decode(foscEncoded))
               .toList()
-              .map((e) => Marker(
-                  point: LatLng.fromJson(e['location']!),
-                  child: IconButton(onPressed: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(
-                            builder: (context) => MuftaScreen(
-                                mufta: Mufta.fromJson(e),
-                                /*
-                                callback: () {
-                                  setState(() {
-                                    couplers.clear();
-                                    widget.isFromBilling
-                                        ? loadListFromBilling()
-                                        : loadListFromDevice();
-                                  });
-                                },*/
-                                settings: widget.settings)));
-                  }, icon: const Icon(Icons.blinds_rounded))))
+              .map((e) {
+                if (e['location'] == null) return null;
+                return Marker(
+                    point: LatLng.fromJson(e['location']!),
+                    child: IconButton(onPressed: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(
+                              builder: (context) => MuftaScreen(
+                                  mufta: Mufta.fromJson(e),
+                                  /*
+                                  callback: () {
+                                    setState(() {
+                                      couplers.clear();
+                                      widget.isFromBilling
+                                          ? loadListFromBilling()
+                                          : loadListFromDevice();
+                                    });
+                                  },*/
+                                  settings: widget.settings)));
+                    }, icon: const Icon(Icons.blinds_rounded)));
+              })
+              .whereType<Marker>()
               .toList(),
         )
         //TileLayerOptions(urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", userAgentPackageName: 'com.example.app',),
@@ -307,19 +311,23 @@ class _CouplersListState extends State<CouplersList> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     List<String> codedCouplersListKeys = sharedPreferences
         .getKeys()
-        .where((element) => element.startsWith('coupler: '))
+        .where((element) =>
+            element.startsWith('coupler:') || element.startsWith('coupler: '))
         .toList();
     print('codedCouplersListKeys: $codedCouplersListKeys');
     setState(() {
       couplers = codedCouplersListKeys
           .map((codedCouplerKey) =>
-              sharedPreferences.getString(codedCouplerKey) ?? '')
+              sharedPreferences.getString(codedCouplerKey))
+          .where((value) => value != null && value!.trim().isNotEmpty)
+          .cast<String>()
           .toList();
     });
   }
 
   void removeCoupler(String couplerName) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.remove('coupler:$couplerName');
     sharedPreferences.remove('coupler: $couplerName');
   }
 
