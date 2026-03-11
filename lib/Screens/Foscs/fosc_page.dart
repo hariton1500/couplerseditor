@@ -207,7 +207,7 @@ class MuftaScreenState extends State<MuftaScreen> {
                                           ),
                                           Row(
                                             children: [
-                                              TranslateText('Spliter of ',
+                                              TranslateText('Spliter on',
                                                   language:
                                                       widget.settings.language),
                                               Text('$spliter'),

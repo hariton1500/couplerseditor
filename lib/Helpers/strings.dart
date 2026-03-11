@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 Map<String, Map<String, String>> strings = {
   'Empty': {
@@ -36,6 +36,10 @@ Map<String, Map<String, String>> strings = {
   'Add cable': {
     'en': 'Add cable',
     'ru': 'Добавить кабель',
+  },
+  'Add': {
+    'en': 'Add',
+    'ru': 'Добавить',
   },
   'Add connection': {
     'en': 'Add connection',
@@ -279,6 +283,30 @@ Map<String, Map<String, String>> strings = {
   'Viewer from Local device': {
     'en': 'Viewer from Local device',
     'ru': 'Просмотр из устройства'
+  },
+  'Edit cable name': {
+    'en': 'Edit cable name',
+    'ru': 'Изменить название кабеля'
+  },
+  'Save to Local Device': {
+    'en': 'Save to Local Device',
+    'ru': 'Сохранить на устройство'
+  },
+  'Save to Server': {
+    'en': 'Save to Server',
+    'ru': 'Сохранить на сервер'
+  },
+  'Saved': {
+    'en': 'Saved',
+    'ru': 'Сохранено'
+  },
+  'Not Saved': {
+    'en': 'Not Saved',
+    'ru': 'Не сохранено'
+  },
+  'Cable editor': {
+    'en': 'Cable editor',
+    'ru': 'Редактор кабеля'
   }
 };
 
