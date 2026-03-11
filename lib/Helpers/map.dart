@@ -23,12 +23,7 @@ TileLayer layerMap(MapSource mapSource) {
       return TileLayer(
           urlTemplate:
               'https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x={x}&y={y}&z={z}&lang=ru_RU&projection=web_mercator');
-    default:
-      return TileLayer(
-        urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-        userAgentPackageName: 'com.example.app',
-      );
-  }
+    }
 }
 
   double calculateDistance(LatLng point1, LatLng point2){
